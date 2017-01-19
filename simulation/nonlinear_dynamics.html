@@ -1,0 +1,536 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Nonlinear Dynamics</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Nonlinear Dynamics</h1>
+<p>Two approaches to science:</p>
+<ul>
+<li>mathematical, defined by equations, using proofs ("classical" models).</li>
+<li>typically deterministic</li>
+<li>generally involve many simplifying assumptions</li>
+<li>uses linear approximations to model non-linear systems</li>
+<li>computational-based, typically defined by simple rules, using simulations ("complex" models)</li>
+<li>often stochastic</li>
+<li>often also involve simplifying assumptions, but less</li>
+<li>deals better with non-linear systems</li>
+</ul>
+<p>(Chapter 1 of <a href="http://www.greenteapress.com/compmod/"><em>Think Complexity</em></a> provides a good overview of these two approaches).</p>
+<p>Some systems may be very hard to accurately model, even though they may be deterministic.</p>
+<p>Complex behavior arises from deterministic nonlinear dynamic systems and exhibit two special properties:</p>
+<ul>
+<li>sensitive dependence on initial conditions</li>
+<li>characteristic structure</li>
+</ul>
+<p>Most nonlinear dynamic systems are chaotic, and nonlinear dynamic systems constitute most of the dynamic systems we encounter. In general, systems involving flows (heat, fluid, etc) demonstrate nonlinear dynamics, but they also show up in classical mechanics (e.g. the three-body problem, the double-jointed pendulum).</p>
+<p>The equations that describe chaotic systems can't be solved analytically - they are solved with computers instead.</p>
+<h2>Maps</h2>
+<p><strong>Maps</strong> describe systems that operate in discrete time intervals.</p>
+<p>In particular, a map is a mathematical operator that advances the system one time step (i.e. the next step). We describe them using a <strong>difference equation</strong> (not to be confused with differential equations, which come up later):</p>
+<p><mathjax>$$
+x_{n+1} = f(x_n)
+$$</mathjax></p>
+<p>Where <mathjax>$f$</mathjax> is the map and <mathjax>$x_i$</mathjax> is the state of the system at time step <mathjax>$i$</mathjax>.</p>
+<p>The states (i.e. each of <mathjax>$x_0, x_1, \dots$</mathjax>, also called <em>iterates</em>) of a map may converge to a <strong>fixed point</strong> where they no longer change as the map is further applied (i.e. it is invariant to the dynamics of the system), which is notated as <mathjax>$x^*$</mathjax>.</p>
+<p>There are different kinds of fixed points:</p>
+<ul>
+<li><strong>attracting</strong> fixed points, which the system tends towards when perturbed (stable)</li>
+<li><strong>unstable</strong> fixed points, in which the dynamics are stationary, but the system is not "naturally drawn" to (they are <strong>repelling</strong>). If they are perturbed from this point, they do not settle back into it.</li>
+</ul>
+<p>For example, if you drop the double pendulum, eventually it settles to a stationary position:</p>
+<div class="highlight"><pre>_____
+  |
+  |
+  0
+</pre></div>
+
+
+<p>This is an attracting fixed point.</p>
+<p>There are other fixed points in this system. For example:</p>
+<div class="highlight"><pre>  0
+  |
+  |
+__|__
+</pre></div>
+
+
+<p>That is, the pendulum could be balanced on top, in which it would remain stationary, but easily disturbed, and this is not one that the system would settle into.</p>
+<p>The time steps leading to a fixed point is called the <strong>transient</strong>.</p>
+<p>The sequence of iterates is called an <strong>orbit</strong> or a <strong>trajectory</strong> of the dynamical system.</p>
+<p>The first state <mathjax>$x_0$</mathjax> is the <strong>initial condition</strong>.</p>
+<p>A common map is the <strong>logistic map</strong>, <mathjax>$L(x_n)$</mathjax> (often used to model populations):</p>
+<p><mathjax>$$
+x_{n+1} = r x_n (1-x_n)
+$$</mathjax></p>
+<p>It includes a parameter <mathjax>$r \in (0,4)$</mathjax> and <mathjax>$x \in (0,1)$</mathjax>.</p>
+<p><strong>Attractors</strong> are the states that remain after the transient dies out (i.e. after the system "settles"). Attracting fixed points are one kind of attractor, but there are also periodic (oscillating) and chaotic (strange) attractors.</p>
+<p>A <strong>basin of attraction</strong> is the set of initial conditions which eventually converge on the same attractor.</p>
+<p>One attractor is the (fixed) <strong>periodic orbit</strong> (also called a <strong>limit cycle</strong>) which is just a sequence of iterates that repeats indefinitely. A particular cycle may be referred to as an <mathjax>$n$</mathjax>-cycle, where <mathjax>$n$</mathjax> refers to the period of the cycle, i.e. the number of time steps that the cycle repeats over.</p>
+<h3>Bifurcations</h3>
+<p>A <strong>bifurcation</strong> refers to a qualitative change in the topology of an attractor. For example, in the logistic map, one value of <mathjax>$r$</mathjax> may give a fixed point attractor, but changing it to another value may change it to a (fixed) periodic orbit attractor (here <mathjax>$r$</mathjax> would be called a <strong>bifurcation parameter</strong>). Note that "qualitative" change means it changes the <em>kind</em> of attractor, i.e. if changing <mathjax>$r$</mathjax> just shifts the fixed point, that is <em>not</em> a bifurcation.</p>
+<p>For example, with the logistic map: when <mathjax>$r=3.6$</mathjax>, we have a chaotic attractor (also known as a <strong>strange attractor</strong>), when <mathjax>$r=3.1$</mathjax> we have a periodic attractor, and when <mathjax>$r=2$</mathjax> we have a fixed point attractor.</p>
+<h3>Return maps</h3>
+<p>Often (1D/scalar) maps are plotted as a <strong>time domain plot</strong>, in which the horizontal axis is time <mathjax>$n$</mathjax> and the vertical axis is the state value <mathjax>$x_n$</mathjax>.</p>
+<p>Another way of plotting them is using the (first) <strong>return map</strong>, also known as a <strong>correlation plot</strong> or a <strong>cobweb diagram</strong>, in which the horizontal axis is <mathjax>$x_n$</mathjax> and the vertical axis is <mathjax>$x_{n+1}$</mathjax>. This is known as the <em>first</em> return map because we correlate <mathjax>$x_n$</mathjax> with <mathjax>$x_{n+1}$</mathjax>. A <em>second</em> return map, for example, would correlate <mathjax>$x_n$</mathjax> with <mathjax>$x_{n+2}$</mathjax>.</p>
+<p>On a return map, we also often include the line <mathjax>$x_{n+1} = x_n$</mathjax>, which is the line on which any fixed points must lie (by definition).</p>
+<figure><img alt="A cobweb plot for the logistic map, from Wikipedia" src="../assets/cobwebplot.png" /><figcaption>A cobweb plot for the logistic map, from <a href="https://commons.wikimedia.org/wiki/File:Logistic_map_cobweb_plot_a=1.8.png">Wikipedia</a></figcaption>
+</figure>
+<h3>Bifurcation diagrams</h3>
+<p>A <strong>bifurcation diagram</strong> has as its horizontal axis <mathjax>$r$</mathjax> (i.e. from the logistic map) and has <mathjax>$x_n$</mathjax> as its vertical axis. We also remove the transient from the front of the trajectory (knowing how remove the transient, i.e. how many points to throw away, takes a bit of trial-and-error). That way we only see the points the system settles on for any given value of <mathjax>$r$</mathjax> (if indeed it settles).</p>
+<p>So for each value of <mathjax>$r$</mathjax> that leads to a fixed point attractor, there is only one value of <mathjax>$x_n$</mathjax> For each value of <mathjax>$r$</mathjax> that leads to periodic attractors, we may have two or a few of <mathjax>$x_n$</mathjax>. For each value of <mathjax>$r$</mathjax> that leads to chaotic attractors, we will have many, many values of <mathjax>$x_n$</mathjax>.</p>
+<figure><img alt="Bifurcation diagram of the logistic map, from Wikipedia" src="../assets/bifurcation.png" /><figcaption>Bifurcation diagram of the logistic map, from <a href="https://en.wikipedia.org/wiki/Bifurcation_diagram#/media/File:LogisticMap_BifurcationDiagram.png">Wikipedia</a></figcaption>
+</figure>
+<p>When looking at a bifurcation diagram, you may notice some interesting structures. In particular, you may notice that some periodic attractors bifurcate into period attractors of double the cycle (e.g. a 2-cycle period that turns into a 4-cycle period at some value of <mathjax>$r$</mathjax>). This is called a <strong>period-doubling cascade</strong>.</p>
+<p>You may also notice "dark veils" (they can look like thin lines cutting through) in the chaotic parts of the bifurcation diagram - they are the result of <strong>unstable periodic orbits</strong>.</p>
+<p>The bifurcation diagram can also be a <strong>fractal</strong> object in that it can contain copies of itself within itself. For example, you can "zoom in" on the diagram and find its own structure repeated at smaller levels.</p>
+<p>Note that many, but not all, chaotic systems have a fractal state-space structure.</p>
+<h3>Feigenbaum number</h3>
+<p>If you look at the parts between bifurcations (the "pitchforks") in a bifurcation diagram, you may notice that their widths and heights decrease at a constant ratio.</p>
+<figure><img alt="Feigenbaum numbers from a bifurcation diagram, source" src="../assets/feigenbaum.png" /><figcaption>Feigenbaum numbers from a bifurcation diagram, <a href="http://www.owl-spip.ch/IMG/png/nombres_de_Feigenbaum.png">source</a></figcaption>
+</figure>
+<p>If we take <mathjax>$\Delta_i$</mathjax> to be the width of a bifurcation <mathjax>$i$</mathjax>, we can frame this as (for widths) <mathjax>$\frac{\Delta_2}{\Delta_1} = \frac{\Delta_3}{\Delta_2}$</mathjax>. We can look at the limit of this as <mathjax>$n \to \infty$</mathjax> to figure out this ratio. For the logistic map:</p>
+<p><mathjax>$$
+\lim_{n \to \infty} \frac{\Delta_n}{\Delta_{n+1}} = 4.66
+$$</mathjax></p>
+<p>This value is called the <strong>Feigenbaum number</strong>, and it holds (as 4.66) for any 1D map with a quadratic maximum (i.e. it looks like a parabola near its maximum).</p>
+<p>For the heights of these pitchforks there's a different value that's computed in a similar way.</p>
+<h3>Sensitive to initial conditions</h3>
+<p>One way of describing maps' property of sensitivity to initial conditions is that they bring far points close together and cause close together points to be pushed far away from each other.</p>
+<p>One analogy is the kneading of dough. As you knead dough, parts that were close together end up far apart, and parts that were far apart end up close together (although if we consider the kneading as a continuous process, technically, this is a flow, but we can imagine it as discrete time steps).</p>
+<h2>Flows</h2>
+<p><strong>Flows</strong> describe systems that operate in continuous time (e.g. the double-jointed pendulum). They are modeled using <strong>differential equations</strong> rather than difference equations.</p>
+<p>All the concepts that apply to maps also apply to flows.</p>
+<p>In the double-jointed pendulum, the state has four components: the angle of the top joint <mathjax>$\theta_1$</mathjax>, the angle of the lower joint <mathjax>$\theta_2$</mathjax>, the angular velocity of the top joint <mathjax>$\omega_1$</mathjax>, and the angular velocity of the lower joint <mathjax>$\omega_2$</mathjax>.</p>
+<p>A system without any friction (more generally, friction is known as <strong>dissipation</strong>) is called a <strong>conservative system</strong> or a <strong>Hamiltonian system</strong> or a <strong>non-dissipative system</strong>. These systems do not have attracting fixed points because there is nothing to cause the transient to die out. They do, however, still have fixed points - just not attracting ones - and they still have chaos - just not chaotic attractors.</p>
+<p>Conversely, <strong>dissipative</strong> systems are those that have attractors.</p>
+<h3>Ordinary differential equations</h3>
+<p>An ODE expresses relationships between derivatives of an unknown function.</p>
+<p>For example:</p>
+<p><mathjax>$$
+\frac{d}{dt} x(t) = 1
+$$</mathjax></p>
+<p>The unknown function here is <mathjax>$x(t)$</mathjax> and the derivative is wrt to time <mathjax>$t$</mathjax>.</p>
+<p>To solve this, we know that the derivative of <mathjax>$x(t)$</mathjax> is equal to 1, so we ask - what <mathjax>$x(t)$</mathjax> - that is, what set of functions - would make this true? Here, <mathjax>$x(t)$</mathjax> can be any function of time that has a slope of 1, i.e. <mathjax>$x(t) = t + C$</mathjax>.</p>
+<p>Another example: say we have the ODE <mathjax>$x''(t) = -x(t)$</mathjax> and the <em>initial conditions</em> <mathjax>$x(t=0) = 1$</mathjax>. This is asking: what function is the negative of its own second derivative? This could be <mathjax>$\sin$</mathjax> or <mathjax>$\cos$</mathjax>. The initial condition restricts this to <mathjax>$\cos$</mathjax> because only <mathjax>$\cos(0) = 1$</mathjax>.</p>
+<p>This is an analytic solution (closed-form, i.e. can be written out finitely). In most case, we will not be solving ODEs analytically, but numerically. This is because ODEs that can be solved analytically are, by definition, not chaotic.</p>
+<p>ODEs may be <em>linear</em>, which have the form of a sum of "constant times variable" terms, e.g. <mathjax>$y = ax + b$</mathjax>, where <mathjax>$a,b$</mathjax> are constants and <mathjax>$y,x$</mathjax> are variables. or ODEs may be <em>nonlinear</em>, which involve powers of the variables, products of variables, or transcendental functions involving the variables.</p>
+<p>Note that nonlinearity is a necessary condition for chaos. If the ODE is nonlinear, it's possible there may not be an analytic solution - this property is known as <em>nonintegrability</em>, and it is a necessary and sufficient condition for chaos. They must be solved numerically.</p>
+<p>Technically, "nonintegrability" only applies to Hamiltonian systems, but here we will use it as a shorthand for "has no analytic solution" more generally.</p>
+<p>With flows we can think of fixed points in terms of a "dynamics landscape", i.e. the topography of the system. We can think of stable fixed points as some kind of "bowl" that values "roll down". In contrast, an unstable fixed point could be either an upside-down bowl or a saddle.</p>
+<p>Sidebar on some linear algebra: matrices can be applied to transform space, i.e. for rotations, scaling, translations, etc. A matrix of eigenvectors allows us to express the fundamental features of a landscape. A point that starts on an eigenvector stays on that eigenvector ("eigen" means "same"). An eigenvalue tells you how fast a state travels along an eigenvector and in what direction - specifically, the movement is exponential: <mathjax>$e^{st}$</mathjax>, where <mathjax>$s$</mathjax> is the eigenvalue. Each eigenvalue is associated with an eigenvector.</p>
+<p>Say we have two crossing eigenvectors, one of which is associated with eigenvalue <mathjax>$s_1$</mathjax> and one associated with eigenvalue <mathjax>$s_2$</mathjax>. Both <mathjax>$s_1, s_2$</mathjax> are negative, which means that <mathjax>$e^{st}$</mathjax> shrinks, meaning that both eigenvectors "point" inwards (note that the fixed point is marked with <code>*</code>):</p>
+<pre><code>     s_1
+     |
+     v
+     |
+---&gt;-*-&lt;---s_2
+     |
+     ^
+     |
+</code></pre>
+<p>That is, we have a bowl shape.</p>
+<p>If instead both eigenvalues were positive, we'd have an upside-down bowl.</p>
+<p>If one were positive and one were negative, we'd have a saddle.</p>
+<p>Of course in practice, the forms (bowl, upside-down bowl, saddle) are rarely this neat and tidy, but often we use these as (linear) approximations when looking locally (i.e. "zoomed in" on a particular region). When looking at a larger scale, we instead must resort to nonlinear mathematics - the eigenvectors typically aren't "straight" at larger scales; they may become curvy.</p>
+<p>When a fixed point's unstable eigenvector (that is, the one moving away from the fixed point) connects to the stable eigenvector of another fixed point (that is, the eigenvector moving into the other fixed point), that is called a <strong>heteroclinic orbit</strong>. For example (the relevant part has double-arrows, the weird hump is meant to be a curve to show that these eigenvectors are linear only locally around each fixed point):</p>
+<pre><code>     |                   |
+     v      --&gt;&gt;--       v
+     |     /      \      |
+---&lt;-*-&gt;&gt;-/        \--&gt;&gt;-*-&lt;--
+     |                   |
+     ^                   ^
+     |                   |
+</code></pre>
+<p>On the other hand, if a fixed point's unstable eigenvector, in the large scale, loops back and connects to its stable eigenvector, that is called a <strong>homoclinic orbit</strong>.</p>
+<pre><code>     /-&lt;&lt;--\
+     |      |
+     |      |
+     |      ^
+     v      |
+     |      /
+---&lt;-*-&gt;&gt;--/
+     |
+     ^
+     |
+</code></pre>
+<p>We call these larger structures (i.e. when looking beyond just the local eigenvectors, but rather the full curves that connect them) the <em>stable</em> or <em>unstable</em> <em>manifolds</em> of a fixed point. They are like nonlinear generalizations of eigenvectors in that they are <em>invariant</em> manifolds; that is, a state that starts on one of these manifolds stays on the manifold. They start out tangent to the eigenvectors (which is why we just use eigenvectors locally), but as mentioned before, they "curve" out depending on the dynamics landscape.</p>
+<p>Growth/movement along these manifolds is also exponential, like it is for eigenvectors.</p>
+<p>If all manifolds are stable, you have a fixed point (some kind of bowl, roughly speaking, but nonlinear). If all manifolds are unstable, you have a fixed point (some kind of upside-down bowl, roughly speaking).</p>
+<p>Also note: a nonlinear system can have <em>any</em> number of attractors, of all types (fixed points, limit cycles/periodic orbits, quasiperiodic orbits [not discussed in this class], chaotic attractors) scattered throughout its state space, but there is no way of knowing <em>a priori</em> where they are and what type they are (or even how many there are).</p>
+<p>Every point in the state space is in the basin of attraction of <em>some</em> attractor. The basins of attraction and the basin boundaries <em>partition</em> the state space.</p>
+<h3>More on ODEs</h3>
+<p>An <mathjax>$n$</mathjax>th-order ODE can be broken up into <mathjax>$n$</mathjax> 1st-order ODEs.</p>
+<p>For example, take the ODE for a simple harmonic oscillator (a mass on a spring):</p>
+<p><mathjax>$$
+mx'' + \beta x' + kx - mg = 0
+$$</mathjax></p>
+<p>This is a 2nd-order ODE. We can break it down into 1st-order ODEs like so:</p>
+<ol>
+<li>Isolate the highest-order term:</li>
+</ol>
+<p><mathjax>$$
+x'' = \frac{mg - \beta x' - kx}{m}
+$$</mathjax></p>
+<ol start="2">
+<li>Then define a helper variable:</li>
+</ol>
+<p><mathjax>$$
+x' = v
+$$</mathjax></p>
+<ol start="3">
+<li>Rewrite the whole equation using the helper variable:</li>
+</ol>
+<p><mathjax>$$
+v' = g - \frac{\beta}{m}v - \frac{k}{m}x
+$$</mathjax></p>
+<p>We have actually defined two first-order ODEs (that is, it is a 2D ODE system), which we can represent as a vector:</p>
+<p><mathjax>$$
+\begin{bmatrix}
+x' \\ v'
+\end{bmatrix}
+=
+\begin{bmatrix}
+v \\ g - \frac{\beta}{m}v - \frac{k}{m}x
+\end{bmatrix}
+$$</mathjax></p>
+<p>There are no derivatives on the right-hand side, which is how we want things to be. The derivatives are isolated and the right-hand side just captures the dynamics of the system. The vector on the left-hand side is called a <em>state vector</em>.</p>
+<p>Here we started with a 2nd-order ODE so we only required one helper variable. More generally, for an <mathjax>$n$</mathjax>th-order ODE, you require <mathjax>$n-1$</mathjax> helper variables.</p>
+<p>Note that at least 3 dimensions is necessary for a chaotic system.</p>
+<p>The general form for an <mathjax>$n$</mathjax>th-order ODE system is as follows:</p>
+<p><mathjax>$$
+\begin{aligned}
+\dot x_1 &amp;= f_1(x_1, \dots, x_n) \\
+\dot x_2 &amp;= f_2(x_1, \dots, x_n) \\
+&amp;\vdots \\
+\dot x_n &amp;= f_n(x_1, \dots, x_n)
+\end{aligned}
+$$</mathjax></p>
+<p>(As a reminder, <mathjax>$\dot x$</mathjax> is another notation for the derivative of <mathjax>$x$</mathjax>.)</p>
+<p>The state variables can be represented as a state vector:</p>
+<p><mathjax>$$
+\vec x =
+\begin{bmatrix}
+x_1 \\ x_2 \\ \vdots \\ x_n
+\end{bmatrix}
+$$</mathjax></p>
+<p>This system defines a <em>vector field</em>. For every value of <mathjax>$\vec x$</mathjax>, we can compute <mathjax>$\dot {\vec x} = \vec f (\vec x)$</mathjax>, which tells us the slope at that point (i.e. which way is downhill, and how steep it is).</p>
+<p>For linear systems, matrices can describe how a "ball rolls in a landscape" (e.g. bowls, saddles, etc). The description is only good locally for nonlinear systems, as mentioned earlier.</p>
+<p>For example, consider the following 2D linear system expressed with ODEs:</p>
+<p><mathjax>$$
+\begin{aligned}
+\dot x_1 &amp;= a x_1 + b x_2 \\
+\dot x_2 &amp;= c x_1 + d x_2
+\end{aligned}
+$$</mathjax></p>
+<p>This can be re-written as:</p>
+<p><mathjax>$$
+\begin{aligned}
+\dot {\vec x} &amp;= A \vec x \\
+\vec x &amp;= \begin{bmatrix}
+x_1 \\ x_2
+\end{bmatrix} \\
+A &amp;= \begin{bmatrix}
+a &amp; b \\ c &amp; d
+\end{bmatrix}
+\end{aligned}
+$$</mathjax></p>
+<p>So the matrix <mathjax>$A$</mathjax> describes the dynamics of the system.</p>
+<p>But with a nonlinear system, we cannot write down such a matrix <mathjax>$A$</mathjax> and have only numbers in it.</p>
+<h3>Reminder on distinction b/w difference and differential equations</h3>
+<p>A differential equation <mathjax>$\vec f$</mathjax> takes a state vector <mathjax>$\vec x$</mathjax> and gives us <mathjax>$\dot {\vec x}$</mathjax>, that is, the derivative of <mathjax>$\vec x$</mathjax>.</p>
+<p>A difference equation <mathjax>$\vec f$</mathjax> takes a state vector <mathjax>$\vec x_n$</mathjax> and gives us the state vector at the next (discrete) time step, <mathjax>$\vec x_{n+1}$</mathjax>.</p>
+<h3>ODE Solvers</h3>
+<p>An ODE solver takes as input:</p>
+<ul>
+<li>an ODE</li>
+<li>initial conditions, <mathjax>$\vec x (t=t_0)$</mathjax></li>
+<li>a time difference <mathjax>$\Delta t$</mathjax></li>
+</ul>
+<p>And gives as output an estimate of <mathjax>$\vec x (t_0 + \Delta t)$</mathjax>.</p>
+<p>There are different methods of doing this, but a common one is <strong>Forward Euler</strong>, sometimes just called <strong>Euler's method</strong> or "<em>follow the slope</em>" - as it says, you just follow the slope to the next point. But how far do you follow the slope? There may be a lot of "bumps" in the landscape in which case following the slope at one point may become inaccurate after some distance (e.g. it may "overstep"). Shorter steps are computationally more expensive, since you must re-calculate the slope more frequently, but gives greater accuracy. For an ODE solver, this step size is controlled via the <mathjax>$\Delta t$</mathjax> input. These two factors - the shape of the landscape and the time step - are main contributors to error here.</p>
+<p>For Forward Euler, the estimate of <mathjax>$\vec x(t_0 + \Delta t)$</mathjax> is computed as follows:</p>
+<p><mathjax>$$
+\vec x(t_0 + \Delta t) = \vec x (t_0) + \Delta t \cdot \vec x' (t)
+$$</mathjax></p>
+<p>A related method is <strong>Backward Euler</strong>:</p>
+<p><mathjax>$$
+\vec x(t_0 + \Delta t) = \vec x (t_0) + \Delta t \cdot \vec x_{FE}' (t_0 + \Delta t)
+$$</mathjax></p>
+<p>Where <mathjax>$\vec x_{FE}(t_0 + \Delta t)'$</mathjax> is not the derivative at the original point, but rather the derivative of the point reached after one time step of Forward Euler.</p>
+<p>Intuitively, this is like taking a "test step", computing the derivative there, moving back to the start, and then and moving based on the derivative computed from the test step.</p>
+<p>Note that Forward Euler and Backward Euler have <strong>numerical damping</strong> effects. For Backward Euler, it is positive damping, so it acts sort of like friction; for Forward Euler it is negative. The results of these computational precision errors, however, are indistinguishable from natural effects, which makes them difficult to deal with.</p>
+<p>Note that Forward Euler is equivalent to the first part of a Taylor series, which is also used to approximate a point locally:</p>
+<p><mathjax>$$
+f(x_0 + \Delta x) = f(x_0) + \Delta x (f'(x_0)) + \frac{1}{2}(\Delta x)^2(f''(x_0)) + \dots \frac{1}{n!}(\Delta x^n)f^n(x_0)
+$$</mathjax></p>
+<p>There are also other errors such as floating point errors - e.g. truncation or roundoff errors, depending on how the are handled. This is common with sensors. These errors propagate/snowball as they are used as starting points for the next computation and so on.</p>
+<p>Another numerical approximation method is the <strong>trapezoidal method</strong> which essentially takes the average of Forward Euler and Backward Euler, and it does better than both.</p>
+<p><strong>Adaptive time-step</strong> ODE solvers change their time step as they go in an attempt to minimize error. In very flat parts of the landscape, for instance, large time steps are fine, but in very rugged parts, smaller time steps are better. A challenge here is that we don't know what the landscape looks like in the first place, which is why we are using an ODE solver to begin with. However, there are some methods that try to work around this.</p>
+<p>One way of doing this is to take a step of <mathjax>$h$</mathjax> length and also, starting from the same point, take two steps of <mathjax>$h/2$</mathjax> length, then see if those movements each land you in a similar point. If the distance between the points is less than some user-specified tolerance, then that <mathjax>$h$</mathjax> is doubled and the procedure repeats. Otherwise, <mathjax>$h$</mathjax> is halved and the procedure is repeated. A possible problem here is that <mathjax>$h$</mathjax> may get reduced to small enough that you run into floating point errors, if your tolerance is too small.</p>
+<p>The method that is most used in nonlinear dynamics is <strong>Runge-Kutta</strong>. It is similar to Backward Euler in that it takes test steps to get a sense of the landscape ahead. The "order" of Runge-Kutta is the number of test steps it uses, e.g. RK2 uses two test steps.</p>
+<p>Collectively, Forward Euler, Backward Euler, trapezoidal, and the Runge-Kutta "clan" are known as <strong>single-step</strong> ODE solvers. Technically, Forward Euler is the same as RK1 and trapezoidal is RK2. Backward Euler is an <em>implicit</em> version of RK1, meaning that it looks ahead.</p>
+<p>There are also <strong>multi-step</strong> ODE solvers, which essentially fit a curve to the last <mathjax>$n$</mathjax> points and extrapolate from that curve (whereas single-step methods look only at a single point).</p>
+<p>In a way similar to adaptive time-step approaches, we can use different Runge-Kutta orders where appropriate throughout the landscape - in flatter/smoother regions, we may use RK2, whereas in more rugged regions we may instead opt for RK4.</p>
+<p>There are also special solvers for conservative systems (Hamiltonian) such as planets in the solar system. These are called <strong>symplectic</strong> ODE solvers. And there are other families of ODE solvers beyond these.</p>
+<p>The fact that ODE solvers typically make mistakes, even very small ones, should lead you to question - if chaotic systems are sensitively dependent on initial conditions, what good are these solvers for chaotic systems?</p>
+<p>The <strong>shadowing</strong> lemma gives us the following assurance (for chaotic attractors): Every noise-added trajectory on a chaotic attractor is <strong>shadowed</strong> by a true trajectory. Note that this is for <em>state</em> noise, not parameter noise. Another caveat is that this is not true if the noise bumps the trajectory out of the basin.</p>
+<p>Another way of saying this is that noise can bump you onto a trajectory you would have ended up on anyways, either backwards in time or forwards in time. Thus this still messes up your position in time, but a good solver with a small step size causes these time-shift effects to be fairly small in scale.</p>
+<h3>More on stable and unstable manifolds</h3>
+<p>Remember that stable manifolds are those which "flow" towards a fixed point, and unstable manifolds are those that flow away from a fixed point.</p>
+<p>You can think of the unstable and stable manifolds as manipulating the state space itself. For example, say you look at many initial points simultaneously in the state space and track how they move over time. What you are essentially observing is how the dynamics of the system transform the state space itself (since the state space is composed of these points).</p>
+<p>We can use this to formally define dissipation: dissipation happens when the state space shrinks. Similarly, for attractors to exist, the state space action has to be a contraction (i.e. the points are being pulled into a fixed point).</p>
+<h3>Lyapunov exponents</h3>
+<p><strong>Lyapunov exponents</strong> parameterize the "spreading" action of dynamics, i.e. the unstable manifolds. They are notated as <mathjax>$\lambda$</mathjax>. An <mathjax>$n$</mathjax>-dimensional system has <mathjax>$n$</mathjax> Lyaponux exponents <mathjax>$\lambda_i$</mathjax>.</p>
+<p>A negative <mathjax>$\lambda_i$</mathjax> compresses state space along stable manifolds and a positive <mathjax>$\lambda_i$</mathjax> stretches state space along unstable manifolds.</p>
+<p>To get an attractor, shrinking has to be the dominant action of the Lyapunov exponents. That is, <mathjax>$\sum \lambda_i &lt; 0$</mathjax> for dissipative systems.</p>
+<p>To get a chaotic attractor, there must be <em>some</em> stretching so the system doesn't collapse on a fixed point - that is, there must be at least one positive Lyapunov exponent for a chaotic attractor. Note that this however is not a necessary and sufficient condition for chaos.</p>
+<p>Note that we are interested in long-term dynamics of the system, so we typically define Lyapunov exponents as long-term averages where <mathjax>$t \to \infty$</mathjax>. This means that they are properties of attractors; i.e. they are the same for all initial conditions in an attractor's basin. In particular, the largest Lyapunov exponent, notated <mathjax>$\lambda_1$</mathjax>, dominates as <mathjax>$t \to \infty$</mathjax> (so the <mathjax>$i$</mathjax> in <mathjax>$\lambda_i$</mathjax> corresponds to the relative size of the exponent, with the largest being <mathjax>$i=1$</mathjax> and the smallest at <mathjax>$i=n$</mathjax>). Consider for example:</p>
+<p><mathjax>$$
+\lim_{t \to \infty} [e^{0.1t} + e^{10t} + e^{-5t} + e^{\frac{1}{5}t}]
+$$</mathjax></p>
+<p>As <mathjax>$t \to infty$</mathjax>, the negative exponents grow smaller and become less significant, and the larger exponent <mathjax>$e^{10t}$</mathjax> comes to dominate the smaller positive exponent <mathjax>$e^{0.1t}$</mathjax>.</p>
+<p>If you have the equations, you can calculate Lyapunov exponents using the eigenvalues of the <strong>variational matrix</strong> (not covered here).</p>
+<p>If you only have data, there are various algorithms that can be used to compute them.</p>
+<h3>Sections</h3>
+<p>A <strong>section</strong> is a cross-section of a space, thus reducing its dimensionality. In the context of nonlinear dynamics, they are often called <strong>Poincare sections</strong>. The slicing surface is referred to as a <strong>plane of section</strong>, often notated <mathjax>$\Sigma$</mathjax>.</p>
+<h3>Unstable periodic orbits</h3>
+<p>Consider a landscape with a circular trench in it. This is equivalent to a stable periodic orbit - a ball would tend to fall into that trench and loop around in an orbit.</p>
+<p>In contrast, consider a thin circular ridge, like the rim of a volcano. If a ball were placed on it and pushed in just the right way, it would circle the rim in a periodic orbit. However, it is unstable - a slight tap will send the ball off the rim.</p>
+<p>Embedded within any chaotic attractor are an infinite number of unstable periodic orbits (UPOs).</p>
+<h2>Nonlinear Time Series Analysis</h2>
+<p>So far we have been assuming that we know and can measure all the state variables, but that is seldom actually the case. Furthermore, measurements are seldom exact (they are almost always noisy), and even when they are, that measurement is just a projection of the full state space. For instance, the state space may be three-dimensional but we measure only a single scalar value.</p>
+<p>This is problematic because trajectories that don't cross in the full state space are made to seem as if they are crossing in the projected space, which misrepresents the topology of the object and also violates the assumptions for the systems we are studying here.</p>
+<p>So then, is it possible to get the original topology from the projection?</p>
+<p>There are other issues as well:</p>
+<ul>
+<li>the act of measuring may alter the system's dynamics</li>
+<li>we often have no idea how many dimensions the system has</li>
+</ul>
+<h3>Delay-Coordinate Embedding</h3>
+<p>A technique called <strong>delay-coordinate embedding</strong> (DCE) allows us to "undo" a projection, giving us a <em>qualitatively identical</em> copy of the original system.</p>
+<p>The basic idea is to plot the data against delayed versions of itself.</p>
+<p>The space in which we reconstruct the original system from a projection is called the <strong>reconstruction space</strong>, which has many dimensions <mathjax>$m$</mathjax>, called the <strong>embedding dimension</strong>, as we want. We build points in this space by making vectors of delayed coordinates.</p>
+<p>Thus each axis plots our projected data delayed by some time step <mathjax>$\tau$</mathjax>. So the first axis would simply be <mathjax>$x(t)$</mathjax>, the second would be <mathjax>$x(t-\tau)$</mathjax>, the third would be <mathjax>$x(t-2\tau)$</mathjax>, etc.</p>
+<p>For example, say we have the following data:</p>
+<table>
+<thead>
+<tr>
+<th><mathjax>$x$</mathjax></th>
+<th><mathjax>$t$</mathjax></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.3</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>1.2</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td>0.3</td>
+</tr>
+<tr>
+<td>0.8</td>
+<td>0.4</td>
+</tr>
+<tr>
+<td>1.1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>1.4</td>
+<td>0.6</td>
+</tr>
+<tr>
+<td>1.6</td>
+<td>0.7</td>
+</tr>
+</tbody>
+</table>
+<p>Which we want to plot in a three-dimensional (<mathjax>$m=3$</mathjax>) reconstruction space. We choose <mathjax>$\tau=0.2$</mathjax>.</p>
+<p>Our first point would simply be (1.3, 1.0, 1.1). The next point would be (1.2, 0.8, 1.4), then the next would be (1.0, 1.1, 1.6), etc.</p>
+<p><strong>Takens theorem</strong> states that:</p>
+<blockquote>
+<p>For the right <mathjax>$\tau$</mathjax> and enough dimensions, the embedded dynamics are <strong>diffeomorphic</strong> to (i.e. has the same topology as) the original state-space dynamics.</p>
+</blockquote>
+<p>So we must choose appropriate values of <mathjax>$\tau$</mathjax> and <mathjax>$m$</mathjax> for DCE to be successful. The main constraint is that <mathjax>$\tau &gt; 0$</mathjax>. If you think about it, if <mathjax>$\tau = 0$</mathjax>, then the "reinflated" trajectory will just be a diagonal through the reconstruction space (and thus still crossing). So <mathjax>$\tau$</mathjax> must be positive to "spread out" the trajectory so that it is no longer crossing.</p>
+<p>In practice, <mathjax>$\tau$</mathjax> may have to be larger than that because the trajectory must be spread out enough so that they are far enough apart that they are not crossing/touching from the perspective of a computer (which has a finite resolution for numbers).</p>
+<p>Note that two systems with the same topology may still look very different to a person. But many dynamical invariants are invariant under transformations that preserve topology - which is to say, preserving the topology preserves many properties we care about (such as Lyaponuv exponents).</p>
+<p>However, an additional constraint of <em>enough dimensions</em> is also asserted by Takens theorem. Generally, <mathjax>$m$</mathjax> must be at least twice as large as the number of dimensions in the original system <mathjax>$(m &gt; 2d)$</mathjax>. However, as mentioned earlier, we don't know how many dimensions there are in the original system.</p>
+<p>Elsewhere the constraint is reduced to <mathjax>$m &gt; 2d_{\text{cap}}$</mathjax>, where <mathjax>$d_{\text{cap}}$</mathjax> is the <strong>capacity dimension</strong> of the original space. But there is a chicken-and-egg problem here: we have to embed the data before we can calculate the capacity dimension.</p>
+<p>Note that these constraints for <mathjax>$m$</mathjax> are sufficient, but not necessary, but it's possible that lower values of <mathjax>$m$</mathjax> will work well too.</p>
+<p>A final requirement is that the measured quantity (our data) must be a smooth, generic function on the state space and must be uniformly sampled in time.</p>
+<h4>Aside: Topology</h4>
+<p>Topology is the study of shape, without concern for measurement (size does not matter). Only the number of pieces and holes matters.</p>
+<p>(Geometry, on the other hand, <em>is</em> concerned with size and measurement, hence the <em>metry</em> in its name.)</p>
+<p>If you can take a shape and transform it into another shape without breaking it into pieces, combining pieces, or adding/removing holes, they have the same topology. The mathematical transformation that accomplishes this is called a <strong>diffeomorphism</strong>.</p>
+<h4>Estimating <mathjax>$\tau$</mathjax></h4>
+<p><mathjax>$\tau$</mathjax> is generally chosen by identifying coordinates which share a minimal amount of mutual information - this allows the data to be "spread out" best. Another way of saying this is that we want to choose <mathjax>$\tau$</mathjax> so that the coordinates are maximally independent. In some sense, this allows the data to spread out farther apart because the directions it moves in are more independent, i.e. "more" orthogonal (this is a bit imprecise but hopefully gets the intuition across).</p>
+<p>The procedure for this is:</p>
+<ul>
+<li>plot out <mathjax>$\tau$</mathjax> vs <mathjax>$I[x(t); x(t-\tau)]$</mathjax> (mutual information)</li>
+<li>pick the first minimum of this curve</li>
+</ul>
+<p>Some suggest choosing the second minimum of the curve to allow enough lag to fully unfold/expand the dynamics.</p>
+<p>This is the main heuristic (no theoretical guarantees) for choosing <mathjax>$\tau$</mathjax>, but there are many others, and it is not always appropriate.</p>
+<h4>Estimating <mathjax>$m$</mathjax></h4>
+<p>The standard technique for estimating <mathjax>$m$</mathjax> is the method of <strong>false nearest neighbors</strong>.</p>
+<p>The basic idea is: if <mathjax>$m$</mathjax> is too low, there will be crossings in the dynamics. So increase <mathjax>$m$</mathjax> until there are no crossings (or only a few crossings).</p>
+<p>In more detail: when two points are close together at some dimension <mathjax>$m$</mathjax> but then are far apart at a dimension <mathjax>$m+1$</mathjax>, we call them false neighbors. When we increment <mathjax>$m$</mathjax>, we calculate the ratio of false neighbors to true neighbors. When the ratio drops below some satisfactory threshold (usually 10-30%), then we take that <mathjax>$m$</mathjax> to be sufficient.</p>
+<p>This is also just a heuristic (there are others) with no theoretical guarantees. We also can't use the value of <mathjax>$m$</mathjax> given by this method to estimate <mathjax>$d$</mathjax>, the true dimensionality of the original system.</p>
+<p>We can't brute-force the <mathjax>$m$</mathjax> estimation by choosing a very large value of <mathjax>$m$</mathjax> because large values of <mathjax>$m$</mathjax> magnify the effects of noise. If we have <mathjax>$m$</mathjax> dimensions, a datapoint of noise will be used in coordinates <mathjax>$m$</mathjax> times, so it will affect our results <mathjax>$m$</mathjax> times.</p>
+<h4>DCE in practice</h4>
+<p>As amazing as DCE is, there are still many challenges when applying it:</p>
+<ul>
+<li>noise in data</li>
+<li>finite amount of data</li>
+<li>only sampling at discrete time intervals, which are seldom sampled exactly evenly in time</li>
+<li><strong>nonstationarity</strong> - the dynamics may be changing as you measure</li>
+</ul>
+<p>So in practice, the conditions for Takens theorem can seldom be fully satisfied.</p>
+<p>Noise can interfere with the false nearest neighbors method for estimating <mathjax>$m$</mathjax> because it can nudge points to have different neighbors than they would have without noise. This would the ratio of false neighbors to true neighbors to plateau at some point as you increase <mathjax>$m$</mathjax> - if you see that, you should suspect noise as the cause.</p>
+<p>Generally you need on the order of <mathjax>$k^d$</mathjax> data to effectively use DCE, where <mathjax>$k$</mathjax> is some small integer (e.g. 3-10) and <mathjax>$d$</mathjax> is the dimensionality of the system.</p>
+<p>To deal with nonstationarity, you can repeat the analysis on chunks of your data to see if that affects the results.</p>
+<h3>Fractal dimensions</h3>
+<p>General dimensions are presented as integers - e.g 1-dimension, 2-dimension, 3-dimension, etc.</p>
+<p>But <strong>fractional dimensions</strong>, also called <strong>fractal dimensions</strong>, are possible as well.</p>
+<p>First, consider a line, a square, and a cube. Consider what happens when you scale each side of each object by some value <mathjax>$k$</mathjax>. You end up an object which is the size of <mathjax>$k$</mathjax> copies of the original.</p>
+<p>For example, when you scale a line by <mathjax>$k$</mathjax>, you end up with a line which is equivalent in length to <mathjax>$k$</mathjax> original lines.</p>
+<p>When you scale a square's sides by <mathjax>$k$</mathjax>, you end up with a square with area equal to the area of <mathjax>$k^2$</mathjax> original squares.</p>
+<p>When you scale a cube's sides by <mathjax>$k$</mathjax>, you end up with a cube with volume equal to the volume of <mathjax>$k^3$</mathjax> original cubes.</p>
+<p>A pattern starts to emerge - the exponent is the dimensions of the object:</p>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th># Copies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Line</td>
+<td><mathjax>$k^1$</mathjax></td>
+</tr>
+<tr>
+<td>Square</td>
+<td><mathjax>$k^2$</mathjax></td>
+</tr>
+<tr>
+<td>Cube</td>
+<td><mathjax>$k^3$</mathjax></td>
+</tr>
+</tbody>
+</table>
+<p>Now consider a fractal such as the <strong>Sierpinski triangle</strong>:</p>
+<figure><img alt="The Sierpinski triangle" src="../assets/sierpinski_triangle.png" /><figcaption>The Sierpinski triangle</figcaption>
+</figure>
+<p>When you scale the sides of the Sierpinski triangle by <mathjax>$k$</mathjax>, how many copies do you get? With <mathjax>$k=2$</mathjax>, for example, you get three copies. Which means for a Sierpinski triangle, <mathjax>$3 = 2^d$</mathjax>. If you solve for <mathjax>$d$</mathjax> (the number of dimensions), then you get a fraction.</p>
+<p>There are two ways of defining fractal dimension: capacity dimension and correlation dimension.</p>
+<h4>Capacity dimension</h4>
+<p>The <strong>capacity dimension</strong>, also known as the <strong>box dimension</strong>, <strong>box-counting dimension</strong>, or <strong>Minkowski-Bouligand dimension</strong>, for an object is defined as:</p>
+<p><mathjax>$$
+d_{\text{cap}} = \lim_{\epsilon \to 0^+} \frac{\log(N(\epsilon))}{\log(1/\epsilon)}
+$$</mathjax></p>
+<p>The intuition is that the capacity dimension describes how many balls of size <mathjax>$\epsilon$</mathjax> (or boxes of side-length <mathjax>$\epsilon$</mathjax>) it takes to cover your object (this is the <mathjax>$N(\epsilon)$</mathjax> term) for each value of <mathjax>$\epsilon$</mathjax>.</p>
+<p>This is similar to the procedure outlined above.</p>
+<p>How can we estimate the capacity dimension of an object?</p>
+<p>The definition capacity dimension can be rearranged to (dropping the limit):</p>
+<p><mathjax>$$
+\log(N(\epsilon)) = d_{\text{cap}} \log(1/\epsilon)
+$$</mathjax></p>
+<p>We can estimate the capacity dimension by changing <mathjax>$\epsilon$</mathjax> and counting the number of boxes required to cover the object at that <mathjax>$\epsilon$</mathjax>, giving us <mathjax>$N(\epsilon)$</mathjax>. Then we can use the above relationship and plot <mathjax>$\log(1/\epsilon)$</mathjax> (x-axis) against <mathjax>$\log(N(\epsilon))$</mathjax> (y-axis). The slope of this line gives us an estimate for <mathjax>$d_{\text{cap}}$</mathjax>.</p>
+<p>There may be artifacts in this plot - for smaller epsilon values, <mathjax>$\log(N(\epsilon))$</mathjax> won't change much because the boxes will be small enough such that every point in the object is covered by one box. After some large threshold, epsilon value will be so large that the entire object is covered by a single box. The interesting part is between these two regions - this region is called a <strong>scaling region</strong>; here it is described by the power law relation <mathjax>$N(\epsilon) \varpropto \epsilon^{-d_{\text{cap}}}$</mathjax>. The slope here gives us the capacity dimension estimate.</p>
+<h4>Correlation dimension</h4>
+<p>The <strong>correlation dimension</strong> avoids to more computationally-intensive approach for estimating capacity dimension.</p>
+<p>This method is called the <strong>Grassberger-Proccacia algorithm</strong>.</p>
+<p>We start by defining the <strong>pointwise dimension</strong>. We pick a point <mathjax>$x$</mathjax> in our data, draw a ball of radius <mathjax>$\epsilon$</mathjax> centered on that point, then we count the number of points in that ball to give us <mathjax>$N_x(\epsilon)$</mathjax>. This provides a measure of how often a trajectory typically visits an <mathjax>$\epsilon$</mathjax> neighborhood of <mathjax>$x$</mathjax>. Then we vary <mathjax>$\epsilon$</mathjax> which gives us <mathjax>$N_x(\epsilon) \varpropto \epsilon^{d_p}$</mathjax>, where <mathjax>$d_p$</mathjax> is the pointwise dimension.</p>
+<p><mathjax>$d_p$</mathjax> will vary according to which point <mathjax>$x$</mathjax> we chose. So we average <mathjax>$N_x(\epsilon)$</mathjax> over many points <mathjax>$x$</mathjax>. This gives us <mathjax>$C(\epsilon)$</mathjax>, which scales similarity with <mathjax>$\epsilon$</mathjax>: <mathjax>$C(\epsilon) \varpropto \epsilon^{d_\text{corr}}$</mathjax>, where <mathjax>$d_\text{corr}$</mathjax> is the correlation dimension.</p>
+<p>We can tune the amount of computation we want to do (at the expense of accuracy) by deciding what number of points to average over.</p>
+<p>Note that <mathjax>$d_\text{corr} \leq d_\text{cap}$</mathjax> because at best the correlation dimension captures every point.</p>
+<p>Formally, we define <mathjax>$C(\epsilon)$</mathjax> with the <strong>correlation sum</strong>, which is the standard:</p>
+<p><mathjax>$$
+C(\epsilon) = \frac{1}{N(N-1)} \sum^N_{i=1} \sum^N_{j=i+1} \Theta (\epsilon - || x_i - x_j ||)
+$$</mathjax></p>
+<p>Where <mathjax>$x_i, x_j$</mathjax> are two points in the data.</p>
+<p><mathjax>$\Theta$</mathjax> is the <strong>Heaviside step function</strong>:</p>
+<p><mathjax>$$
+\Theta(x) = \begin{cases}
+1 &amp; x &gt; 0 \\
+0 &amp; x \leq 0
+\end{cases}
+$$</mathjax></p>
+<h2>Estimating Lyaponuv exponents</h2>
+<p>Almost all methods for estimating Lyaponuv exponents assume the system is <strong>autonomous</strong>; that is, the direction that is dynamically downhill at a given point is always the same regardless of when or how the point got there.</p>
+<h3>Wolf's algorithm</h3>
+<p>A point is chosen on the trajectory of the system, then looks at that point's nearest neighbor, tracks the movement of both points and watches how the distance between them grows with time. The initial distance between the two is <mathjax>$L_i$</mathjax>. When that distance grows beyond some threshold, the final distance is noted as <mathjax>$L_i'$</mathjax> and a <em>renormalization</em> occurs: the nearest neighbor of the endpoint is then taken and the process is repeated.</p>
+<p>Then this formula is used to compute <mathjax>$\lambda_1$</mathjax> (the biggest positive Lyapunov exponent):</p>
+<p><mathjax>$$
+\lambda_1 = \frac{1}{N \Delta t} \sum^{M-1}_1 \log_2 \frac{L_i'}{L_i}
+$$</mathjax></p>
+<h3>The Kantz algorithm</h3>
+<p>In practice, Wolf's algorithm is not used because of its sensitivity to noise (as mentioned earlier, noise will easily mess with what points are nearest neighbors).</p>
+<p>This sensitivity can be mitigated by choosing multiple points and multiple neighbors instead of just one of each, and tracking them in parallel.</p>
+<p>First, we pick a starting point on the trajectory, then draw a ball of radius <mathjax>$\epsilon$</mathjax> around it. Then we find all the points within that ball and measure the distance to the central point. Then we average those distances.</p>
+<p>Then we figure out where each of these points moves next. Then we repeat the average distance measurement with these one time-step forward points (i.e. from the center point one time-step forward to the other points one time-step forward).</p>
+<p>The ratio of the first average distance to the second average distance is called the <strong>stretching factor</strong> <mathjax>$\Delta s$</mathjax>, which is exactly what the Lyaponuv exponent tries to capture.</p>
+<p>We repeat this for many different initial points and many different time-step sizes. Then we plot the results on a curve of <mathjax>$t$</mathjax> (x-axis) vs <mathjax>$\ln \Delta s$</mathjax> (y-axis).</p>
+<p>Like with capacity dimension estimation, there is a scaling region in this graph that is the region of interest. When time is small, points don't have enough time to stretch out, and when time is very large, the points spread out everywhere as far as they can. So somewhere in the middle is the scaling region.</p>
+<p>If we call the slope of the scaling region <mathjax>$a$</mathjax>, we can describe the scaling region as <mathjax>$\ln(\Delta s) = at$</mathjax>. If we raise <mathjax>$e$</mathjax> to each side, i.e. <mathjax>$e^{\ln(\Delta s)} = e^{at}$</mathjax>, then we can solve for <mathjax>$\Delta s = e^{at}$</mathjax>. This means that <mathjax>$a$</mathjax> is the Lyaponuv exponent, i.e. <mathjax>$a = \lambda$</mathjax>.</p>
+<p>You have to be careful in applying this algorithm though - you should not imagine an appropriate scaling region when there isn't one, or if the curve is unstable when you tweak the algorithm settings (e.g. the <mathjax>$\epsilon$</mathjax> size of the ball).</p>
+<h2>Noise filtering</h2>
+<p>Noise reduction for nonlinear systems can be quite tricky, but one approach you can use is from Farmer &amp; Sidorowich.</p>
+<p>The general idea is that we can imagine that noise as a blob around a "true" point. The true point is in the center of the blob but noise means the observed point may show up anywhere else in that blob.</p>
+<p>If we know something about the dynamics of the system, we can look at a point backwards in a time (the point and noise blob on the left) and a point forwards in time (the point and noise blob on the right) and see how the dynamics of that system (in particular, transverse stable and unstable manifolds) squish that noise blob (shown in the middle). All three version of the data should be identical at the center time, so we can average them - graphically, this is the overlap region, which provides us a smaller noisy area, i.e. it reduces noise.</p>
+<p>This works best if the manifolds are perpendicular, but it is only required that they are transverse.</p>
+<figure><img alt="Farmer &amp; Sidorowich noise reduction" src="../assets/nonlinear_noise_filtering.svg" /><figcaption>Farmer &amp; Sidorowich noise reduction</figcaption>
+</figure>
+<p>There are other methods as well, some of which involve using the topology of the attractor.</p>
+<h2>Prediction</h2>
+<p>Generally the first step with prediction of nonlinear dynamics is, as a preprocessing step, to first embed the data using DCE so that whatever approach you do use can more fully take advantage of temporal patterns.</p>
+<p>There are many ways to try and make predictions about nonlinear systems, but a simple and remarkably successful one is essentially <mathjax>$k$</mathjax>-nearest neighbors.</p>
+<p>The first technique is called <strong>Lorenz's method of analogues</strong> (LMA). Say you have a point <mathjax>$x$</mathjax> and you want to predict where it will be in the next time step. This method involves simply taking the nearest neighbor to <mathjax>$x$</mathjax> and taking its next position as your predicted position for <mathjax>$x$</mathjax>. Of course, like other nearest neighbor methods we have seen, it is not very robust to noise.</p>
+<p>A simple but very effective enhancement is similar to those we have seen before - just to take multiple nearest neighbors, look where they all go, and average those next positions. This method is called <mathjax>$k$</mathjax>LMA.</p>
+<h2>References</h2>
+<ul>
+<li><a href="http://www.complexityexplorer.org/online-courses/29-nonlinear-dynamics-mathematical-and-computational-approaches-fall-2015/segments/3878?summary">Nonlinear Dynamics: Mathematical and Computational Approaches</a>. Liz Bradley. 2015. From Complexity Explorer (Santa Fe Institute).</li>
+<li><a href="http://www.greenteapress.com/compmod/">Think Complexity</a>. Version 1.2.3. Allen B. Downey. 2012.</li>
+<li><a href="http://math.rice.edu/~lanius/fractals/dim.html">Fractal Dimension</a>. Cynthia Lanius.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

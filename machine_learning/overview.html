@@ -1,0 +1,58 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Overview</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Overview</h1>
+<h2>Representation vs Learning:</h2>
+<ul>
+<li>Representation: whether or not a function can be simulated by the model; i.e. is the model capable of <em>representing</em> a given function?</li>
+<li>Learning: whether or not their exists an algorithm with which the weights can be adjusted to represent a particular function</li>
+</ul>
+<h2>Types of learning</h2>
+<ul>
+<li><strong>supervised learning</strong> - the learning algorithm is provided with pre-labeled <em>training</em> examples to learn from.</li>
+<li><strong>unsupervised learning</strong> - the learning algorithm is provided with unlabeled examples. Generally, unsupervised learning is used to uncover some structure of or pattern in the data.</li>
+<li><strong>semi-supervised learning</strong> - the learning algorithm is provided with a mixture of labeled and unlabeled data.</li>
+<li><strong>active learning</strong> - similar to semi-supervised learning, but the algorithm can "ask" for extra labeled data based on what it needs to improve on.</li>
+<li><strong>reinforcement learning</strong> - actions are taken and rewarded or penalized in some way and the goal is maximizing lifetime/long-term reward (or minimizing lifetime/long-term penalty).</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><em>Neural Computing: Theory and Practice</em> (1989). Philip D. Wasserman</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

@@ -1,0 +1,376 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Reinforcement Learning</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Reinforcement learning</h1>
+<p>A quick refresher - a Markov Decision Process (MDP) involves a set of states and actions. Actions connect states with some uncertainty described by the dynamics <mathjax>$P(s'|a,s)$</mathjax> (i.e. transition probabilities which underlie the transition function <mathjax>$T(s,a,s')$</mathjax>)  Additionally is a reward function <mathjax>$R(s,a,s')$</mathjax> that associates a reward or penalty with each state. When these are known or learned the result is a policy <mathjax>$\pi$</mathjax> which prescribes actions to take given a state. We can then value a given state <mathjax>$s$</mathjax> and a policy <mathjax>$\pi$</mathjax> in terms of expected future rewards with a value function <mathjax>$V^{\pi}(s)$</mathjax>. So the ultimate goal here is to identify an optimal policy.</p>
+<p>Markov Decision Processes as described so far have been fully-observed in the sense that we knew all of their parameters (transition probabilities and so on). Because everything was known in advance, we could conduct <strong>offline planning</strong>, that is, formulate a plan without needing to interact with the world.</p>
+<p>MDP parameters aren't always known from the onset - we may not know the reward function <mathjax>$R$</mathjax> or even the transition model <mathjax>$T$</mathjax>, and then we must engage in <strong>online planning</strong>, in which we must interact with the world to learn more about it to better formulate a plan.</p>
+<p>Online planning involves <strong>reinforcement learning</strong>, where agents can learn in what states rewards or goals are located without needing to know from the start.</p>
+<p>Reinforcement learning in summary:</p>
+<ul>
+<li>the agent interacts with its environment and receives feedback in the form of rewards</li>
+<li>the agent's utility is defined by the reward function</li>
+<li>the agent must learn to act so as to maximize expected rewards</li>
+<li>learning is based on observed samples of outcomes</li>
+</ul>
+<p>The ultimate goal of reinforcement learning is to learn a <em>policy</em> which returns an action to take given a state. To form a good policy we need to know the value of a given state; we do so by learning a <em>value function</em> which is the sum of rewards from the current state to some terminal state, following a fixed policy. This value function can be learned and approximated by any learning and approximation approach, e.g. neural networks.</p>
+<p>One challenge with reinforcement learning is the <strong>credit assignment problem</strong> - a much earlier action could be responsible for the current outcome, but how is that responsibility assigned? And how it is quantified?</p>
+<p>With reinforcement learning, we still assume a MDP, it's just not fully specified - that is, we don't know <mathjax>$R$</mathjax> and we might not know <mathjax>$T$</mathjax>.</p>
+<p>If we do know <mathjax>$T$</mathjax>, a <strong>utility-based agent</strong> can learn <mathjax>$R$</mathjax> and thus <mathjax>$V$</mathjax>, which we can then use for MDP.</p>
+<p>If <mathjax>$T$</mathjax> and <mathjax>$R$</mathjax> are both unknown, a <strong>Q-learning agent</strong> can learn <mathjax>$Q(s,a)$</mathjax> without needing either. Where <mathjax>$V(s)$</mathjax> is the value over states, <mathjax>$Q(s,a)$</mathjax> is the value over state-action pairs and can also be used with MDP.</p>
+<p>A <strong>reflex agent</strong> can also directly learn the policy <mathjax>$\pi(s)$</mathjax> without needing to know <mathjax>$T$</mathjax> or <mathjax>$R$</mathjax>.</p>
+<p>Reinforcement learning agents can be <em>passive</em>, which means the agent has a fixed policy and learns <mathjax>$R$</mathjax> and <mathjax>$T$</mathjax> (if necessary) while executing that policy.</p>
+<p>Alternatively, an <em>active</em> reinforcement learning agent changes its policy as it goes and learns.</p>
+<p>Passive learning has the drawbacks that it can take awhile to converge on good estimates for the unknown quantities, and it may limit how much of the space is actually explored, and as such, there may be little or no information about some states and better paths may remain unknown.</p>
+<h4>Critic, Actor, and Actor-Critic methods</h4>
+<p>We can broadly categorize various RL methods into three groups:</p>
+<ul>
+<li>critic-only methods, which first learn a value function and then use that to define a policy, e.g. TD learning.</li>
+<li>actor-only methods, which directly search the policy space. An example is an evolutionary approach where different policies are evolved.</li>
+<li>actor-critic methods, where a critic and an actor are both included and learned separately. The critic observes the actor and evaluates its policy, determining when it needs to change.</li>
+</ul>
+<h2>Model-based learning</h2>
+<p>Model-based learning is a simple approach to reinforcement learning.</p>
+<p>The basic idea:</p>
+<ul>
+<li>learn an approximate model (i.e. <mathjax>$P(s'|s,a)$</mathjax>, that is, <mathjax>$T(s,a,s')$</mathjax>, and <mathjax>$R(s,a,s')$</mathjax>) based on experiences</li>
+<li>solve for values (i.e. using value iteration or policy iteration) as if the learned model were correct</li>
+</ul>
+<p>In more detail:</p>
+<ol>
+<li>learn an empirical MDP model</li>
+<li>count outcomes <mathjax>$s'$</mathjax> for each <mathjax>$s, a$</mathjax></li>
+<li>normalize to get an estimate of <mathjax>$\hat T(s,a,s')$</mathjax></li>
+<li>discover each <mathjax>$\hat R(s,a,s')$</mathjax> when we experience <mathjax>$(s,a,s')$</mathjax></li>
+<li>solve the learned MPD (e.g. value iteration or policy iteration)</li>
+</ol>
+<h3>Temporal Difference Learning (TDL or TD Learning)</h3>
+<p>In <strong>temporal difference learning</strong>, the agent moves from one state <mathjax>$s$</mathjax> to the next <mathjax>$s'$</mathjax>, looks at the reward difference between the states, then backs up (propagates) the values (as in value iteration) from one state to the next.</p>
+<p>We run this many times, reaching a terminal state, then restarting, and so on, to get better estimates of the rewards (utilities) for each state.</p>
+<p>We keep track of rewards for visited states as <mathjax>$U(s)$</mathjax> and also the number of times we have visited each state as <mathjax>$N(s)$</mathjax>.</p>
+<p>The main part of the algorithm is:</p>
+<ul>
+<li>if <mathjax>$s'$</mathjax> is new then <mathjax>$U[s'] = r'$</mathjax></li>
+<li>if <mathjax>$s$</mathjax> is not null then</li>
+<li>increment <mathjax>$N_s[s]$</mathjax></li>
+<li><mathjax>$U[s] = U[s] + \alpha(N_s[s])(r + \gamma U[s] - U[s])$</mathjax></li>
+</ul>
+<p>Where <mathjax>$\alpha$</mathjax> is the learning rate and <mathjax>$\gamma$</mathjax> is the discount factor.</p>
+<p>Another way of thinking of TD learning:</p>
+<p>Consider a sequence of values <mathjax>$v_1, v_2, v_3, \dots, v_t$</mathjax>. We want to estimate the value <mathjax>$v_{t+1}$</mathjax>. We might do so by averaging the observed values, e.g. <mathjax>$\hat v_{t+1} = \frac{v_1 + \dots + v_t}{t}$</mathjax>.</p>
+<p>We can rearrange these terms to give us:</p>
+<p><mathjax>$$
+\begin{aligned}
+t \hat v_{t+1} &amp;= v_1 + \dots + v_{t-1} + v_t \\
+t \hat v_{t+1} &amp;= (t-1) \hat v_t + v_t \\
+\hat v_{t+1} &amp;= (1-\frac{1}{t}) \hat v_t + \frac{v_t}{t} \\
+\hat v_{t+1} &amp;= \hat v_t + \frac{v_t - \hat v_t}{t}
+\end{aligned}
+$$</mathjax></p>
+<p>The term <mathjax>$v_t - \hat v_t$</mathjax> is the <em>temporal difference error</em>. Basically our estimate <mathjax>$\hat v_{t+1}$</mathjax> is derived by updating the previous estimate <mathjax>$\hat v_t$</mathjax> proportionally to this error. For instance, if <mathjax>$v_t &gt; \hat v_t$</mathjax> then the next estimate is increased.</p>
+<p>This approach treats all values with equal weight, though we may want to decay older values.</p>
+<h4>Greedy TDL</h4>
+<p>One method of active reinforcement learning is the greedy approach.</p>
+<p>Given new estimates for the rewards, we recompute a new optimal policy and then use that policy to guide exploration of the space. This gives us new estimates for the rewards, and so on, until convergence.</p>
+<p>Thus it is greedy in the sense that it always tries to go for policies that seem immediately better, although in the end that doesn't necessarily guarantee the overall optimal policy (this is the exploration vs exploitation problem).</p>
+<p>One alternate approach is to randomly try a non-optimal action, thus exploring more of the space. This works, but can be slow to converge.</p>
+<h3>Exploration agent</h3>
+<p>A approach better than TDL is to use an <strong>exploration agent</strong>, which favors exploring more when it is uncertain. More specifically, we can use the same TDL algorithm, but while <mathjax>$N_s &lt; \epsilon$</mathjax>, where <mathjax>$\epsilon$</mathjax> is some exploration threshold, we set <mathjax>$U[s] = R$</mathjax>, where <mathjax>$R$</mathjax> is the largest reward we expect to get. When <mathjax>$N_s &gt; \epsilon$</mathjax>, we start using the learned reward as with regular TDL.</p>
+<h2>Model-free learning</h2>
+<p>With model-free learning, instead of trying to estimate <mathjax>$T$</mathjax> or <mathjax>$R$</mathjax>, we take actions and the actual outcome to what we expected the outcome would be.</p>
+<p>With <strong>passive reinforcement learning</strong>, the agent is given an existing policy and just learns from the results of that policy's execution (that is, learns the state values; i.e. this is essentially just policy evaluation, except this is <em>not</em> offline, this involves interacting with the environment).</p>
+<p>To compute the values for each state under <mathjax>$\pi$</mathjax>, we can use <strong>direct evaluation</strong>:</p>
+<ul>
+<li>act according to <mathjax>$\pi$</mathjax></li>
+<li>every time we visit a state, record what the sum of discounted rewards turned out to be</li>
+<li>average those samples</li>
+</ul>
+<p>Direct evaluation is simple, doesn't require any knowledge of <mathjax>$T$</mathjax> or <mathjax>$R$</mathjax>, and <em>eventually</em> gets the correct average values. However, it throws out information about state connections, since each state is learned separately - for instance, if we have a state <mathjax>$s_i$</mathjax> with a positive reward, and another state <mathjax>$s_j$</mathjax> that leads into it, it's possible that direct evaluation assigns state <mathjax>$s_j$</mathjax> a negative reward, which doesn't make sense - since it leads to a state with a positive reward, it should also have some positive reward. Given enough time/samples, this will eventually resolve, but that can require a long time.</p>
+<p>Policy evaluation, on the other hand, <em>does</em> take in account the relationship between states, since the value of each state is a function of its child states, i.e.</p>
+<p><mathjax>$$
+V_{k+1}^{\pi_i}(s) = \sum_{s'} T(s, \pi_k(s), s') [R(s, \pi_k(s), s') + \gamma V_k^{\pi_i}(s')]
+$$</mathjax></p>
+<p>However, we don't know <mathjax>$T$</mathjax> and <mathjax>$R$</mathjax>. Well, we could just try actions and take samples of outcomes <mathjax>$s'$</mathjax> and average:</p>
+<p><mathjax>$$
+V_{k+1}^{\pi}(s) = \frac{1}{n}\sum_i \text{sample}_i
+$$</mathjax></p>
+<p>Where each <mathjax>$\text{sample}_i = R(s, \pi(s), s_i') + \gamma V_k^{\pi}(s_i')$</mathjax>. <mathjax>$R(s, \pi(s), s_i')$</mathjax> is just the observed reward from taking the action.</p>
+<p>This is called <strong>sample-based policy evaluation</strong>.</p>
+<p>One challenge here: when you try an action, you end up in a new state - how do you get back to the original state to try another action? We don't know anything about the MDP so we don't necessarily know what action will do this.</p>
+<p>So really, we only get one sample, and then we're off to another state.</p>
+<p>With <em>temporal difference learning</em>, we learn from each experience ("episode"); that is, we update <mathjax>$V(s)$</mathjax> each time we experience a transition <mathjax>$(s,a,s',r)$</mathjax>. The likely outcomes <mathjax>$s'$</mathjax> will contribute updates more often. The policy is still fixed (given), and we're still doing policy evaluation.</p>
+<p>Basically, we have an estimate <mathjax>$V(s)$</mathjax>, and then we take an action and get a new sample. We update <mathjax>$V(s)$</mathjax> like so:</p>
+<p><mathjax>$$
+V^{\pi}(s) = (1 - \alpha) V^{\pi}(s) + (\alpha) \text{sample}
+$$</mathjax></p>
+<p>So we specify a learning rate <mathjax>$\alpha$</mathjax> (usually small, e.g. <mathjax>$\alpha=0.1$</mathjax>) which controls how much of the old estimate we keep. This learning rate can be decreased over time.</p>
+<p>This is an exponential moving average.</p>
+<p>This update can be re-written as:</p>
+<p><mathjax>$$
+V^{\pi}(s) = V^{\pi}(s) + \alpha (\text{sample} - V^{\pi}(s))
+$$</mathjax></p>
+<p>The term <mathjax>$(\text{sample} - V^{\pi}(s))$</mathjax> can be interpreted as an error, i.e. how off our current estimate <mathjax>$V^{\pi}(s)$</mathjax> was from the observed sample.</p>
+<p>So we still never learn <mathjax>$T$</mathjax> or <mathjax>$R$</mathjax>, we just keep running sample averages instead; hence temporal difference learning is a model-free method for doing policy evaluation.</p>
+<p>However, it doesn't help with coming up with a new policy, since we need Q-values to do so.</p>
+<h3>Q-Learning</h3>
+<p>With <em>active reinforcement learning</em>, the agent is actively trying new things rather than following a fixed policy.</p>
+<p>The fundamental trade-off in active reinforcement learning is <strong>exploitation vs exploration</strong>. When you land on a decent strategy, do you just stick with it? What if there's a better strategy out there? How do you balance using your current best strategy and searching for an even better one?</p>
+<p>Remember that value iteration requires us to look at <mathjax>$\max_a$</mathjax> over the set of possible actions from a state:</p>
+<p><mathjax>$$
+V_{k+1}(s) = \max_a \sum_{s'} T(s,a,s') [R(s,a,s') + \gamma V_k(s')]
+$$</mathjax></p>
+<p>However, we can't compute maximums from samples since the maximum is always unknown (there's always the possibility of a new sample being larger; we can only compute averages from samples).</p>
+<p>We can instead iteratively compute Q-values (Q-value iteration):</p>
+<p><mathjax>$$
+Q_{k+1}(s,a) = \sum_{s'} T(s,a,s') [R(s,a,s') + \gamma \max_{a'} Q(s', a')]
+$$</mathjax></p>
+<p>Remember that while a value <mathjax>$V(s)$</mathjax> is the value of a state, a Q-value <mathjax>$Q(s,a)$</mathjax> is the value of an action (from a particular state).</p>
+<p>Here the <mathjax>$\max$</mathjax> term pushed inside, and we are ultimately just computing an average, so we can compute this from samples.</p>
+<p>This is the basis of the <strong>Q-Learning algorithm</strong>, which is just sample-based Q-value iteration.</p>
+<p>We learn <mathjax>$Q(s,a)$</mathjax> values as we go:</p>
+<ul>
+<li>take an action <mathjax>$a$</mathjax> from a state <mathjax>$s$</mathjax> and see the outcome as a sample <mathjax>$(s,a,s',r)$</mathjax>.</li>
+<li>consider the old estimate <mathjax>$Q(s,a)$</mathjax></li>
+<li>consider the new sample estimate: <mathjax>$\text{sample} = R(s,a,s') + \gamma \max_{a'} Q(s', a')$</mathjax>, where <mathjax>$R(s,a,s') = r$</mathjax>, i.e. the reward we just received</li>
+<li>incorporate this new estimate into a running average:</li>
+</ul>
+<p><mathjax>$$
+Q(s,a) = (1 - \alpha)Q(s,a) + (\alpha)\text{sample}
+$$</mathjax></p>
+<p>This can also be written:</p>
+<p><mathjax>$$
+Q(s,a) =_{\alpha} R(s,a,s') + \gamma \max_{a'} Q(s', a')
+$$</mathjax></p>
+<p>These updates emulate Bellman updates as we do in known MDPs.</p>
+<p>Q-learning converges to an optimal policy, even if you're acting suboptimal. When an optimal policy is still learned from suboptimal actions, it is called <strong>off-policy learning</strong>. Another way of saying this is that with off-policy learning, Q-values are updated not according to the current policy (i.e. the current actions), but according to a greedy policy (i.e. the greedy/best actions).</p>
+<p>We still, however, need to explore and decrease the learning rate (but not too quickly or you'll stop learning things).</p>
+<p>In Q-Learning, we don't need <mathjax>$P$</mathjax> or the reward/utility function. We directly learn the rewards/utilities of state-action pairs, <mathjax>$Q(s,a)$</mathjax>.</p>
+<p>With this we can just choose our optimal policy as:</p>
+<p><mathjax>$$
+\pi(s) = \argmax_a \sum_{s'} Q(s,a)
+$$</mathjax></p>
+<p>The <mathjax>$Q$</mathjax> update formula is simply:</p>
+<p><mathjax>$$
+Q(s,a) = Q(s,a) + \alpha(R(s) + \gamma \max Q(s', a') - Q(s,a))
+$$</mathjax></p>
+<p>Where <mathjax>$\alpha$</mathjax> is the learning rate and <mathjax>$\gamma$</mathjax> is the discount factor.</p>
+<p>Again, we can back up (as with value iteration) to propagate these values through the network.</p>
+<p>Note that a simpler version of Q-learning is <em>SARSA</em>, ("State Action Reward State Action", because the quintuple <mathjax>$(s_t, a_t, r_t, s_{t+1}, a_{t+1})$</mathjax> is central to this method), which uses the update:</p>
+<p><mathjax>$$
+Q(s,a) = Q(s,a) + \alpha(R(s) + \gamma Q(s', a') - Q(s,a))
+$$</mathjax></p>
+<p>SARSA, in contrast to Q-learning, is <em>on-policy</em> learning; that is, it updates states based on the current policy's actions, so Q-values are learned according to the current policy and not a greedy policy.</p>
+<h4>n-step Q-learning</h4>
+<p>An action may be responsible for a reward later on, so we want to be able to learn that causality, i.e. propagate rewards. The default one-step Q-learning and SARSA algorithms only associate reward with the direct state-action pair <mathjax>$s,a$</mathjax> that immediately led to it. We can instead propagate these rewards further with <mathjax>$n$</mathjax>-step variations, e.g. <mathjax>$n$</mathjax>-step Q-learning updates <mathjax>$Q(s,a)$</mathjax> with:</p>
+<p><mathjax>$$
+r_t + \gamma r_{t+1} + \dots + \gamma^{n-1} r_{t+n} + \max_a \gamma^n Q(s+{t+n+1}, a)
+$$</mathjax></p>
+<h3>Exploration vs exploitation</h3>
+<p>Up until now we have not considered how we <em>select actions</em>. So how do we? That is, how do we explore?</p>
+<p>One simple method is to sometimes take random actions (<mathjax>$\epsilon$</mathjax>-greedy). With a small probability <mathjax>$\epsilon$</mathjax>, act randomly, with probability <mathjax>$1-\epsilon$</mathjax>, act on the current best policy.</p>
+<p>After the space is thoroughly explored, you don't want to keep moving randomly - so you can decrease <mathjax>$\epsilon$</mathjax> over time.</p>
+<p>A simple modification for <mathjax>$\epsilon$</mathjax>-greedy action selection is <em>soft-max</em> action selection, where actions are chosen based on their estimated <mathjax>$Q(s,a)$</mathjax> value. One specific method is to use a Gibbs or Boltzmann distribution where selecting action <mathjax>$a$</mathjax> in state <mathjax>$s$</mathjax> is proportional to <mathjax>$e^{Q(s,a)/T}$</mathjax> where <mathjax>$T&gt;0$</mathjax> is a temperature which influences how randomly actions should be chosen. The higher the temperature, the more random; when <mathjax>$T=0$</mathjax>, the best-valued action is always chosen. More specifically, in state <mathjax>$s$</mathjax>, action <mathjax>$a$</mathjax> is chosen with the probability:</p>
+<p><mathjax>$$
+\frac{e^{Q(s,a)/T}}{\sum_a e^{Q(s,a)/T}}
+$$</mathjax></p>
+<p>Alternatively, we can use <em>exploration functions</em>. Generally, we want to explore areas we have high uncertainty for. More specifically, an exploration function takes a value estimate <mathjax>$u$</mathjax> and a visit count <mathjax>$n$</mathjax> and returns an optimistic utility. For example: <mathjax>$f(u,n) = u + \frac{k}{n}$</mathjax>.</p>
+<p>We can modify our Q-update to incorporate an exploration function:</p>
+<p><mathjax>$$
+Q(s,a) =_{\alpha} R(s,a,s') + \gamma \max_{a'} f(Q(s', a'), N(s',a'))
+$$</mathjax></p>
+<p>This encourages the agent not only to try unknown states, but to also try states that lead to unknown states.</p>
+<p>In addition to exploration and exploitation, we also introduce a concept of <strong>regret</strong>. Naturally, mistakes are made as the space is explored - regret is a measure of the total mistake cost. That is, it is the difference between your expected rewards and optimal expected rewards.</p>
+<p>We can try to minimize regret - to do so, we must not only learn to be optimal, but we must <em>optimally</em> learn how to be optimal.</p>
+<p>For example: both random exploration and exploration functions are optimal, but random exploration has higher regret.</p>
+<h3>Approximate Q-Learning</h3>
+<p>Sometimes state spaces are far too large to satisfactorily explore. This can be a limit of memory (since Q-learning keeps a table of Q-values) or simply that there are too many states to visit in a reasonable time. In fact, this is the rule rather than the exception. So in practice we cannot learn about every state.</p>
+<p>The general idea of <strong>approximate Q-learning</strong> is to transfer learnings from one state to other similar states. For example, if we learn from exploring one state that a fire pit is bad, then we can generalize that all fire pit states are probably bad.</p>
+<p>This is an approach like machine learning - we want to learn general knowledge from a few training states; the states are represented by features (for example, we could have a binary feature <mathjax>$\text{has fire pit}$</mathjax>). Then we describe q-states in terms of features, e.g. as linear functions (called a <strong>Q-function</strong>; this method is called <em>linear function approximation</em>):</p>
+<p><mathjax>$$
+Q(s,a) = w_1 f_1(s,a) + w_2 f_2(s,a) + \dots + w_n f_n(s,a)
+$$</mathjax></p>
+<p>Note that we can do the same for value functions as well, i.e.</p>
+<p><mathjax>$$
+V(s) = w_1 f_1(s) + w_2 f_2(s) + \dots + w_n f_n(s)
+$$</mathjax></p>
+<p>So we observe a transition <mathjax>$(s,a,r,s')$</mathjax> and then we compute the difference of this observed transition from what we expected, i.e:</p>
+<p><mathjax>$$
+\text{difference} = [r + \gamma \max_{a'} Q(s', a')] - Q(s,a)
+$$</mathjax></p>
+<p>With exact Q-learning, we would update <mathjax>$Q(s,a)$</mathjax> like so:</p>
+<p><mathjax>$$
+Q(s,a) = Q(s,a) + \alpha [\text{difference}]
+$$</mathjax></p>
+<p>With approximate Q-learning, we instead update the weights, and we do so in proportion to their feature values:</p>
+<p><mathjax>$$
+w_i = w_i + \alpha [\text{difference}] f_i (s,a)
+$$</mathjax></p>
+<p>This is the same as least-squares regression.</p>
+<p>That is, given a point <mathjax>$x$</mathjax>, with features <mathjax>$f(x)$</mathjax> and target value <mathjax>$y$</mathjax>, the error is:</p>
+<p><mathjax>$$
+\text{error}(w) = \frac{1}{2} (y - \sum_k w_k f_k(x))^2
+$$</mathjax></p>
+<p>The derivative of the error with respect to a weight <mathjax>$w_m$</mathjax> is:</p>
+<p><mathjax>$$
+\frac{\partial \text{error}(w)}{\partial w_m} = - ( y- \sum_k w_k f_k(x)) f_m(x)
+$$</mathjax></p>
+<p>Then we update the weight:</p>
+<p><mathjax>$$
+w_m = w_m + \alpha (y - \sum_k w_k f_k(x)) f_m(x)
+$$</mathjax></p>
+<p>In terms of approximate Q-learning, the target <mathjax>$y$</mathjax> is <mathjax>$r + \gamma \max_{a'} Q(s', a')$</mathjax> and our prediction is <mathjax>$Q(s,a)$</mathjax>:</p>
+<p><mathjax>$$
+w_m = w_m + \alpha [r + \gamma \max_{a'} Q(s', a') - Q(s,a)] f_m (s,a)
+$$</mathjax></p>
+<h3>Policy Search</h3>
+<p>Q-learning tries to model the states by learning q-values. However, a feature-based Q-learning model that models the states well does not necessarily translate to a good feature-based policy (and vice-versa).</p>
+<p>Instead of trying to model the unknown states, we can directly try to learn the policies that maximize rewards.</p>
+<p>So we can use Q-learning and learn a decent solution, then fine-tune by hill climbing on feature weights. That is, we learn an initial linear Q-function, the nudge each feature weight and up and down to see if the resulting policy is better.</p>
+<p>We test whether or not a policy is better by running many sample episodes.</p>
+<p>If we have many features, we have to test many new policies, and this hill climbing approach becomes impractical. There are better methods (not discussed here).</p>
+<h3>Summary</h3>
+<p>A helpful table:</p>
+<p>For a known MDP, we can compute an offline solution:</p>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Technique</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute <mathjax>$V^*, Q^*, \pi^*$</mathjax></td>
+<td>Value or policy iteration</td>
+</tr>
+<tr>
+<td>Evaluate a fixed policy <mathjax>$\pi$</mathjax></td>
+<td>Policy evaluation</td>
+</tr>
+</tbody>
+</table>
+<p>For an unknown MDP, we can use model-based approaches:</p>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Technique</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute <mathjax>$V^*, Q^*, \pi^*$</mathjax></td>
+<td>Value or policy iteration on the approximated MDP</td>
+</tr>
+<tr>
+<td>Evaluate a fixed policy <mathjax>$\pi$</mathjax></td>
+<td>Policy evaluation on the approximated MDP</td>
+</tr>
+</tbody>
+</table>
+<p>Or we can use model-free approaches:</p>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Technique</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute <mathjax>$V^*, Q^*, \pi^*$</mathjax></td>
+<td>Q-learning</td>
+</tr>
+<tr>
+<td>Evaluate a fixed policy <mathjax>$\pi$</mathjax></td>
+<td>Value learning</td>
+</tr>
+</tbody>
+</table>
+<h2>Deep Q-Learning</h2>
+<p>The previous Q-learning approach was <em>tabular</em> in that we essentially kept a table of mappings from <mathjax>$(s,a)$</mathjax> to some value. However, we'd like to be a bit more flexible and not have to map <em>exact states</em> to values, but map <em>similar states</em> to similar values.</p>
+<p>The general idea behind deep Q-learning is using a deep neural network to learn <mathjax>$Q(s,a)$</mathjax>, which gives us this kind of mapping.</p>
+<p>This is essentially a regression problem, since Q-values are continuous. So we can use a squared error loss in the form of a Bellman equation:</p>
+<p><mathjax>$$
+L = \frac{1}{2}[ r + \max_{a'} Q(s', a') - Q(s, a)]^2
+$$</mathjax></p>
+<p>Where the <mathjax>$r + \max_{a'} Q(s', a')$</mathjax> term is the target value and <mathjax>$Q(s,a)$</mathjax> is the predicted value.</p>
+<p>Approximating Q-values using nonlinear functions is not very stable, so tricks are needed to get good performance.</p>
+<p>One problem is <strong>catastrophic forgetting</strong>, in which similar states may lead to drastically different outcomes. For instance, there may be a state for which is a single move away from winning, and then another similar state where that same move leads to failure. When the agent wins from that first state, it will assign a high value to it. Then, when it loses from the similar state, it revises its value negatively, and in doing so it "overwrites" its assessment of the other state.</p>
+<p>So catastrophic forgetting occurs when similar states lead to very different outcomes, and when this happens, the agent is unable to properly learn.</p>
+<p>One trick for this is <strong>experience replay</strong> in which each experience tuple <mathjax>$(s,a,r,s')$</mathjax> are saved (this collection of saved experiences is called "replay memory"). Memory size is often limited to keep only the last <mathjax>$n$</mathjax> experiences.</p>
+<p>Then the network is trained using random minibatches sampled from the replay memory. This essentially turns the task into a supervised learning task.</p>
+<p>A deep Q-learning algorithm that includes experience replay and <mathjax>$\epsilon$</mathjax>-greedy exploration follows (<a href="http://www.nervanasys.com/demystifying-deep-reinforcement-learning/">source</a>):</p>
+<ul>
+<li>initialize replay memory <mathjax>$D$</mathjax></li>
+<li>initialize action-value function <mathjax>$Q$</mathjax> (with random weights)</li>
+<li>observe initial state <mathjax>$s$</mathjax></li>
+<li>repeat<ul>
+<li>select an action <mathjax>$a$</mathjax><ul>
+<li>with probability <mathjax>$\epsilon$</mathjax> select a random action</li>
+<li>otherwise select <mathjax>$a = \argmax_{a'} Q(s,a')$</mathjax></li>
+</ul>
+</li>
+<li>carry out action <mathjax>$a$</mathjax></li>
+<li>observe reward <mathjax>$r$</mathjax> and new state <mathjax>$s'$</mathjax></li>
+<li>store experience <mathjax>$&lt;s,a,r,s'&gt;$</mathjax> in replay memory <mathjax>$D$</mathjax></li>
+<li>sample random transitions <mathjax>$&lt;ss, aa, rr, ss'&gt;$</mathjax> from replay memory <mathjax>$D$</mathjax></li>
+<li>calculate target for each minibatch transition<ul>
+<li>if  <mathjax>$ss'$</mathjax> is terminal state then <mathjax>$tt = rr$</mathjax></li>
+<li>otherwise <mathjax>$tt = rr + \gamma \max_{a'} Q(ss', aa')$</mathjax></li>
+</ul>
+</li>
+<li>train the Q network using <mathjax>$(tt - Q(ss, aa))^2$</mathjax> as loss</li>
+<li><mathjax>$s = s'$</mathjax></li>
+</ul>
+</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="http://outlace.com/Reinforcement-Learning-Part-1/">Reinforcement Learning - Part 1</a>. Brandon B.</li>
+<li><a href="https://www.edx.org/course/artificial-intelligence-uc-berkeleyx-cs188-1x">CS188: Artificial Intelligence</a>. Dan Klein, Pieter Abbeel. University of California, Berkeley (edX).</li>
+<li><a href="https://www.udacity.com/course/intro-to-artificial-intelligence--cs271">Intro to Artificial Intelligence</a>. CS271. Peter Norvig, Sebastian Thrun. Udacity.</li>
+<li><a href="http://artint.info/html/ArtInt_262.html">11.3 Reinforcement Learning</a>. Artificial Intelligence: Foundations of Computational Agents. David Poole and Alan Mackworth. Cambridge University Press, 2010.</li>
+<li><a href="http://image.diku.dk/igel/paper/RLiaN.pdf">Reinforcement Learning in a Nutshell</a>. V. Heidrich-Meisner, M. Lauer, C. Igel, M. Riedmiller.</li>
+<li><a href="http://arxiv.org/pdf/1602.01783v1.pdf">Asynchronous Methods for Deep Reinforcement Learning</a>. Volodymyr Mnih, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, Tim Harley, Timothy P. Lillicrap, David Silver, Koray Kavukcuoglu.</li>
+<li><a href="http://www.nervanasys.com/demystifying-deep-reinforcement-learning/">Demystifying Deep Reinforcement Learning</a>. Tambet Matiisen.</li>
+<li><a href="http://old.nbu.bg/cogs/events/2000/Readings/Petrov/rltutorial.pdf">Reinforcement Learning: A Tutorial</a>. Mance E. Harmon &amp; Stephanie S. Harmon.</li>
+<li><a href="http://outlace.com/Reinforcement-Learning-Part-3/">Q-learning with Neural Networks</a>. Brandon B.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

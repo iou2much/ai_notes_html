@@ -1,0 +1,75 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>causal_loop_diagrams</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <p>notes from <em>Business Dynamics: Systems Thinking and Modeling for a Complex World</em> (John D. Sterman).</p>
+<h1>Causal Loop Diagrams (CLD)</h1>
+<figure><img alt="A simple CLD" src="../assets/cld01.svg" /><figcaption>A simple CLD</figcaption>
+</figure>
+<p>A causal loop diagrams is a way of visualizing relationships between variables in a simulation.</p>
+<p>Variables are connected via <em>causal links</em> which may be positive (the tail variable <mathjax>$A$</mathjax> pressures <mathjax>$B$</mathjax> to increase) or negative (the tail variable <mathjax>$A$</mathjax> pressures <mathjax>$B$</mathjax> to decrease).</p>
+<figure><img alt="Causal links" src="../assets/cld02.svg" /><figcaption>Causal links</figcaption>
+</figure>
+<p>These links may form loops in the diagram, which may be either positive (i.e. <em>reinforcing</em>) or negative (i.e. <em>balancing</em>). This is known as the <em>loop polarity</em>.</p>
+<figure><img alt="Loop polarities" src="../assets/cld03.svg" /><figcaption>Loop polarities</figcaption>
+</figure>
+<p>The loop polarity is related to the <em>open loop gain</em> of the loop ("gain" as in signal strength). The gain is calculated by "breaking open" the loop at some point (hence "open loop").</p>
+<p>One shorthand way to identify loop polarity is to count the number of negative links in the loop. If the number of negative links is even, the loop is positive. If odd, the loop is negative (a "net reversal").</p>
+<p>The sign of the open loop gain is the loop polarity, so we can identify the loop polarity by computing the open loop gain, as follows.</p>
+<p>Say we have a loop of variables <mathjax>$x_1, \dots, x_n$</mathjax>. Assume that <mathjax>$x_1$</mathjax> is where we break the loop. This splits it into <mathjax>$x_1^I$</mathjax> (input) and <mathjax>$x_1^O$</mathjax> (output). The open loop gain is just <mathjax>$\frac{\partial x_1^O}{\partial x_1^I}$</mathjax>, which can be computed using the chain rule, i.e. <mathjax>$\frac{\partial x_1^O}{\partial x_1^I} = \frac{\partial x_1^O}{\partial x_{n-1}} \frac{\partial x_{n-1}}{\partial x_{n-2}} \dots \frac{\partial x_2}{\partal x_1^I}$</mathjax></p>
+<p>If you aren't sure whether a link should be negative or positive, it probably means you're missing a causal variable.</p>
+<figure><img alt="Missing causal variable" src="../assets/cld04.svg" /><figcaption>Missing causal variable</figcaption>
+</figure>
+<p>You should also indicate time delays if they are significant.</p>
+<figure><img alt="Include delays" src="../assets/cld05.svg" /><figcaption>Include delays</figcaption>
+</figure>
+<p>You should also distinguish between actual and perceived conditions, i.e. distinguish between "Product Quality" and "Reported Product Quality".</p>
+<h1>Stocks and Flows</h1>
+<p>A flow is a rate of change (i.e. a derivative) in some variable and a stock is a quantity affect by flows.</p>
+<p>Other terms for "flow" include "rate", "derivative", "throughput".</p>
+<p>Other terms for stock include "integrals", "state variables", "buffers", "levels".</p>
+<p>To compute a stock at time <mathjax>$t$</mathjax> we compute the integral of the in and out flows to the stock:</p>
+<p><mathjax>$$
+\text{Stock}(t) = \int_{t_0}^t \[\text{inflow}(s) - \text{outflow}(s)\] ds + \text{Stock}(t_0)
+$$</mathjax></p>
+<p>Where <mathjax>$\text{inflow}(s), \text{outflow}(s)$</mathjax> are the inflow and outflow at time <mathjax>$s$</mathjax></p>
+<p>Equivalently, we can write this as:</p>
+<p><mathjax>$$
+\frac{d(\text{Stock})}{dt} = \text{inflow}(t) - \text{outflow}(t)
+$$</mathjax></p>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

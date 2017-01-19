@@ -1,0 +1,410 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Algorithms</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Algorithms</h1>
+<p>We measure the performance of algorithms in terms of <strong>time complexity</strong> (how many steps are taken, as a function of input size) and <strong>space complexity</strong> (how much memory is used, as a function of input size).</p>
+<p>There may be trade-offs for better time and space complexity - for instance, there may be situations where speed is more important than <strong>correctness</strong> (a <em>correct</em> algorithm is one that always terminates in the correct answer), in which case we may opt for a faster algorithm that provides only an approximate solution or a local optimum.</p>
+<p>There may be trade-offs between time and space complexity as well - for instance, we might have the choice between a fast algorithm that uses a lot of memory, or a slower one that has lower memory requirements.</p>
+<p>It's important to be able to evaluate and compare algorithms in order to determine which is most appropriate for a particular problem.</p>
+<h2>Algorithm design paradigms</h2>
+<p>Algorithms generally fall into a few categories of "design paradigms":</p>
+<ul>
+<li><strong>decrease-and-conquer</strong>: recursively reduce the problem into a smaller and smaller problem until it can no longer be reduced, then solve that problem.</li>
+<li><strong>divide-and-conquer</strong>: break up the problem into subproblems which can be recursively solved, then combine the results of the subproblems in some way to form the solution for the original problem.</li>
+<li><strong>greedy</strong>: take the solution that looks best at the moment; i.e. always go for the local optimum, in the hope that it may the global optimum, even though it may not be.</li>
+<li><strong>dynamic programming</strong>: the divide-and-conquer paradigm can lead to redundant computations if the same subproblem appears multiple times; dynamic programming involves memoizing ("remembering", i.e. storing in memory) results of computations so that when an identical subproblem is encountered, the solution can just be retrieved from memory.</li>
+<li><strong>brute force</strong>: try everything until you get a solution</li>
+</ul>
+<h2>Algorithmic Analysis</h2>
+<p>The number of operations for an algorithm is typically a function of its inputs, typically denoted <mathjax>$n$</mathjax>.</p>
+<p>There are a few kinds of algorithmic analysis:</p>
+<ul>
+<li><strong>worst-case analysis</strong>: the upper bound running time that is true for any arbitrary input of length <mathjax>$n$</mathjax></li>
+<li><strong>average-case analysis</strong>: assuming that all input are equally likely, the average running time</li>
+<li><strong>benchmarks</strong>: runtime on an agreed-upon set of "typical" inputs</li>
+</ul>
+<p>Average-case analysis and benchmarks requires some domain knowledge about what inputs to expect. When you want to do a more "general purpose" analysis, worst-case analysis is preferable.</p>
+<p>When comparing the performance of algorithms:</p>
+<ul>
+<li>we measure the algorithm in terms of the <em>number of steps</em> (operations) required, which provides a consistent measurement across machines (otherwise, some machines are more powerful and naturally perform faster)</li>
+<li>algorithms may perform differently depending on characteristics of input data, e.g. if it is already partially sorted and so on. So we look at the <strong>worst case</strong> scenario to compensate for this.</li>
+<li>performance can change depending on the size of the input as well (for example, an algorithm <mathjax>$A$</mathjax> which appears slower on a smaller dataset than <mathjax>$B$</mathjax> may in fact be faster than <mathjax>$B$</mathjax> on larger datasets), so we look at algorithmic performance as a function of input size, and look at the <strong>asymptotic</strong> performance as the problem size increases.</li>
+</ul>
+<p>We focus on <strong>asymptotic analysis</strong>; that is, we focus on performance for large input sizes.</p>
+<p>Note, however, that algorithms which are inefficient for large <mathjax>$n$</mathjax> may be better on small <mathjax>$n$</mathjax> when compared to algorithms that perform well for large <mathjax>$n$</mathjax>. For example, insertion sort has an upper bound runtime of <mathjax>$\frac{n^2}{2}$</mathjax>, which, for small <mathjax>$n$</mathjax> (e.g. <mathjax>$n &lt; 90$</mathjax>), is better than merge sort. This is because constant factors are more meaningful with small inputs. Anyways, with small <mathjax>$n$</mathjax>, it often doesn't really matter what algorithm you use, since the input is so small, there are unlikely to be significant performance differences, so analysis of small input sizes is not very valuable (or interesting).</p>
+<p>Thus we define a "fast" algorithm as one in which the worst-case running time grows slowly with input size.</p>
+<h3>Asymptotic Analysis</h3>
+<p>With asymptotic analysis, we suppress constant factors and lower-order terms, since they don't matter much for large inputs, and because the constant factors can vary quite a bit depending on the architecture, compiler, programmer, etc.</p>
+<p>For example, if we have an algorithm with the upper bound runtime of <mathjax>$6n \log_2 n + 6n$</mathjax>, we would rewrite it as just <mathjax>$n \log n$</mathjax> (note that <mathjax>$\log$</mathjax> typically implies <mathjax>$\log_2$</mathjax>).</p>
+<p>Then we say the running time is <mathjax>$O(n \log n)$</mathjax>, said "big-oh of <mathjax>$n \log n$</mathjax>", the <mathjax>$O$</mathjax> implies that we have dropped the constant factors and lower-order terms.</p>
+<p>Generally, we categorize big-oh performance by <em>order of growth</em>, which define a set of algorithms that grow equivalently:</p>
+<table>
+<thead>
+<tr>
+<th>Order of growth</th>
+<th>Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><mathjax>$O(1)$</mathjax></td>
+<td>constant</td>
+</tr>
+<tr>
+<td><mathjax>$O(\log_b n)$</mathjax></td>
+<td>logarithmic (for any <mathjax>$b$</mathjax>)</td>
+</tr>
+<tr>
+<td><mathjax>$O(n)$</mathjax></td>
+<td>linear</td>
+</tr>
+<tr>
+<td><mathjax>$O(n \log_b n)$</mathjax></td>
+<td><mathjax>$n \log n$</mathjax></td>
+</tr>
+<tr>
+<td><mathjax>$O(n^2)$</mathjax></td>
+<td>quadratic</td>
+</tr>
+<tr>
+<td><mathjax>$O(n^3)$</mathjax></td>
+<td>cubic</td>
+</tr>
+<tr>
+<td>$O(c^n)</td>
+<td>exponential (for any <mathjax>$c$</mathjax>)</td>
+</tr>
+</tbody>
+</table>
+<p>The order of growth is determined by the <strong>leading term</strong>, that is, the term with the highest exponent.</p>
+<p>Note for <mathjax>$\log$</mathjax>, the base doesn't matter because it is equivalent to multiplying by a constant, which we ignore anyways.</p>
+<h3>Loop examples</h3>
+<p>Consider the following algorithm for finding an element in an array:</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">el</span> <span class="o">==</span> <span class="n">i</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+</pre></div>
+
+
+<p>This has the running time of <mathjax>$O(n)$</mathjax> since, in the worst case, it checks every item.</p>
+<p>Now consider the following:</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">func2</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">arr</span><span class="p">),</span> <span class="n">func</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+</pre></div>
+
+
+<p>This still has the running time of <mathjax>$O(n)$</mathjax>, although it has twice the number of operations (i.e. <mathjax>$\sim 2n$</mathjax> operations total), we drop the constant factor <mathjax>$2$</mathjax>.</p>
+<p>Now consider the following algorithm for checking if two arrays have a common element:</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">func3</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">el1</span> <span class="ow">in</span> <span class="n">arr1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">el2</span> <span class="ow">in</span> <span class="n">arr2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">el1</span> <span class="o">==</span> <span class="n">el2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+</pre></div>
+
+
+<p>This has a runtime of <mathjax>$O(n^2)$</mathjax>, which is called a <strong>quadratic time</strong> algorithm.</p>
+<p>The following algorithm for checking duplicates in an array also has a runtime of <mathjax>$O(n^2)$</mathjax>, again due to dropping constant factors:</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">func4</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">el1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">el2</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">:]:</span>
+            <span class="k">if</span> <span class="n">el1</span> <span class="o">==</span> <span class="n">el2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+</pre></div>
+
+
+<h3>Big-Oh formal definition</h3>
+<p>Say we have a function <mathjax>$T(n)$</mathjax>, <mathjax>$n \geq 0$</mathjax>, which is usually the worst-case running time of an algorithm.</p>
+<p>We say that <mathjax>$T(n) = O(f(n))$</mathjax> if and only if there exist constants <mathjax>$c, n_0 &gt; 0$</mathjax> such that <mathjax>$T(n) \leq c f(n)$</mathjax> for all <mathjax>$n \geq n_0$</mathjax>.</p>
+<p>That is, we can multiply <mathjax>$f(n)$</mathjax> by some constant <mathjax>$c$</mathjax> such that there is some value <mathjax>$n_0$</mathjax>, after which <mathjax>$T(n)$</mathjax> is always below <mathjax>$c f(n)$</mathjax>.</p>
+<p>For example: we demonstrated that <mathjax>$6n \log_2 n + 6n$</mathjax> is the worst-case running time for merge sort. For merge sort, this is <mathjax>$T(n)$</mathjax>. We described merge sort's running time in big-oh notation with <mathjax>$O(n \log n)$</mathjax>. This is appropriate because there exists some constant <mathjax>$c$</mathjax> we can multiply <mathjax>$n \log n$</mathjax> by such that, after some input size <mathjax>$n_0$</mathjax>, <mathjax>$c f(n)$</mathjax> is always larger than <mathjax>$T(n)$</mathjax>. In this sense, <mathjax>$n_0$</mathjax> defines a sufficiently large input.</p>
+<p>As a simple example, we can prove that <mathjax>$2^{n+10} = O(2^n)$</mathjax>.</p>
+<p>So the inequality is:</p>
+<p><mathjax>$$
+2^{n+10} \leq c 2^n
+$$</mathjax></p>
+<p>We can re-write this:</p>
+<p><mathjax>$$
+2^{10} 2^n \leq c 2^n
+$$</mathjax></p>
+<p>Then it's clear that if we set <mathjax>$c=2^{10}$</mathjax>, this inequality holds, and it happens to hold for all <mathjax>$n$</mathjax>, so we can just set <mathjax>$n_0 = 1$</mathjax>. Thus <mathjax>$2^{n+10} = O(2^n)$</mathjax> is in fact true.</p>
+<h3>Big-Omega notation</h3>
+<p><mathjax>$T(n) = \Omega(f(n))$</mathjax> if and only if there exist constants <mathjax>$c, n_0 &gt; 0$</mathjax> such that <mathjax>$T(n) \geq c f(n)$</mathjax> for all <mathjax>$n \geq n_0$</mathjax>.</p>
+<p>That is, we can multiply <mathjax>$f(n)$</mathjax> by some constant <mathjax>$c$</mathjax> such that there is some value <mathjax>$n_0$</mathjax>, after which <mathjax>$T(n)$</mathjax> is always <em>above</em> <mathjax>$c f(n)$</mathjax>.</p>
+<h3>Big-Theta notation</h3>
+<p><mathjax>$T(n) = \Theta(f(n))$</mathjax> if and only if <mathjax>$T(n) = O(f(n))$</mathjax> <em>and</em> <mathjax>$T(n) = \Omega(f(n))$</mathjax>. That is, <mathjax>$T(n)$</mathjax> eventually stays sandwiched between <mathjax>$c_1 f(n)$</mathjax> and <mathjax>$c_2 f(n)$</mathjax> after some value <mathjax>$n_0$</mathjax>.</p>
+<h3>Little-Oh notation</h3>
+<p>Stricter than big-oh, in that this must be true for all positive constants.</p>
+<p><mathjax>$T(n) = o(f(n))$</mathjax> if and only if for <em>all</em> constants <mathjax>$c&gt;0$</mathjax>, there exists a constant <mathjax>$n_0$</mathjax> such that <mathjax>$T(n) \leq c f(n)$</mathjax> for all <mathjax>$n \geq n_0$</mathjax>.</p>
+<h2>The divide-and-conquer paradigm</h2>
+<p>This consists of:</p>
+<ul>
+<li>Divide the problem into smaller subproblems. You do not have to literally divide the problem in the algorithm's implementation; this may just be a conceptual step.</li>
+<li>Compute the subproblems using recursion.</li>
+<li>Combine the subproblem solutions into the problem for the original problem.</li>
+</ul>
+<h3>The Master Method/Theorem</h3>
+<p>The Master Method provides an easy way of computing the upper-bound runtime for a divide-and-conquer algorithm, so long as it satisfies the assumptions:</p>
+<p>Assume that subproblems have equal size and the recurrence has the format:</p>
+<ul>
+<li>Base case: <mathjax>$T(n) \leq c$</mathjax>, where <mathjax>$c$</mathjax> is a constant, for all sufficiently small <mathjax>$n$</mathjax>.</li>
+<li>For all larger <mathjax>$n$</mathjax>: <mathjax>$T(n) \leq a T(\frac{n}{b}) + O(n^d)$</mathjax>, where <mathjax>$a$</mathjax> is the number of recursive calls, <mathjax>$a \geq 1$</mathjax>, each subproblem has input size <mathjax>$\frac{n}{b}$</mathjax>, <mathjax>$b &gt; 1$</mathjax>, and outside each recursive call, we do some additional <mathjax>$O(n^d)$</mathjax> of work (e.g. a combine step), parameterized by <mathjax>$d$</mathjax>, <mathjax>$d \geq 0$</mathjax>.</li>
+</ul>
+<p><mathjax>$$
+T(n) =
+\begin{cases}
+O(n^d \log_n) &amp; \text{if $a = b^d$} \\
+O(n^d) &amp; \text{if $a &lt; b^d$} \\
+O(n^{\log_b a}) &amp; \text{if $a &gt; b^d$}
+\end{cases}
+$$</mathjax></p>
+<p>Note that the logarithm base does not matter in the first case, since it just changes the leading constant (which doesn't matter in Big-Oh notation), whereas in the last case the base <em>does</em> matter, because it has a more significant effect.</p>
+<p>To use the master method, we just need to determine <mathjax>$a,b,d$</mathjax>.</p>
+<p>For example:</p>
+<p>With merge sort, there are two recursive calls (thus <mathjax>$a=2$</mathjax>), and the input size to each recursive call is half the original input (thus <mathjax>$b=2$</mathjax>), and the combine step only involves the merge operation (<mathjax>$d=1$</mathjax>).</p>
+<p>Thus, working out the master method inequality, we get <mathjax>$2 = 2^1$</mathjax>, i.e. <mathjax>$a = b^d$</mathjax>, thus:</p>
+<p><mathjax>$$
+T(n) = O(n \log_n)
+$$</mathjax></p>
+<h4>Proof of the Master Method</h4>
+<p>(Carrying over the previously-stated assumptions)</p>
+<p>For simplicity, we'll also assume that <mathjax>$n$</mathjax> is a power of <mathjax>$b$</mathjax>, but this proof holds in the general case as well.</p>
+<p>In the recursion tree, at each level <mathjax>$j=0,1,2,\dots,\log_b n$</mathjax>, there are <mathjax>$a^j$</mathjax> subproblems, each of size <mathjax>$n/b^j$</mathjax>.</p>
+<p>At a level <mathjax>$j$</mathjax>, the total work, not including the work in recursive calls, is:</p>
+<p><mathjax>$$
+\leq a^j c (\frac{n}{b^j})^d
+$$</mathjax></p>
+<p>Note that the <mathjax>$a$</mathjax> and <mathjax>$b$</mathjax> terms are dependent on the level <mathjax>$j$</mathjax>, but the <mathjax>$c,n,d$</mathjax> terms are not. We can rearrange the expression to separate those terms:</p>
+<p><mathjax>$$
+\leq cn^d (\frac{a}{b^d})^j
+$$</mathjax></p>
+<p>To get the total work, we can sum over all the levels:</p>
+<p><mathjax>$$
+\leq cn^d \sum_{j=0}^{\log_b n} (\frac{a}{b^d})^j
+$$</mathjax></p>
+<p>We can think of <mathjax>$a$</mathjax> as the rate of subproblem proliferation (i.e. how the number of subproblems grow with level depth) and <mathjax>$b^d$</mathjax> as the rate of work shrinkage per subproblem.</p>
+<p>There are three possible scenarios, corresponding to the master method's three cases:</p>
+<ul>
+<li>If <mathjax>$a &lt; b^d$</mathjax>, then the amount of work decreases with the recursion level.</li>
+<li>If <mathjax>$a &gt; b^d$</mathjax>, then the amount of work increases with the recursion level.</li>
+<li>If <mathjax>$a = b^d$</mathjax>, then the amount of work stays the same with the recursion level.</li>
+</ul>
+<p>If <mathjax>$a = b^d$</mathjax>, then the summation term in the total work expression, <mathjax>$\sum_{j=0}^{\log_b n} (\frac{a}{b^d})^j$</mathjax>, simply becomes <mathjax>$\log_b n + 1$</mathjax>, thus the total work upper bound in that case is just <mathjax>$c n^d (\log_b n + 1)$</mathjax>, which is just <mathjax>$O(n^d \log n)$</mathjax>.</p>
+<p>A geometric sum for <mathjax>$r \neq 1$</mathjax>:</p>
+<p><mathjax>$$
+1 + r + r^2 + r^3 + \dots + r^k
+$$</mathjax></p>
+<p>Can be expressed in the following closed form:</p>
+<p><mathjax>$$
+\frac{r^{k+1} - 1}{r-1}
+$$</mathjax></p>
+<p>If <mathjax>$r &lt; 1$</mathjax> is constant, then this is <mathjax>$\leq \frac{1}{1-r}$</mathjax> (i.e. it is some constant independent of <mathjax>$k$</mathjax>).<br />
+If <mathjax>$r &gt; 1$</mathjax> is constant, then this is <mathjax>$\leq r^k(1 + \frac{1}{r-1})$</mathjax>, where the last term <mathjax>$(1 + \frac{1}{r-1})$</mathjax> is a constant independent of <mathjax>$k$</mathjax>.</p>
+<p>We can bring this back to the master method by setting <mathjax>$r = \frac{a}{b^d}$</mathjax>.</p>
+<p>If <mathjax>$a &lt; b^d$</mathjax>, then the summation term in the total work expression becomes a constant (as demonstrated with the geometric sum); thus in Big-Oh, that summation term drops, and we are left with <mathjax>$O(n^d)$</mathjax>.</p>
+<p>If <mathjax>$a &gt; b^d$</mathjax>, then the summation term in the total work becomes a constant times <mathjax>$r^k$</mathjax>, where <mathjax>$k = \log_b n$</mathjax>, i.e. the summation term becomes a constant times <mathjax>$(\frac{a}{b^d})^{\log_b n}$</mathjax>. So we get <mathjax>$O(n^d (\frac{a}{b^d})^{\log_b n})$</mathjax>, which simplifies to <mathjax>$O(a^{\log_b n})$</mathjax>, which ends up being the number of leavens in the recursion tree. This is equivalent to  <mathjax>$O(n^{\log_b a})$</mathjax>.</p>
+<h2>Data Structures</h2>
+<p>Data structures are particular ways of organizing data that support certain operations. Structures have strengths and weaknesses in what kinds of operations they can perform, and how well they can perform them.</p>
+<p>For example: lists, stacks, queues, heaps, search trees, hashtables, bloom filters, etc.</p>
+<p>Different data structures are appropriate for different operations (and thus different kinds of problems).</p>
+<h3>Heaps</h3>
+<p>A <em>heap</em> (sometimes called a <em>priority queue</em>) is a container for objects that have keys; these keys are comparable (e.g. we can say that one key is bigger than another).</p>
+<p>Supported operations:</p>
+<ul>
+<li><code>insert</code>: add a new object to the heap, runtime <mathjax>$O(\log n)$</mathjax></li>
+<li><code>extract-min</code>: remove the object with the minimum key value (ties broken arbitrarily), runtime <mathjax>$O(\log n)$</mathjax></li>
+</ul>
+<p>Alternatively, there are max-heaps which return the maximum key value (this can be emulated by a heap by negating key values such that the max becomes the min, etc).</p>
+<p>Sometimes there are additional operations supported:</p>
+<ul>
+<li><code>heapify</code>: initialize a heap in linear time (i.e. <mathjax>$O(n)$</mathjax> time, faster than inserting them one-by-one)</li>
+<li><code>delete</code>: delete an arbitrary element from the middle of the heap in <mathjax>$O(\log n)$</mathjax> time</li>
+</ul>
+<p>For example, you can have a heap where events are your objects and their keys are a scheduled time to occur. Thus when you <code>extract-min</code> you always get the next event scheduled to occur.</p>
+<h3>Balanced Binary Search Tree</h3>
+<p>A <em>balanced binary search tree</em> can be thought of as a dynamic sorted array (i.e. a sorted array which supports <code>insert</code> and <code>delete</code> operations).</p>
+<p>First, consider sorted arrays. They support the following operations:</p>
+<ul>
+<li><code>search</code>: binary search, runtime <mathjax>$O(\log n)$</mathjax></li>
+<li><code>select</code>: select an element by index, runtime <mathjax>$O(1)$</mathjax></li>
+<li><code>min</code> and <code>max</code>: return first and last element of the array (respectively), runtime <mathjax>$O(1)$</mathjax></li>
+<li><code>predecessor</code> and <code>successor</code>: return next smallest and next largest element of the array (respectively), runtime <mathjax>$O(1)$</mathjax></li>
+<li><code>rank</code>: the number of elements less than or equal to a given value, runtime <mathjax>$O(\log n)$</mathjax> (search for the given value and return the position)</li>
+<li><code>output</code>: output elements in sorted order, runtime <mathjax>$O(n)$</mathjax> (since they are already sorted)</li>
+</ul>
+<p>With sorted arrays, insertion and deletions have <mathjax>$O(n)$</mathjax> runtime, which is too slow.</p>
+<p>If you want more logarithmic-time insertions and deletions, we can use a balanced binary search tree. This supports the same operations as sorted arrays (though some are slower) in addition to faster insertions and deletions:</p>
+<ul>
+<li><code>search</code>: runtime <mathjax>$O(\log n)$</mathjax></li>
+<li><code>select</code>: runtime <mathjax>$O(\log n)$</mathjax> (slower than sorted arrays)</li>
+<li><code>min</code> and <code>max</code>: runtime <mathjax>$O(\log n)$</mathjax> (slower than sorted arrays)</li>
+<li><code>predecessor</code> and <code>successor</code>: runtime <mathjax>$O(\log n)$</mathjax> (slower than sorted arrays)</li>
+<li><code>rank</code>: runtime <mathjax>$O(\log n)$</mathjax></li>
+<li><code>output</code>: runtime <mathjax>$O(n)$</mathjax></li>
+<li><code>insert</code>: runtime <mathjax>$O(\log n)$</mathjax></li>
+<li><code>delete</code>: runtime <mathjax>$O(\log n)$</mathjax></li>
+</ul>
+<p>To understand how balanced binary search trees, first consider binary search trees.</p>
+<h4>Binary Search Tree</h4>
+<p>A binary search tree (BST) is a data structure for efficient searching.</p>
+<p>The keys that are stored are the nodes of the tree.</p>
+<p>Each node has three pointers: one to its parent, one to its left child, and one to its right child.</p>
+<p>These pointers can be null (e.g. the root node has no parent).</p>
+<p>The <em>search tree property</em> asserts that for every node, all the keys stored in its left subtree should be less than its key, and all the keys in its right subtree should be greater than its key.</p>
+<p>You can also have a convention for handling equal keys (e.g. just put it on the left or the right subtree).</p>
+<p>This search tree property is what makes it very easy to search for particular values.</p>
+<p>Note that there are many possible binary search trees for a given set of keys. The same set of keys could be arranged as a very deep and narrow BST, or as a very shallow and wide one. The worst case is a depth of about <mathjax>$n$</mathjax>, which is more of a chain than a tree; the best case is a depth of about <mathjax>$\log_2 n$</mathjax>, which is perfectly <em>balanced</em>.</p>
+<p>This search tree property also makes insertion simple. You search for the key to be inserted, which will fail since the key is not in the tree yet, and you get a null pointer - you just assign that pointer to point to the new key. In the case of duplicates, you insert it according to whatever convention you decided on (as mentioned previously). This insert method maintains the search tree property.</p>
+<p>Search and insert performance are dependent on the depth of the tree, so at worst the runtime is <mathjax>$O(\text{height})$</mathjax>.</p>
+<p>The min and max operations are simple: go down the leftmost branch for the min key and go down the rightmost branch for the max key.</p>
+<p>The predecessor operation is a bit more complicated. First you search for the key in question. Then, if the key's node has a left subtree, just take the max of that subtree. However, if the key does not have a left subtree, move up the tree through its parent and ancestors until you find a node with a key less than the key in question. (The successor operation is accomplished in a similar way.)</p>
+<p>The deletion operation is tricky. First we must search for the key we want to delete. Then there are three possibilities:</p>
+<ul>
+<li>the node has no children, so we can just delete it and be done</li>
+<li>the node has one child; we can just delete the node and replace it with its child</li>
+<li>the node has two children; we first compute the predecessor of the node, then swap it with the node, then delete the node</li>
+</ul>
+<p>For the select and rank operations, we can <em>augment</em> our search tree by including additional information at each node: the size of its subtree, including itself (i.e. number of descendants + 1). Augmenting the data structure in this way does add some overhead, e.g. we have to maintain the data/keep it updated whenever we modify the tree.</p>
+<p>For select, we want to find the <mathjax>$i$</mathjax>th value of the data structure. Starting at a node <mathjax>$x$</mathjax>, say <mathjax>$a$</mathjax> is the size of its left subtree. If <mathjax>$a = i-1$</mathjax>, return <mathjax>$x$</mathjax>. If <mathjax>$a \geq i$</mathjax>, recursively select the <mathjax>$i$</mathjax>th value of the left subtree. If <mathjax>$a &lt; i-1$</mathjax>, recursively select the <mathjax>$(i-a-1)$</mathjax>th value of the right subtree.</p>
+<h4>Balanced Binary Search Trees (Red-Black Trees)</h4>
+<p>Balanced binary search trees have the "best" depth of about <mathjax>$\log_2 n$</mathjax>.</p>
+<p>There are different kinds of balanced binary search trees (which are all quite similar), here we will talk about red-black trees (other kinds are AVL trees, splaytrees, B trees, etc).</p>
+<p>Red-Black trees maintain some invariants/constraints which are what guarantee that the tree is balanced:</p>
+<ol>
+<li>each node stores an additional bit indicating if it is a "red" or "black" node</li>
+<li>the root is always black</li>
+<li>never allow two reds in a row (e.g. all of a red node's children are black)</li>
+<li>every path from the root node to a null pointer (e.g. an unsuccessful search) must go through the same number of black nodes</li>
+</ol>
+<p>Consider the following: for a binary search tree, if every root-null path has <mathjax>$\geq k$</mathjax> nodes, then the tree includes at the top a perfectly balanced search tree of depth <mathjax>$k-1$</mathjax>. Thus there must be at least <mathjax>$2^k - 1$</mathjax> nodes in the tree, i.e. <mathjax>$n \geq 2^k - 1$</mathjax>. We can restate this as <mathjax>$k \leq \log_2(n+1)$</mathjax></p>
+<p>In a red-black tree, there is a root-null path with at most <mathjax>$log_2(n+1)$</mathjax> black nodes (e.g. it can have a root-null path composed of only black nodes).</p>
+<p>The fourth constraint on red-black trees means that <em>every</em> root-null path has <mathjax>$\leq log_2(n+1)$</mathjax> black nodes. The third constraint means that we can never have more red nodes than black nodes (because the red nodes can never come one after the other) in a path. So at most a root-null path will have <mathjax>$\leq 2 log_2(n+1)$</mathjax>, which gives us a balanced tree.</p>
+<h3>Hash Tables</h3>
+<p><em>Hash tables</em> (also called <em>dictionaries</em>) allow us to maintain a (possibly evolving) set of stuff.</p>
+<p>The core operations include:</p>
+<ul>
+<li><code>insert</code> using a key</li>
+<li><code>delete</code> using a key</li>
+<li><code>lookup</code> using a key</li>
+</ul>
+<p>When implemented properly, and on non-pathological data, these operations all run in <mathjax>$O(1)$</mathjax> time.</p>
+<p>Hash tables do <em>not</em> maintain any ordering.</p>
+<p>Basically, hash tables use some hash function to produce a hash for an object (some number); this hash is the "address" of the object in the hash table.</p>
+<p>More specifically, we have a hash function which gives us a value in some range <mathjax>$[0, n]$</mathjax>; we have an array of length <mathjax>$n$</mathjax>, so the hash function tells us and what index to place some object.</p>
+<p>There is a chance of <em>collisions</em> in which two different objects produce the same hash.</p>
+<p>There are two main solutions for resolving collisions:</p>
+<ul>
+<li><em>(separate) chaining</em>: if there is a collision, store the objects together at that index as a list</li>
+<li><em>open addressing</em>: here, a hash function specifies a <em>sequence</em> (called a <em>probe sequence</em>) instead of a single value. Try the first value, if its occupied, try the next, and so on.</li>
+<li>one strategy, <em>linear probing</em>, just has you try the hash value + 1 and keep incrementing by one until an empty bucket is found</li>
+<li>another is <em>double hashing</em>, in which you have two hash functions, you look at the first hash, if occupied, offset by the second hash until you find an empty bucket</li>
+</ul>
+<p>Each is more appropriate in different situations.</p>
+<p>The performance of a hash table depends a lot on the particular hash function. Ideally, we want a hash function that:</p>
+<ul>
+<li>has good performance (i.e. low collisions)</li>
+<li>should be easy to store</li>
+<li>should be fast to evaluate (constant time)</li>
+</ul>
+<p>Designing hash functions is as much an art as it is a science. They are quite difficult to design.</p>
+<p>A hash table has a <em>load factor</em> (sometimes just called <em>load</em>), denoted <mathjax>$\alpha = \frac{\text{num. objects in hash table}}{\text{num. buckets in hash table}}$</mathjax>.</p>
+<p>For hash table operations to run constant time, it is necessary that <mathjax>$\alpha = O(1)$</mathjax>. Ideally, it is less than 1, especially with open addressing.</p>
+<p>So for good performance, we need to control load. For example, if <mathjax>$\alpha$</mathjax> passes some threshold, e.g. 0.75, then we may want to expand the hash table to lower the load.</p>
+<p>Every hash function has a "pathological" data set which it performs poorly on. There is no hash function which is guaranteed to spread out <em>every</em> data set evenly (i.e. have low collisions on any arbitrary data set). You can often reverse engineer this pathological data set by analyzing the hash function.</p>
+<p>However, for some hash functions, it is "infeasible" to figure out its pathological data set (as is the case with cryptographic hash functions).</p>
+<p>One approach is to define a <em>family</em> of hash functions, rather than just one, and randomly choose a hash function to use at runtime. This has the property that, on average, you do well across all datasets.</p>
+<h3>Bloom Filters</h3>
+<p>Bloom filters are a variant on hash tables - they are more space efficient, but they allow for some errors (that is, there's a chance of a false positive). In some contexts, this is tolerable.</p>
+<p>They are more space efficient because they do not actually store the objects themselves. They are more commonly used to keep track of what objects have been seen so far. They typically do not support deletions (there are variants that do incorporate deletions but they are more complicated). There is also a small chance that it will say that it's seen an object that it hasn't (i.e. false positives).</p>
+<p>Like a hash table, a bloom filter consists of an array <mathjax>$A$</mathjax>, but each entry in the array is just one bit. Say we have a set of objects <mathjax>$S$</mathjax> and the total number of bits <mathjax>$n$</mathjax> - a bloom filter will use only <mathjax>$\frac{n}{|S|}$</mathjax> bits per object in <mathjax>$S$</mathjax>.</p>
+<p>We also have <mathjax>$k$</mathjax> hash functions <mathjax>$h_1, \dots, h_k$</mathjax> (usually <mathjax>$k$</mathjax> is small).</p>
+<p>The insert operation is defined:</p>
+<div class="highlight"><pre><span class="n">hash_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+  <span class="n">A</span><span class="p">[</span><span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="nb">input</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+
+
+<p>That is, we just set the values of those bits to 1.</p>
+<p>Thus lookup is just to check that all the corresponding bits for an object are 1.</p>
+<p>We can't have any false negatives because those bits will not have been set and bits are never reset back to zero.</p>
+<p>False positives are possible, however, because some other objects may have in aggregate set the bits corresponding to another object.</p>
+<h2>P vs NP</h2>
+<p>Consider the following problem:</p>
+<pre><code>7 * 13 = ?
+</code></pre>
+<p>This is solved very quickly by a computer (it gives 91).</p>
+<p>Now consider the following <em>factoring</em> problem :</p>
+<pre><code>? * ? = 91
+</code></pre>
+<p>This a bit more difficult for a computer to solve, though it will yield the correct answers (7 and 13).</p>
+<p>If we consider extremely large numbers, a computer can still very quickly compute their product.</p>
+<p>But, given a product, it will take a computer a very, very long time to compute their factors.</p>
+<p>In fact, modern cryptography is based on the fact that computers are not good at finding factors for a number (in particular, prime factors).</p>
+<p>This is because computers basically have to use brute force search to identify a factor; with very large numbers, this search space is enormous (it grows exponentially).</p>
+<p>However, once we find a possible solution, it is easy to check that we are correct (e.g. just multiply the factors and compare the product).</p>
+<p>There are many problems which are characterized in this way - they require brute force search to identify the <em>exact</em> answer (there are often faster ways of getting <em>approximate</em> answers), but once an answer is found, it can be easily checked if it is correct.</p>
+<p>There are other problems, such as multiplication, where we can easily "jump" directly to the correct exact answer.</p>
+<p>For the problems that require search, it is not known whether or not there is also a method that can "jump" to the correct answer.</p>
+<p>Consider the "needle in the haystack" analogy. We could go through each piece of hay until we find the needle (brute force search). Or we could use a magnet to pull it out immediately. The question is open: does this magnet exist for problems like factorization?</p>
+<p>Problems which we can quickly solve, like multiplication, are in a family of problems called "P", which stands for "polynomial time" (referring to the relationship between the number of inputs and how computation time increases).</p>
+<p>Problems which can be quickly verified to be correct are in a family of problems called "NP", which stands for "nondeterministic polynomial time".</p>
+<p>P is a subset of NP, since their answers are quickly verified, but NP also includes the aforementioned search problems. Thus, a major question is whether or not P = NP, i.e. we have the "magnet" for P problems, but is there also one for the rest of the NP problems? Or is searching the only option?</p>
+<h3>NP-hard</h3>
+<p>Problems which are <strong>NP-hard</strong> are at least as hard as NP problems, so this includes problems which may not even be in NP.</p>
+<h3>NP-completeness</h3>
+<p>There are some NP problems which all NP problems can be reduced to. Such an NP problem is called <strong>NP-complete</strong>.</p>
+<p>For example, any NP problem can be reduced to a clique problem (e.g. finding a clique of some arbitrary size in a graph); thus the clique problem is NP-complete. Any other NP problem can be reduced to a clique problem, and if we can find a way of solving the clique problem quickly, we can also all of those related problems quickly as well.</p>
+<p>To show that a problem is NP complete, you must:</p>
+<ul>
+<li>Show that it is in NP: that is, show that there is a polynomial time algorithm that can verify whether or not an answer is correct</li>
+<li>Show that it is NP-hard: that is, reduce some known NP-complete problem to your problem in polynomial time.</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.coursera.org/course/algo">Algorithms: Design and Analysis, Part 1</a>. Tim Roughgarden. Stanford/Coursera.</li>
+<li><a href="http://www.greenteapress.com/compmod/">Think Complexity</a>. Version 1.2.3. Allen B. Downey. 2012.</li>
+<li><a href="https://www.youtube.com/watch?v=msp2y_Y5MLE">Beyond Computation: The P vs NP Problem</a>. Michael Sipser, MIT. Tuesday, October 3, 2006.</li>
+<li><em>Algorithmic Puzzles</em>. Anany Levitin, Maria Levitin. 2011.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

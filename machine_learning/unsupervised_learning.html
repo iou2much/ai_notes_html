@@ -1,0 +1,256 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Unsupervised Learning</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Unsupervised Learning</h1>
+<p>In unsupervised learning, our data does not have any labels. Unsupervised learning algorithms try to find some structure in the data.</p>
+<p>An example is a <strong>clustering</strong> algorithm. We don't tell the algorithm in advance anything about the structure of the data; it discovers it on its own by figuring how to group them.</p>
+<p>Some other examples are <strong>dimensionality reduction</strong>, in which you try to reduce the dimensionality of the data representation, <strong>density estimation</strong>, in which you estimate the probability distribution of the data, <mathjax>$p(x)$</mathjax>, and <strong>feature extraction</strong>, in which you try to learn meaningful features automatically.</p>
+<h2>k-Nearest Neighbors (kNN)</h2>
+<p>A very simple nonparametric classification algorithm in which you take the <mathjax>$k$</mathjax> closest neighbors to a point ("closest" depends on the distance metric you choose) and each neighbor constitutes a "vote" for its label. Then you assign the point the label with the most votes.</p>
+<p>Because this is essentially predicting an input's label based on similar instances, kNN is a <strong>case-based approach</strong>. The key with case-based approaches is how you define similarity - a common way is feature dot products:</p>
+<p><mathjax>$$
+\text{sim}(x, x') = x \cdot x' = \sum_i x_i x_i'
+$$</mathjax></p>
+<p><mathjax>$k$</mathjax> can be chosen heuristically: generally you don't want it to be so high that the votes become noisy (in the extreme, if you have <mathjax>$n$</mathjax> datapoints and set <mathjax>$k=n$</mathjax>, you will just choose the most common label in the dataset), and you want to chose it so that it is coprime with the number of classes (that is, they share no common divisors except for 1). This prevents ties.</p>
+<p>Alternatively, you can apply an optimization algorithm to choose <mathjax>$k$</mathjax>.</p>
+<p>Some distances that you can use include Euclidean distance, Manhattan distance (also known as the city block distance or the taxicab distance), Minkowski distance (a generalization of the Manhattan and Euclidean distances), and Mahalanobis distance.</p>
+<p>Minkowski-type distances assume that data is symmetric; that in all dimensions, distance is on the same scale. Mahalanobis distance, on the other hand, takes into account the standard deviation of each dimension.</p>
+<p>kNN can work quite quickly when implemented with something like a k-d tree.</p>
+<p>kNN and other case-based approaches are examples of nonparametric models. With nonparametric models, there is not a fixed set of parameters (which isn't to say that there are <em>no</em> parameters, though the name "nonparametric" would have you think otherwise). Rather, the complexity of the classifier increases with the data. Nonparametric models typically require a lot of data before they start to be competitive with parametric models.</p>
+<h2>Clustering</h2>
+<h3>K-Means Clustering Algorithm</h3>
+<p>First, randomly initialize <mathjax>$K$</mathjax> points, called the <em>cluster centroids</em>.</p>
+<p>Then iterate:</p>
+<ul>
+<li>Cluster assignment step: go through each data point and assign it to the closest of the <mathjax>$K$</mathjax> centroids.</li>
+<li>Move centroid step: move the centroids to the average of their points.</li>
+</ul>
+<p>Closeness is computed by some distance metric, e.g. euclidean.</p>
+<p>More formally, there are two inputs:</p>
+<ul>
+<li><mathjax>$K$</mathjax> - the number of clusters</li>
+<li>The training set <mathjax>$\\{x^{(1)}, x^{(2)}, \dots, x^{(m)}\\}$</mathjax></li>
+</ul>
+<p>Where <mathjax>$x^{(i)} \in \mathbb R^n$</mathjax> (we drop the <mathjax>$x_0 = 1$</mathjax> convention).</p>
+<p>Randomly initialize <mathjax>$K$</mathjax> cluster centroids <mathjax>$\mu_1, \mu_2, \dots, \mu_K \in \mathbb R^n$</mathjax>.</p>
+<p>Repeat:</p>
+<ul>
+<li>For <mathjax>$i=1$</mathjax> to <mathjax>$m$</mathjax><ul>
+<li><mathjax>$c^{(i)} :=$</mathjax> index (from 1 to <mathjax>$K$</mathjax>) of cluster centroid closest to <mathjax>$x^{(i)}$</mathjax>. That is, <mathjax>$c^{(i)} := \text{min}_k ||x^{(i)} - \mu_k||$</mathjax>.</li>
+</ul>
+</li>
+<li>For <mathjax>$k=1$</mathjax> to <mathjax>$K$</mathjax><ul>
+<li><mathjax>$\mu_k :=$</mathjax> average (mean) of points assigned to cluster <mathjax>$k$</mathjax></li>
+</ul>
+</li>
+</ul>
+<p>If you have an empty cluster, it is common to just eliminate it entirely.</p>
+<p>We can notate the cluster centroid of the cluster to which example <mathjax>$x^{(i)}$</mathjax> has been assigned as <mathjax>$\mu_{c^{(i)}}$</mathjax>.</p>
+<p>In K-means, the optimization objective is:</p>
+<p><mathjax>$$
+\begin{aligned}
+J(c^{(i)}, \dots, c^{(m)}, \mu_1, \dots, \mu_K) = \frac{1}{m} \sum^m_{i=1} ||x^{(i)} - \mu_{c^{(i)}}||^2 \\
+min_{c^{(i)}, \dots, c^{(m)}, \mu_1, \dots, \mu_K} J(c^{(i)}, \dots, c^{(m)}, \mu_1, \dots, \mu_K)
+\end{aligned}
+$$</mathjax></p>
+<p>This cost function is sometimes called the <em>distortion</em> cost function or the distortion of the K-means algorithm.</p>
+<p>The algorithm outlined above is minimizing the cost: the first step tries to minimize <mathjax>$c^{(i)}, \dots, c^{(m)}$</mathjax> and the second step tries to minimize <mathjax>$\mu_1, \dots, \mu_K$</mathjax>.</p>
+<p>Note that we randomly initialize the centroids, so different runs of K-means could lead to (very) different clusterings.</p>
+<p>One question is - what's the best way to initialize the initial centroids to avoid local minima of the cost function?</p>
+<p>First of all, you should halve <mathjax>$K &lt; m$</mathjax> (i.e. less than your training examples.)</p>
+<p>Then randomly pick <mathjax>$K$</mathjax> training examples. Use these as your initialization points (i.e. set <mathjax>$\mu_1, \dots, \mu_k$</mathjax> to these <mathjax>$K$</mathjax> examples).</p>
+<p>Then, to better avoid local optima, just rerun K-means several times (e.g. 50-1000 times) with new initializations of points. Keep track of the resulting cost function and then pick the clustering that gave the lowest cost.</p>
+<p>So, how do you choose a good value for <mathjax>$K$</mathjax>?</p>
+<p>Unfortunately, there is no good way of doing this automatically. The most common way is to just choose it manually by looking at the output. If you plot out the data and look at it - even among people it is difficult to come to a consensus on how many clusters there are.</p>
+<p>One method that some use is the <em>Elbow method</em>. In this approach, you vary <mathjax>$K$</mathjax>, run K-means, and compute the cost function for each value. If you plot out <mathjax>$K$</mathjax> vs the cost functions, there may be a clear "elbow" in the graph and you pick the <mathjax>$K$</mathjax> at the elbow. However, most of the time there isn't a clear elbow, so the method is not very effective.</p>
+<p>One drawback of K-means (which many other clustering algorithms share) is that <em>every</em> point has a cluster assignment, which is to say K-means has no concept of "noise".</p>
+<p>Furthermore, K-means expects clusters to be globular, so it can't handle more exotic cluster shapes (such as moon-shaped clusters).</p>
+<p>There are still many situations where K-means is quite useful, especially since it scales well to large datasets.</p>
+<h3>Hierarchical Agglomerative Clustering</h3>
+<p>Hierarchical agglomerative clustering (HAC) is a bottom-up clustering process which is fairly simple:</p>
+<ol>
+<li>Find two closest data points or clusters, merge into a cluster (and remove the original points or clusters which formed the new cluster)</li>
+<li>Repeat</li>
+</ol>
+<p>This results in a hierarchy (e.g. a tree structure) describing how the data can be grouped into clusters and clusters of clusters. This structure can be visualized as a dendrogram:</p>
+<figure><img alt="A dendrogram" src="../assets/dendrogram.svg" /><figcaption>A dendrogram</figcaption>
+</figure>
+<p>Two things which must be specified for HAC are:</p>
+<ul>
+<li>the distance metric: euclidean, cosine, etc</li>
+<li>the merging approach - that is, how is the distance between two clusters measured?<ul>
+<li><em>complete linkage</em> - use the distance between the two further points</li>
+<li><em>average linkage</em> - take the average distances of all pairs between the clusters</li>
+<li><em>single linkage</em> -  take the distance between the two nearest points</li>
+<li>(there are others as well)</li>
+</ul>
+</li>
+</ul>
+<p>Unlike K-means, HAC is deterministic (since there are no randomly-initialized centroids) but it can be unstable: changing a few points or the presence of some outliers can vastly change the result. Scaling of variables/features can also affect clustering.</p>
+<p>HAC does not assume globular clusters, although it does not have a concept of noise.</p>
+<h3>Affinity Propagation</h3>
+<p>In affinity propagation, data points "vote" on their preferred "exemplar", which yields a set of exemplars as the initial cluster points. Then we just assign each point to the nearest exemplar.</p>
+<p>Affinity Propagation is one of the few clustering algorithms which supports non-metric dissimilarities (i.e. the dissimilarities do not need to be symmetric or obey the triangle inequality).</p>
+<p>Like K-means, affinity propagation also does not have a concept of noise and also assumes that clusters are globular. Unlike K-means, however, it is deterministic, and it does not scale very well (mostly because its support for non-metric dissimilarities precludes it from many optimizations that other algorithms can take advantage of).</p>
+<h3>Spectral Clustering</h3>
+<p>With spectral clustering, datapoints are clustered by <em>affinity</em> - that is, by nearby points - rather than by centroids (as is with K-Means). Using affinity instead of centroids, spectral clustering can identify clusters where K-Means fails to.</p>
+<p>In spectral clustering, an <em>affinity matrix</em> is produced which, for a set of <mathjax>$n$</mathjax> datapoints, is an <mathjax>$n \times n$</mathjax> matrix. Pairwise affinities are computed for the dataset. Affinity is some distance metric.</p>
+<p>Then, from this affinity matrix, PCA is used to extract the eigenvectors with the largest eigenvalues and the data is then projected to the new space defined by PCA. The data will be more clearly separated in this new representation such that conventional clustering methods (e.g. K-Means) can be applied.</p>
+<p>More formally: spectral clustering generates a graph of the datapoints, with edges as the distances between the points. Then the Laplacian of the graph is produced:</p>
+<p>Given the adjacency matrix <mathjax>$A$</mathjax> and the degree matrix <mathjax>$D$</mathjax> of a graph <mathjax>$G$</mathjax> of <mathjax>$n$</mathjax> vertices, the Laplacian matrix <mathjax>$L_{n \times n}$</mathjax> is simply <mathjax>$L = D - A$</mathjax>.</p>
+<p>As a reminder:</p>
+<ul>
+<li>the adjacency matrix <mathjax>$A$</mathjax> is an <mathjax>$n \times n$</mathjax> matrix where the element <mathjax>$A_{i,j}$</mathjax> is 1 if an edge exists between vertices <mathjax>$i$</mathjax> and <mathjax>$j$</mathjax> and 0 otherwise.</li>
+<li>the degree matrix <mathjax>$D$</mathjax> is an <mathjax>$n \times n$</mathjax> diagonal matrix where the element <mathjax>$D_{i,i}$</mathjax> is the degree of vertex <mathjax>$i$</mathjax>.</li>
+</ul>
+<p>Then the eigenvectors of the Laplacian are computed to find an embedding of the graph into Euclidean space. Then some clustering algorithm (typically K-Means) is run on the data in this transformed space.</p>
+<p>Spectral clustering enhances clustering algorithms which assume globular clusters in that its space transformation of the data causes non-globular data to be globular in the transformed space. However, the graph transformation slows things down.</p>
+<h3>Mean Shift Clustering</h3>
+<p>Mean shift clustering extends KDE one step further: the data points iteratively hill-climb to the peak of nearest KDE surface.</p>
+<p>As a parameter to the kernel density estimates, you need to specify a <em>bandwidth</em> - this will affect the KDEs and their peaks, and thus it will affect the clustering results. You do not, however, need to specify the number of clusters.</p>
+<p>Below are some examples of different bandwidth results (<a href="http://spin.atomicobject.com/2015/05/26/mean-shift-clustering/">source</a>).</p>
+<p><img alt="Bandwidth: 2" src="../assets/meanshift_bw_01.png" /><br />
+<img alt="Bandwidth: 0.8" src="../assets/meanshift_bw_02.png" /></p>
+<p>You also need to make the choice of what kernel to use. Two commonly used kernels are:</p>
+<ul>
+<li>Flat kernel:</li>
+</ul>
+<p><mathjax>$$
+K(x) =
+\begin{cases}
+1 &amp; \text{if $||x|| \leq 1$} \\
+0 &amp; \text{otherwise}
+\end{cases}
+$$</mathjax></p>
+<ul>
+<li>Gaussian kernel</li>
+</ul>
+<figure><img alt="Gaussian kernel" src="../assets/gaussian_kernel.svg" /><figcaption>Gaussian kernel</figcaption>
+</figure>
+<p>Mean shift is slow (<mathjax>$O(N^2)$</mathjax>).</p>
+<h3>Non-Negative Matrix Factorization (NMF)</h3>
+<p>NMF is a particular matrix factorization in which each element of <mathjax>$V$</mathjax> is <mathjax>$\geq 0$</mathjax> (a non-negative constraint), and results in factor matrices <mathjax>$W$</mathjax> and <mathjax>$H$</mathjax> such that each of their elements are also <mathjax>$\geq 0$</mathjax>.</p>
+<figure><img alt="Non-negative matrix factorization (By Qwertyus, CC BY-SA 3.0, via Wikimedia Commons)" src="../assets/nmf.svg" /><figcaption>Non-negative matrix factorization (By Qwertyus, CC BY-SA 3.0, via Wikimedia Commons)</figcaption>
+</figure>
+<p>Each column <mathjax>$v_i$</mathjax> in <mathjax>$V$</mathjax> can be calculated from <mathjax>$W$</mathjax> and <mathjax>$H$</mathjax> like so (where <mathjax>$h_i$</mathjax> is a column in <mathjax>$H$</mathjax>):</p>
+<p><mathjax>$$
+v_i = W h_i
+$$</mathjax></p>
+<p>NMF can be used for clustering; it has a consequence of naturally clustering the columns of <mathjax>$V$</mathjax>.</p>
+<p>It is also useful for reducing (i.e. compressing) the dimensionality of a dataset, in particular, it reduces it into a linear combination of bases.</p>
+<p>If you add an orthogonality constraint, i.e. <mathjax>$HH^T = I$</mathjax>, if the value at <mathjax>$H_{kj} &gt; 0$</mathjax>, then the <mathjax>$j$</mathjax>th column of <mathjax>$V$</mathjax>, that is, <mathjax>$v_j$</mathjax>, belongs to the cluster <mathjax>$k$</mathjax>.</p>
+<h4>Matrix factorization</h4>
+<p>Let <mathjax>$V$</mathjax> be an <mathjax>$m \times n$</mathjax> matrix of rank <mathjax>$r$</mathjax>. Then there is an <mathjax>$m \times r$</mathjax> matrix <mathjax>$W$</mathjax> and an <mathjax>$r \times n$</mathjax> matrix <mathjax>$H$</mathjax> such that <mathjax>$V=WH$</mathjax>. So we can factorize (or <em>decompose</em>) <mathjax>$V$</mathjax> into <mathjax>$W$</mathjax> and <mathjax>$H$</mathjax>.</p>
+<p>This matrix factorization can be seen as a form of compression (for low rank matrices, at least) - if we were to store <mathjax>$V$</mathjax> on its own, we have to store <mathjax>$m \times n$</mathjax> elements, but if we store <mathjax>$W$</mathjax> and <mathjax>$H$</mathjax> separately, we only need to store <mathjax>$m \times r + r \times n$</mathjax> elements, which will be smaller than <mathjax>$m \times n$</mathjax> for low rank matrices.</p>
+<p>Note that this kind of factorization can't be solved analytically, so it is usually approximated numerically (there are a variety of algorithms for doing so).</p>
+<h3>DBSCAN</h3>
+<p>DBSCAN transforms the space according to density, then identifies for dense regions as clusters by using single linkage clustering. Sparse points are considered noise - not all points are forced to have cluster assignment.</p>
+<p>DBSCAN handles non-globular clusters well, provided they have consistent density - it has some trouble with variable density clusters (they may be split up into multiple clusters).</p>
+<h3>HDBSCAN</h3>
+<p>HDBSCAN is an improvement upon DBSCAN which can handle variable density clusters, while preserving the scalability of DBSCAN. DBSCAN's epsilon parameter is replaced with a "min cluster size" parameter.</p>
+<p>HDBSCAN uses single-linkage clustering, and a concern with single-linkage clustering is that some errant point between two clusters may accidentally act as a bridge between them, such that they are identified as a single cluster. HDBSCAN avoids this by first transforming the space in such a way that sparse points (these potentially troublesome noise points) are pushed further away.</p>
+<p>To do this, we first define a distance called the <strong>core distance</strong>, <mathjax>$\text{core}_k(x)$</mathjax>, which is point <mathjax>$x$</mathjax>'s distance from its <mathjax>$k$</mathjax>th nearest neighbor.</p>
+<p>Then we define a new distance metric based on these core distances, called <strong>mutual reachability distance</strong>. The mutual reachability distance <mathjax>$d_{\text{mreach}-k}$</mathjax> between points <mathjax>$a$</mathjax> and <mathjax>$b$</mathjax> is the furthest of the following points: <mathjax>$\text{core}_k(a), \text{core}_k(b), d(a,b)$</mathjax>, where <mathjax>$d(a,b)$</mathjax> is the regular distance metric between <mathjax>$a$</mathjax> and <mathjax>$b$</mathjax>. More formally:</p>
+<p><mathjax>$$
+d_{\text{mreach}-k}(a, b) = \max(\text{core}_k(a), \text{core}_k(b), d(a,b))
+$$</mathjax></p>
+<p>For example, if <mathjax>$k=5$</mathjax>:</p>
+<figure><img alt="" src="../assets/hdbscan_distance_01.svg" /><figcaption></figcaption>
+</figure>
+<p>Then we can pick another point:</p>
+<figure><img alt="" src="../assets/hdbscan_distance_02.svg" /><figcaption></figcaption>
+</figure>
+<p>And another point:</p>
+<figure><img alt="" src="../assets/hdbscan_distance_03.svg" /><figcaption></figcaption>
+</figure>
+<p>Say we want to compute the mutual reachability distance between the blue <mathjax>$b$</mathjax> and green <mathjax>$g$</mathjax> points.</p>
+<p>First we can compute <mathjax>$d(b, g)$</mathjax>:</p>
+<figure><img alt="" src="../assets/hdbscan_distance_04.svg" /><figcaption></figcaption>
+</figure>
+<p>Which is larger than <mathjax>$\text{core}_k(b)$</mathjax>, but both are smaller than <mathjax>$\text{core}_k(g)$</mathjax>. So the mutual reachability distance between <mathjax>$b$</mathjax> and <mathjax>$g$</mathjax> is <mathjax>$\text{core}k(g)$</mathjax>:</p>
+<figure><img alt="" src="../assets/hdbscan_distance_05.svg" /><figcaption></figcaption>
+</figure>
+<p>On the other hand, the mutual reachability distance between the red and green points is equal to <mathjax>$d(r, g)$</mathjax> because that is larger than either of their core distances.</p>
+<p>We build a distance matrix out of these mutual reachability distances; this is the transformed space. We can use this distance matrix to represent a graph of the points.</p>
+<p>We want to construct a minimum spanning tree out of this graph.</p>
+<p>As a reminder, a <em>spanning tree</em> of a graph is any subgraph which contains all vertices and is a tree (a tree is a graph where vertices are connected by only one path; i.e. it is a connected graph - all vertices are connected - but there are no cycles).</p>
+<p>The weight of a tree is the sum of its edges' weights. A minimum spanning tree is a spanning tree with the least (or equal to least) weight.</p>
+<p>The minimum spanning tree of this graph can be constructed using Prim's algorithm.</p>
+<p>From this spanning tree, we then want to create the cluster hierarchy. This can be accomplished by sorting edges from closest to furthest and iterating over them, creating a merged cluster for each edge.</p>
+<p>(A note from the original post which I don't understand yet: "The only difficult part here is to identify the two clusters each edge will join together, but this is easy enough via a union-find data structure.")</p>
+<p>Given this hierarchy, we want a set of flat clusters. DBSCAN asks you to specify the number of clusters, but HDBSCAN can independently discover them. It does require, however, that you specify a minimum cluster size.</p>
+<p>In the produced hierarchy, it is often the case that a cluster splits into one large subcluster and a few independent points. Other times, the cluster splits into two good-sized clusters. The minimum cluster size makes explicit what a "good-sized" cluster is.</p>
+<p>If a cluster splits into clusters which are at or above the minimum cluster size, we consider them to be separate clusters. Otherwise, we don't split the cluster (we treat the other points as having "fallen out of" the parent cluster) and just keep the parent cluster intact. However, we keep track of which points have "fallen out" and at what distance that happened. This way we know at which distance cutoffs the cluster "sheds" points. We also keep track at what distances a cluster split into its children clusters.</p>
+<p>Using this approach, we "clean up" the hierarchy.</p>
+<p>We use the distances at which a cluster breaks up into subclusters to measure the <em>persistence</em> of a cluster. Formally, we think in terms of <mathjax>$\lambda = \frac{1}{\text{distance}}$</mathjax>.</p>
+<p>We define for each cluster a <mathjax>$\lambda_{\text{birth}}$</mathjax>, which is the distance at which this cluster's parent split to yield this cluster, and a <mathjax>$\lambda_{\text{death}}$</mathjax>, which is the distance at which this cluster itself split into subclusters (if it does eventually split into subclusters).</p>
+<p>Then, for each point <mathjax>$p$</mathjax> within a cluster, we define <mathjax>$\lambda_p$</mathjax> to be when that point "fell out" of the cluster, which is either somewhere in between <mathjax>$\lambda_{\text{birth}}, \lambda_{\text{death}}$</mathjax>, or, if the point does not fall out of the cluster, it is just <mathjax>$\lambda_{\text{death}}$</mathjax> (that is, it falls out when the cluster itself splits).</p>
+<p>The <em>stability</em> of a cluster is simply:</p>
+<p><mathjax>$$
+\sum_{p \in \text{cluster}} (\lambda_p - \lambda_{\text{birth}})
+$$</mathjax></p>
+<p>Then we start with all the leaf nodes and select them as clusters. We move up the tree and sum the stabilities of each cluster's child clusters. Then:</p>
+<ul>
+<li>If the sum of cluster's child stabilities <em>greater</em> than its own stability, then we set its stability to be the sum of its child stabilities.</li>
+<li>If the sum of a cluster's child stabilities is <em>less</em> than its own stability, then we select the cluster and unselect its descendants.</li>
+</ul>
+<p>When we reach the root node, return the selected clusters. Points not in any of the selected clusters are considered noise.</p>
+<p>As a bonus: each <mathjax>$\lambda_p$</mathjax> in the selected clusters can be treated as membership strength to the cluster if we normalize them.</p>
+<h3>CURE (Clustering Using Representatives)</h3>
+<p>If you are dealing with more data than can fit into memory, you may have issues clustering it.</p>
+<p>A flexible clustering algorithm (there are no restrictions about the shape of the clusters it can find) which can handle massive datasets is CURE.</p>
+<p>CURE uses Euclidean distance and generates a set of <mathjax>$k$</mathjax> representative points for each clusters. It uses these points to represent clusters, therefore avoiding the need to store every datapoint in memory.</p>
+<p>CURE works in two passes.</p>
+<p>For the first pass, a random sample of points from the dataset are chosen. The more samples the better, so ideally you choose as many samples as can fit into memory. Then you apply a conventional clustering algorithm, such as hierarchical clustering, to this sample. This creates an initial set of clusters to work with.</p>
+<p>For each of these generated clusters, we pick <mathjax>$k$</mathjax> representative points, such that these points are as dispersed as possible within the cluster.</p>
+<p>For example, say <mathjax>$k=4$</mathjax>. For each cluster, pick a point at random, then pick the furthest point from that point (within the same cluster), then pick the furthest point (within the same cluster) from those two points, and repeat one more time to get the fourth representative point.</p>
+<p>Then copy each representative point and move that copy some fixed fraction (e.g. 0.2) closer to the cluster's centroid. These copied points are called "synthetic points" (we use them so we don't actually move the datapoints themselves). These synthetic points are the representatives we end up using for each cluster.</p>
+<p>For the second pass, we then iterate over each point <mathjax>$p$</mathjax> in the entire dataset. We assign <mathjax>$p$</mathjax> to its closest cluster, which is the cluster that has the closest representative point to <mathjax>$p$</mathjax>.</p>
+<h2>References</h2>
+<ul>
+<li><a href="http://nbviewer.jupyter.org/github/lmcinnes/hdbscan/blob/master/notebooks/How%20HDBSCAN%20Works.ipynb">How HDBSCAN Works</a>. Leland McInnes.</li>
+<li><em>Thoughtful Machine Learning</em>. Matthew Kirk. 2015.</li>
+<li><a href="http://nbviewer.ipython.org/github/lmcinnes/hdbscan/blob/master/notebooks/Comparing%20Clustering%20Algorithms.ipynb">Comparing Python Clustering Algorithms</a>. Leland McInnes.</li>
+<li><a href="https://www.edx.org/course/artificial-intelligence-uc-berkeleyx-cs188-1x">CS188: Artificial Intelligence</a>. Dan Klein, Pieter Abbeel. University of California, Berkeley (edX).</li>
+<li><a href="http://spin.atomicobject.com/2015/05/26/mean-shift-clustering/">Mean Shift Clustering</a>. Matt Nedrich.</li>
+<li><a href="https://www.coursera.org/course/mmds">Mining Massive Datasets</a> (Coursera &amp; Stanford, 2014). Jure Leskovec, Anand Rajaraman, Jeff Ullman.</li>
+<li><a href="https://www.youtube.com/watch?v=o8PiWO8C3zs">Example of matrix factorization.</a>. <a href="https://www.youtube.com/channel/UCPvidEQSVoWlS0KAIEilThA">MH1200</a>.</li>
+<li><a href="https://en.wikipedia.org/wiki/Non-negative_matrix_factorization#Clustering_property">Non-negative matrix factorization</a>. Wikipedia.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

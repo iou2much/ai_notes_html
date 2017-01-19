@@ -1,0 +1,60 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>alphago</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <p>Mastering the game of Go with deep neural networks and tree search. David Silver, Aja Huang, Chris J. Maddison, Arthur Guez, Laurent Sifre, George van den Driessche, Julian Schrittwieser, Ioannis Antonoglou, Veda Panneershelvam, Marc Lanctot, Sander Dieleman, Dominik Grewe, John Nham, Nal Kalchbrenner, Ilya Sutskever, Timothy Lillicrap, Medeleine Leach, Koray Kavukcuoglu, Thore Graepel, Demis Hassabis. Nature, Vol 529. January 28, 2016.</p>
+<p>In a perfect-information game, there is some optimal value function <mathjax>$v^*(s)$</mathjax> for a given state <mathjax>$s$</mathjax> that holds when all players play perfectly.</p>
+<p>A search space may be too large to fully expand to terminal nodes. There are two techniques for reducing this search space:</p>
+<ol>
+<li>The <em>depth</em> can be reduced truncating the search tree under state <mathjax>$s$</mathjax> and using an approximate value function <mathjax>$v(s) \approx v^*(s)$</mathjax> for that state.</li>
+<li>The <em>breadth</em> can be reduced by sampling moves (actions) from a learned policy <mathjax>$p(a|s)$</mathjax> (a probability distribution over possible actions <mathjax>$a$</mathjax> from state <mathjax>$s$</mathjax>) rather than exhaustively considering every possible move from that state.</li>
+</ol>
+<p>A <em>Monte Carlo rollout</em> searches the complete depth of a tree, but along a single branch; that is, at each step it samples one move from the policy and extends the tree with that.</p>
+<p><em>Monte Carlo Tree Search</em> (MCTS) uses such multiple rollouts to value each state.</p>
+<p>AlphaGo has three policy (neural) network and a value (neural) network.</p>
+<p>The three policy networks are:</p>
+<ol>
+<li>a supervised learning policy network, <mathjax>$p_{\sigma}$</mathjax>, which is a convolutional neural network</li>
+<li>a simple linear softmax policy network, <mathjax>$p_{\pi}$</mathjax>, which is less accurate than <mathjax>$p_{\sigma}$</mathjax> but much faster</li>
+<li>a reinforcement learning policy network <mathjax>$p_{\rho}$</mathjax>, which has the same architecture as <mathjax>$p_{\sigma}$</mathjax> and has weights initialized from <mathjax>$p_{\sigma}$</mathjax> as well (basically, it is a copy of <mathjax>$p_{\sigma}$</mathjax> that is improved through reinforcement learning)</li>
+</ol>
+<p><mathjax>$p_{\rho}$</mathjax>'s reward function <mathjax>$r(s)$</mathjax> is zero for all non-terminal time steps. It is trained from randomly selected previous iterations of itself (so as to avoid overfitting to a particular opponent policy).</p>
+<p>Typically, the approximate value function <mathjax>$v(s)$</mathjax> is just a linear combination of features. Here, a neural network is used instead - in particular, a convolutional neural network with the same architecture as <mathjax>$p_{\sigma}$</mathjax>, but outputs a single prediction rather than a distribution.</p>
+<p>See the paper for more details on how each of these networks are trained.</p>
+<p>The policy networks and value networks are then used as parts of Q-Learning.</p>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

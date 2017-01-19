@@ -1,0 +1,135 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Functions</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <p><mathjax>$$
+\DeclareMathOperator{\Img}{im}
+$$</mathjax></p>
+<h1>Functions</h1>
+<p>函数是不同集合间值的映射关系:<br />
+Fundamentally, a function is a relationship (mapping) between the values of some set <mathjax>$X$</mathjax> and some set <mathjax>$Y$</mathjax>:</p>
+<p><mathjax>$$ f:X \to Y $$</mathjax></p>
+<figure><img alt="A function is a mapping between domains." src="../assets/function.svg" /><figcaption>A function is a mapping between domains.</figcaption>
+</figure>
+<p>函数能对同一个集合内的元素自身映射.<br />
+A function can map a set to itself. For example, <mathjax>$f(x) = x^2$</mathjax>, also notated <mathjax>$f:x \mapsto x^2$</mathjax>, is the mapping of all real numbers to all real numbers, or <mathjax>$f:\mathbb R \to \mathbb R$</mathjax>.</p>
+<p>映射的源集合叫<strong>定义域</strong>.<br />
+The set you are mapping <em>from</em> is called the <strong>domain</strong>.</p>
+<p>映射的目标集合叫<strong>值域</strong>.<br />
+The set that is being mapped <em>to</em> is called the <strong>codomain</strong>.</p>
+<p>The <strong>range</strong> is the subset of the codomain which the function actually maps to (a function doesn't necessarily map to <em>every</em> value in the codomain. But where it does, the range equals the codomain).</p>
+<p>Functions which map to <mathjax>$\mathbb R$</mathjax> are known as <strong>scalar-valued</strong> or <strong>real-valued</strong> functions.</p>
+<p>Functions which map to <mathjax>$\mathbb R^n$</mathjax> where <mathjax>$n &gt; 1$</mathjax> are known as <strong>vector-valued</strong> functions.</p>
+<h3>Identity functions</h3>
+<p>An identity function maps something to itself:</p>
+<p><mathjax>$$
+I_X : X \to X
+$$</mathjax></p>
+<p>That is, for every <mathjax>$a$</mathjax> in <mathjax>$X$</mathjax>, <mathjax>$I_X(a) = a$</mathjax>:</p>
+<p><mathjax>$$
+I_X(a) = a, \forall \, a \in X
+$$</mathjax></p>
+<h3>The inverse of a function</h3>
+<p>Say we have a function <mathjax>$f: X \to Y$</mathjax>, where <mathjax>$f(a) = b$</mathjax> for any <mathjax>$a \in X$</mathjax>.</p>
+<p>We say <mathjax>$f$</mathjax> is <strong>invertible</strong> if and only if there exists a function <mathjax>$f^{-1}: Y \to X$</mathjax> such that <mathjax>$f^{-1} \circ f = I_X$</mathjax> and <mathjax>$f \circ f^{-1} = I_Y$</mathjax>. Note that <mathjax>$\circ$</mathjax> denotes <strong>function composition</strong>, i.e. <mathjax>$f \circ g = f(g)$</mathjax>, which is the same as <mathjax>$f(g(x))$</mathjax>.</p>
+<p>The inverse of a function is <em>unique</em>, that is, it is <em>surjective</em> and <em>injective</em> (described below), that is, there is a unique <mathjax>$x$</mathjax> for each <mathjax>$y$</mathjax>.</p>
+<h3>Surjective functions</h3>
+<p>A <strong>surjective</strong> function, also called "onto", is a function <mathjax>$f: X \to Y$</mathjax> where, for every <mathjax>$y \in Y$</mathjax> there exists <em>at least</em> one <mathjax>$x \in X$</mathjax> such that <mathjax>$f(x) = y$</mathjax>. That is, every <mathjax>$y$</mathjax> has at least one corresponding <mathjax>$x$</mathjax> value.</p>
+<p>This is equivalent to:</p>
+<p><mathjax>$$ \text{range}(f) = Y $$</mathjax></p>
+<h3>Injective functions</h3>
+<p>An <strong>injective</strong> function, also called "one-to-one", is a function <mathjax>$f: X \to Y$</mathjax> where, for every <mathjax>$y \in Y$</mathjax>, there exists <em>at most</em> one <mathjax>$x \in X$</mathjax> such that <mathjax>$f(x) = y$</mathjax>.</p>
+<p>That is, not all <mathjax>$y$</mathjax> necessarily has a corresponding <mathjax>$x$</mathjax>, but those that do only have <em>one</em> corresponding <mathjax>$x$</mathjax>.</p>
+<h3>Surjective &amp; injective functions</h3>
+<p>A function can be both surjective and injective, which just means that for every <mathjax>$y \in Y$</mathjax> there exists exactly one <mathjax>$x \in X$</mathjax> such that <mathjax>$f(x) = y$</mathjax>, that is, every <mathjax>$y$</mathjax> has exactly one corresponding <mathjax>$x$</mathjax>.</p>
+<p>As mentioned before, the inverse of a function is both surjective and injective!</p>
+<h3>Convex and non-convex functions</h3>
+<blockquote>
+<p>A convex function is a continuous function whose value at the midpoint of every interval in its domain does not exceed the arithmetic mean of its values at the ends of the interval. (<a href="http://mathworld.wolfram.com/ConvexFunction.html">Convex Function</a>. Weisstein, Eric W. Wolfram MathWorld)</p>
+</blockquote>
+<p>A <strong>convex</strong> region is one in which any two points in the region can be joined by a straight line that does not leave the region.</p>
+<p>Which is to say that a convex function has a minimum, and only one (and this is also the only position where the derivative is 0).</p>
+<p>More formally, a function is convex if the second derivative is positive everywhere. A function can be convex on a range <mathjax>$[a,b]$</mathjax> if its second derivative is positive everywhere in that range.</p>
+<p>In higher dimensions, these derivatives aren't scalar values, so we instead define convexity if the <em>Hessian</em> <mathjax>$H$</mathjax> (the matrix of second derivatives) is <em>positive semidefinite</em> (notated <mathjax>$H \succeq 0$</mathjax>). It is <em>strictly</em> convex if <mathjax>$H$</mathjax> is <em>positive definite</em> (notated <mathjax>$H \succ 0$</mathjax>). Refer to the Calculus section for more details on this.</p>
+<figure><img alt="Convex and non-convex functions" src="../assets/convex_nonconvex.svg" /><figcaption>Convex and non-convex functions</figcaption>
+</figure>
+<h3>Transcendental functions</h3>
+<p><strong>Transcendental</strong> functions are those that are not polynomial, e.g. <mathjax>$\sin, \exp, \log, \text{etc}$</mathjax>.</p>
+<h3>Logarithms</h3>
+<p>Logarithms are frequently encountered. They have many useful properties, such as turning multiplication into addition:</p>
+<p><mathjax>$$
+\log(xy) = \log(x) + \log(y)
+$$</mathjax></p>
+<p>Multiplying many small numbers is problematic with computers, leading to underflow errors. Logarithms are commonly used to turn this kind of multiplication into addition and avoid underflow errors.</p>
+<p>Note that <mathjax>$\log(x)$</mathjax>, without any base, typically implies the natural log, i.e. <mathjax>$\log_e(x)$</mathjax>, sometimes notated <mathjax>$\ln(x)$</mathjax>, which has the inverse <mathjax>$\exp(x)$</mathjax>, more commonly seen as <mathjax>$e^x$</mathjax>.</p>
+<h1>Other useful concepts</h1>
+<h2>Solving analytically vs numerically</h2>
+<p>Often you may see a distinction made between solving a problem <strong>analytically</strong> (sometimes <strong>algebraeically</strong> is used) and solving a problem <strong>numerically</strong>.</p>
+<p>Solving a problem analytically means you can exploit properties of the objects and equations, e.g. through methods from calculus, avoiding substituting numerical values for the variables you are manipulating (that is, you only need to manipulate symbols). If a problem may be solved analytically, the resulting solution is called a <strong>closed form</strong> solution (or the <strong>analytic</strong> solution) and is an exact solution.</p>
+<p>Not all problems can be solved analytically; generally more complex mathematical models have no closed form solution. These problems are also often the ones of most interest. Such problems need to be <em>approximated</em> numerically, which involves evaluating the equations many times by substituting different numerical values for variables. The result is an approximate (<strong>numerical</strong>) solution.</p>
+<h2>Linear vs nonlinear models</h2>
+<p>You'll often see a caveat with algorithms that they only work for linear models. On the other hand, some models are touted for their capacity for nonlinear models.</p>
+<p>A <strong>linear model</strong> is a model which takes the general form:</p>
+<p><mathjax>$$
+y = \beta_0 + \beta_1 x_1 + \dots + \beta_n x_n
+$$</mathjax></p>
+<p>Note that this function does not need to produce a literal line. The "linear" constraint does not apply to the predictor variables <mathjax>$x_1, \dots, x_n$</mathjax>. For instance, the function <mathjax>$y = x^2$</mathjax> is linear.</p>
+<p>"Linear" refers to the parameters; i.e. the function must be "linear in the parameters", meaning that the parameters <mathjax>$\beta_0, \dots, \beta_n$</mathjax> themselves must form a line (or its equivalent in whatever dimensional space you're working in).</p>
+<p>A <strong>nonlinear model</strong> includes parameters such as <mathjax>$\beta^2$</mathjax> or <mathjax>$\beta_0 \beta_1$</mathjax> (that is, multiple parameters in the same term, which is <em>not</em> linear) or transcendental functions.</p>
+<h2>Metrics</h2>
+<p>Many artificial intelligence and machine learning algorithms are based on or benefit from some kind of <em>metric</em>. In this context the term has a concrete definition.</p>
+<p>The typical case for metrics is around similarity. Say you have a bunch of random variables <mathjax>$X_i$</mathjax> which take on values in a label space <mathjax>$V$</mathjax>. If <mathjax>$X_i$</mathjax> and <mathjax>$X_j$</mathjax> are connected by an edge, we want them to take on "similar" values.</p>
+<p>How do we define "similar"?</p>
+<p>We'll use a distance function <mathjax>$\mu: V \times V \to R^+$</mathjax>, which needs to satisfy:</p>
+<ul>
+<li><em>reflexivity</em>: <mathjax>$\mu(v,v)=0$</mathjax> for all <mathjax>$v$</mathjax></li>
+<li><em>symmetry</em>: <mathjax>$\mu(v_1,v_2)=\mu(v_2, v_1)$</mathjax> for all <mathjax>$v_1, v_2$</mathjax></li>
+<li><em>triangle inequality</em>: <mathjax>$\mu(v_1, v_2) \leq \mu(v_1, v_3) + \mu(v_3, v_2)$</mathjax> for all <mathjax>$v_1, v_2, v_3$</mathjax></li>
+</ul>
+<p>If all these are satisfied, we say that <mathjax>$\mu$</mathjax> is a <strong>metric</strong>.</p>
+<p>If only reflexivity and symmetry are satisfied, we have a <strong>semi-metric</strong> instead.</p>
+<p>So we can create a <em>feature</em> <mathjax>$f_{ij}(X_i, X_j) = \mu(X_i, X_j)$</mathjax> and then this works out such that:</p>
+<p><mathjax>$$
+\exp(- w_{ij} f_{ij} (X_i, X_j)), w_{ij} &gt; 0
+$$</mathjax></p>
+<p>that the lower the distance (metric), the higher the probability.</p>
+<h2>References</h2>
+<ul>
+<li><a href="http://mathworld.wolfram.com/ConvexFunction.html">Convex Function</a>. Weisstein, Eric W. Wolfram MathWorld.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>In Practice</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>In Practice</h1>
+<h2>Machine Learning System Design</h2>
+<p>Before you start building your machine learning system, you should:</p>
+<ul>
+<li>Be explicit about the problem.<ul>
+<li>Start with a very specific and well-defined question: what do you want to predict, and what do you have to predict it with?</li>
+</ul>
+</li>
+<li>Brainstorm some possible strategies.<ul>
+<li>What features might be useful?</li>
+<li>Do you need to collect more data?</li>
+</ul>
+</li>
+<li>Try and find good input data<ul>
+<li>Randomly split data into:<ul>
+<li>training sample</li>
+<li>testing sample</li>
+<li>if enough data, a validation sample too</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Use features of or features built from the data that may help with prediction</li>
+</ul>
+<p>Then to start:</p>
+<ul>
+<li>Start with a simple algorithm which can be implemented quickly.<ul>
+<li>Apply a machine learning algorithm</li>
+<li>Estimate the parameters for the algorithm on your training data</li>
+</ul>
+</li>
+<li>Test the simple algorithm on your validation data, evaluate the results</li>
+<li>Plot <em>learning curves</em> to decide where things need work:<ul>
+<li>Do you need more data?</li>
+<li>Do you need more features?</li>
+<li>And so on.</li>
+</ul>
+</li>
+<li>Error analysis: manually examine the examples in the validation set that your algorithm made errors on. Try to identify patterns in these errors. Are there categories of examples that the model is failing on in particular? Are there any other features that might help?</li>
+</ul>
+<p>If you have an idea for a feature which may help, it's best to just test it out. This process is much easier if you have a single metric for your model's performance.</p>
+<h2>Machine learning diagnostics</h2>
+<p>In machine learning, a diagnostic is:</p>
+<blockquote>
+<p>A test that you can run to gain insight [about] what is/isn't working with a learning algorithm, and gain guidance as to how best to improve its performance.</p>
+</blockquote>
+<p>They take time to implement but can save you a lot of time by preventing you from going down fruitless paths.</p>
+<h3>Learning curves</h3>
+<p>To generate a learning curve, you deliberately shrink the size of your training set and see how the training and validation errors change as you increase the training set size. This way you can see how your model improves (or doesn't, if something unexpected is happening) with more training data.</p>
+<p>With smaller training sets, we expect the training error will be low because it will be easier to fit to less data. So as training set size grows, the average training set error is expected to grow.<br />
+Conversely, we expect the average validation error to decrease as the training set size increases.</p>
+<p>If it seems like the training and validation error curves are flattening out at a high error as training set size increases, then you have a high bias problem. The curves flattening out indicates that getting more training data will not (by itself) help much.</p>
+<p>On the other hand, high variance problems are indicated by a large gap between the training and validation error curves as training set size increases. You would also see a low training error. In this case, the curves are converging and more training data would help.</p>
+<h3>Important training figures</h3>
+<figure><img alt="Training figures (from Xiu-Shen Wei)" src="../assets/training_figs.jpg" /><figcaption>Training figures (from <a href="http://lamda.nju.edu.cn/weixs/project/CNNTricks/CNNTricks.html">Xiu-Shen Wei</a>)</figcaption>
+</figure>
+<h2>Large Scale Machine Learning</h2>
+<h3>Map Reduce</h3>
+<p>You can distribute the workload across computers to reduce training time.</p>
+<p>For example, say you're running batch gradient descent with <mathjax>$b=400$</mathjax>.</p>
+<p><mathjax>$$
+\theta_j := \theta_j - \alpha \frac{1}{400} \sum^400_{i=1} (h_{\theta}(x^{(i)}) - y^{(i)})x^{(i)}_j
+$$</mathjax></p>
+<p>You can divide up (map) your batch so that different machines calculate the error of a subset (e.g. with 4 machines, each machine takes 100 examples) and then those results are combined (reduced/summed) back on a single machine. So the summation term becomes distributed.</p>
+<p>Map Reduce can be applied wherever your learning algorithm can be expressed as a summation over your training set.</p>
+<p>Map Reduce also works across multiple cores on a single computer.</p>
+<h2>Online (live/streaming) machine learning</h2>
+<h3>Distribution Drift</h3>
+<p>Say you train a model on some historical data and then deploy your model in a production setting where it is working with live data.</p>
+<p>It is possible that the distribution of the live data starts to <em>drift</em> from the distribution your model learned. This change may be due to factors in the real world that influence the data.</p>
+<p>Ideally you will be able to detect this drift as it happens, so you know whether or not your model needs adjusting. A simple way to do it is to continually evaluate the model by computing some validation metric on the live data. If the distribution is stable, then this validation metric should remain stable; if the distribution drifts, the model starts to become a poor fit for the new incoming data, and the validation metric will worsen.</p>
+<h2>References</h2>
+<ul>
+<li>Review of fundamentals, IFT725. Hugo Larochelle. 2012.</li>
+<li><a href="https://sux13.github.io/DataScienceSpCourseNotes/4_EXDATA/Exploratory_Data_Analysis_Course_Notes.pdf">Exploratory Data Analysis Course Notes</a>. Xing Su.</li>
+<li><a href="https://www.coursera.org/course/mmds">Mining Massive Datasets</a> (Coursera &amp; Stanford, 2014). Jure Leskovec, Anand Rajaraman, Jeff Ullman.</li>
+<li><a href="https://www.coursera.org/learn/machine-learning">Machine Learning</a>. 2014. Andrew Ng. Stanford University/Coursera.</li>
+<li><a href="https://www.edx.org/course/artificial-intelligence-uc-berkeleyx-cs188-1x">CS188: Artificial Intelligence</a>. Dan Klein, Pieter Abbeel. University of California, Berkeley (edX).</li>
+<li><em>Evaluating Machine Learning Models</em>. Alice Zheng. 2015.</li>
+<li><a href="https://www.youtube.com/watch?v=heFaYLKVZY4">Computational Statistics II</a> (<a href="https://github.com/fonnesbeck/scipy2015_tutorial">code</a>). Chris Fonnesbeck. SciPy 2015.</li>
+<li><a href="https://www.udacity.com/course/intro-to-artificial-intelligence--cs271">Intro to Artificial Intelligence</a>. CS271. Peter Norvig, Sebastian Thrun. Udacity.</li>
+<li><a href="http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-034-artificial-intelligence-fall-2010/">MIT 6.034 (Fall 2010): Artificial Intelligence</a>. Patrick H. Winston. MIT.</li>
+<li><a href="http://www-labs.iro.umontreal.ca/~bengioy/dlbook/">Deep Learning</a>. Yoshua Bengio, Ian Goodfellow, Aaron Courville.</li>
+<li><a href="https://cs231n.github.io/neural-networks-1/">CS231n Convolutional Neural Networks for Visual Recognition, Module 1: Neural Networks Part 2: Setting up the Data and the Loss</a>. Andrej Karpathy.</li>
+<li><a href="https://www.youtube.com/watch?v=g_4z6o7XZbQ">POLS 509: Hierarchical Linear Models</a>. Justin Esarey.</li>
+<li><a href="http://www.isi.edu/natural-language/people/bayes-with-tears.pdf">Bayesian Inference with Tears</a>. Kevin Knight, September 2009.</li>
+<li><a href="https://chronicles.mfglabs.com/learning-to-learn-or-the-advent-of-augmented-data-scientists-20873282e181">Learning to learn, or the advent of augmented data scientists</a>. Simon Benhamou.</li>
+<li><a href="http://arxiv.org/abs/1206.2944">Practical Bayesian Optimization of Machine Learning Algorithms</a>. Jasper Snoek, Hugo Larochelle, Ryan P. Adams.</li>
+<li><a href="http://www.nature.com/nbt/journal/v26/n8/full/nbt1406.html">What is the expectation maximization algorithm?</a>. Chuong B Do &amp; Serafim Batzoglou.</li>
+<li><a href="https://www.umiacs.umd.edu/~resnik/pubs/LAMP-TR-153.pdf">Gibbs Sampling for the Uninitiated</a>. Philip Resnik, Eric Hardisty. June 2010.</li>
+<li><a href="https://onlinecourses.science.psu.edu/stat414/node/191">Maximum Likelihood Estimation</a>. Penn State Eberly College of Science.</li>
+<li><a href="https://www.coursera.org/specializations/jhu-data-science">Data Science Specialization</a>. Johns Hopkins (Coursera). 2015.</li>
+<li><a href="https://www.coursera.org/learn/practical-machine-learning">Practical Machine Learning</a>. Johns Hopkins (Coursera). 2015.</li>
+<li><a href="http://statweb.stanford.edu/~tibs/ElemStatLearn/">Elements of Statistical Learning</a>. 10th Edition. Trevor Hastie, Robert Tibshirani, Jerome Friedman.</li>
+<li><a href="https://cs231n.github.io/linear-classify/">CS231n Convolutional Neural Networks for Visual Recognition, Linear Classification</a>. Andrej Karpathy.</li>
+<li><a href="http://lamda.nju.edu.cn/weixs/project/CNNTricks/CNNTricks.html">Must Know Tips/Tricks in Deep Neural Networks</a>. Xiu-Shen Wei.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

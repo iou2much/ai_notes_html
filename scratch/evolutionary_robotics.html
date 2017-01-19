@@ -1,0 +1,78 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>evolutionary_robotics</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <p>notes from University of Vermont's <a href="https://www.youtube.com/playlist?list=PLAuiGdPEdw0jySMqCxj2-BQ5QKM9ts8ik">Evolutionary Robotics course</a> (CS206, Spring 2016), taught by Josh Bongard</p>
+<p>General approach:</p>
+<ol>
+<li>create a task environment</li>
+<li>create the robot</li>
+<li>create a neural net as the robot's "brain"</li>
+<li>use an evolutionary algorithm to optimize the neural net for the task</li>
+</ol>
+<p>Some previously evolved behavior for one purpose may later find new use for another purpose. This is called <em>exaptation</em>.</p>
+<p><em>Embodied</em> cognition involves learning through interaction - the agent manipulates its environment, observes the consequence, and learns from that. A "body" here refers to a tool that can affect and be affected by the world. The general idea behind embodied cognition is that the way you process information is affected by your body.</p>
+<p><em>Situated</em> cognition is similar to embodied cognition, which says that the way you process information is affected by the fact that you are physically situated in the world (i.e. you have a bunch of sensors).</p>
+<p>A <em>complete agent</em> is one that is both situated and embodied. There are some important properties that distinguish complete agents from other kinds of agents:</p>
+<ul>
+<li>they are subject to the laws of physics</li>
+<li>they generate sensory stimulation (through behavior)</li>
+<li>they affect the environment (through behavior)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Disembodied</th>
+<th>Embodied</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Not situated</td>
+<td>Computers</td>
+<td>Industrial robots</td>
+</tr>
+<tr>
+<td>Situated</td>
+<td>Embedded devices</td>
+<td>People, robots</td>
+</tr>
+</tbody>
+</table>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

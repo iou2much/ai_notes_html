@@ -1,0 +1,1978 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Probabilistic Graphical Models</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Probabilistic Graphical Models</h1>
+<p>The key tool for probabilistic inference is the <strong>joint probability table</strong>. Each row in a joint probability table describes a combination of values for a set of random variables. That is, say you have <mathjax>$n$</mathjax> events which have a binary outcome (T/F). A row would describe a unique configuration of these events, e.g. if <mathjax>$n=4$</mathjax> then one row might be <mathjax>$0,0,0,0$</mathjax> and another might be <mathjax>$1,0,0,0$</mathjax> and so on. Consider the simpler case of <mathjax>$n=2$</mathjax>, with binary random variables <mathjax>$X,Y$</mathjax>:</p>
+<table>
+<thead>
+<tr>
+<th>X</th>
+<th>Y</th>
+<th>P(X,Y)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0.25</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0.45</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0.15</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0.15</td>
+</tr>
+</tbody>
+</table>
+<p>Using a joint probability table you can learn a lot about how those events are related probabilistically.</p>
+<p>The problem is, however, that joint probability tables can get very big, which is another way of saying that models (since joint probability tables are a representation of probabilistic models) can get complex very quickly.</p>
+<p>Typically, we have a set of random variables <mathjax>$x_1, \dots, x_n$</mathjax> and we want to compute their probability for certain states together; that is, the joint distribution <mathjax>$P(x_1, \dots, x_n)$</mathjax>.</p>
+<p>Even in the simple case where each random variable is binary, you would still have a distribution over <mathjax>$2^n$</mathjax> states.</p>
+<p>We can use <strong>probabilistic graphical models</strong> (PGMs) to reduce this space. Probabilistic graphical models allow us to represent complex networks of interrelated and independent events efficiently and with sparse parameters. All graphical models have some limitations in their ability to graphically express conditional (in)dependence statements but are nevertheless very useful.</p>
+<p>There are two main types of graphical models:</p>
+<ul>
+<li><strong>Bayesian models</strong>: aka <strong>Bayesian networks</strong>, sometimes called <strong>Bayes nets</strong> or <strong>belief networks</strong>. These use directed graphs and are used when there are causal relationships between the random variables.</li>
+<li><strong>Markov models</strong>: These use undirected graphs and are used when there are noncausal relationships between the random variables.</li>
+</ul>
+<h2>Factors</h2>
+<p>The concept of <em>factors</em> is important to PGMs.</p>
+<p>A <strong>factor</strong> is a function <mathjax>$\phi(X_1, \dots, X_k)$</mathjax> which takes all possible combinations of outcomes (assignments) for these random variables <mathjax>$X_1, \dots, X_k$</mathjax> and gives a real value for each combination.</p>
+<p>The set of random variables <mathjax>$\{X_1, \dots, X_k\}$</mathjax> is called the <em>scope</em> of the factor.</p>
+<p>A joint distribution is a factor which returns a number which is the probability of a given combination of assignments.</p>
+<p>An unnormalized measure is also a factor, e.g. <mathjax>$P(I,D, g^1)$</mathjax>.</p>
+<p>A conditional probability distribution (CPD) is also a factor, e.g. <mathjax>$P(G|I,D)$</mathjax>.</p>
+<p>A common operation on factors is a <em>factor product</em>. Say we have the factors <mathjax>$\phi_1(A,B)$</mathjax> and <mathjax>$\phi_2(B,C)$</mathjax>. Their factor product would yield a new factor <mathjax>$\phi_3(A,B,C)$</mathjax>. The result for a given combo <mathjax>$a_i, b_j, c_k$</mathjax> is just <mathjax>$\phi_1 (a_i, b_j) \cdot \phi_2(b_j, c_k)$</mathjax>.</p>
+<p>Another operation is <em>factor marginalization</em>. This is the same as marginalization for probability distributions but generalized for all factors. For example, <mathjax>$\phi(A,B,C) \to \phi(A,B)$</mathjax>.</p>
+<p>Another operation is <em>factor reduction</em> which is similarly is a generalization of probability distribution reduction.</p>
+<h2>Belief (Bayesian) Networks</h2>
+<p>Say we are looking at five events:</p>
+<ul>
+<li>a dog barking (<mathjax>$D$</mathjax>)</li>
+<li>a raccoon being present (<mathjax>$R$</mathjax>)</li>
+<li>a burglar being present (<mathjax>$B$</mathjax>)</li>
+<li>a trash can is heard knocked over (<mathjax>$T$</mathjax>)</li>
+<li>the police are called (<mathjax>$P$</mathjax>)</li>
+</ul>
+<p>We can encode some assumptions about how these events are related in a <em>belief net</em> (also called a <em>Bayesian net</em>):</p>
+<figure><img alt="Belief Network" src="../assets/belief_net_01.svg" /><figcaption>Belief Network</figcaption>
+</figure>
+<p>Every node is dependent on its parent and nothing else that is not a descendant. To put it another way: given its parent, a node is independent of all its non-descendants.</p>
+<p>For instance, the event <mathjax>$P$</mathjax> is dependent on its parent <mathjax>$D$</mathjax> but not <mathjax>$B$</mathjax> or <mathjax>$R$</mathjax> or <mathjax>$T$</mathjax> because their causality flows through <mathjax>$D$</mathjax>.</p>
+<p><mathjax>$D$</mathjax> depends on <mathjax>$B$</mathjax> and <mathjax>$R$</mathjax> because they are its parents, but not <mathjax>$T$</mathjax> because it is not a descendant or a parent. But <mathjax>$D$</mathjax> may depend on <mathjax>$P$</mathjax> because it is a descendant.</p>
+<p>We can then annotate the graph with probabilities:</p>
+<figure><img alt="Belief Network" src="../assets/belief_net_02.svg" /><figcaption>Belief Network</figcaption>
+</figure>
+<p>The <mathjax>$B$</mathjax> and <mathjax>$R$</mathjax> nodes have no parents so they have singular probabilities.</p>
+<p>The others depend on the outcome of their parents.</p>
+<p>With the belief net, we only needed to specify 10 probabilities.</p>
+<p>If we had just constructed joint probability table, we would have had to specify <mathjax>$2^5=32$</mathjax> probabilities (rows).</p>
+<p>If we expand out the conditional probability of this system using the chain rule, it would look like:</p>
+<p><mathjax>$$
+P(p,d,b,t,r) = P(p|d,b,t,r)P(d|b,t,r)P(b|t,r)P(t|r)P(r)
+$$</mathjax></p>
+<p>But we can bring in our belief net's conditional independence assumptions to simplify this:</p>
+<p><mathjax>$$
+P(p,d,b,t,r) = P(p|d)P(d|b,r)P(b)P(t|r)P(r)
+$$</mathjax></p>
+<p>Belief networks are <em>acyclical</em>, that is, they cannot have any loops (a node cannot have a path back to itself). In particular, they are a directed acyclic graph (DAG).</p>
+<p>Two nodes (variables) in a Bayes net are on an <strong>active trail</strong> if a change in one node affects the other. This includes cases where the two nodes have a causal relationship, an evidential relationship, or have some common cause.</p>
+<p>Formally, a belief network is a distribution of the form:</p>
+<p><mathjax>$$
+P(x_1, \dots, x_D) = \prod_{i=1}^D P(x_i| \text{pa}(x_i))
+$$</mathjax></p>
+<p>where <mathjax>$\text{pa}(x_i)$</mathjax> are the <em>parental</em> variables of variable <mathjax>$x$</mathjax> (that is, <mathjax>$x$</mathjax>'s parents in the graph).</p>
+<p>When you factorize a joint probability, you have a number of options for doing so.</p>
+<p>For instance:</p>
+<p><mathjax>$$
+P(x_1, x_2, x_3) = P(x_{i_1} | x_{i_2}, x_{i_3}) P(x_{i_2}| x_{i_3}) P(x_{i_3})
+$$</mathjax></p>
+<p>where <mathjax>$(i_1, i_2, i_3)$</mathjax> is any permutation of <mathjax>$(1,2,3)$</mathjax>.</p>
+<p>Without any conditional independence assumptions, all factorizations produce an equivalent DAG.</p>
+<p>However, once you begin dropping edges (i.e. making conditional independence assumptions), the graphs are not necessarily equivalent anymore.</p>
+<p>Some of the graphs are equivalent; they can be converted amongst each other via Bayes' rule. Others cannot be bridged in this way, and thus are not equivalent.</p>
+<p>Note that belief networks encode conditional independences but do not necessarily encode dependences.</p>
+<p>For instance, the graph <mathjax>$a \to b$</mathjax> appears to mean that <mathjax>$a$</mathjax> and <mathjax>$b$</mathjax> are dependent. But there may be an instance of the belief network distribution such that <mathjax>$p(b|a) = p(b)$</mathjax>; that is, <mathjax>$a$</mathjax> and <mathjax>$b$</mathjax> are independent. So although the DAG may seem to imply dependence, there may be cases where it in fact does not.</p>
+<p>In these cases, we call this implied dependence <strong>graphical dependence</strong>.</p>
+<p>The following belief network triple represents the conditional independence of <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> given <mathjax>$Z$</mathjax>, that is <mathjax>$P(X,Y|Z) = P(X|Z)P(Y|Z)$</mathjax>.</p>
+<figure><img alt="Represents conditional independence between $X$ and $Y$ given $Z$" src="../assets/bn_triple_00.svg" /><figcaption>Represents conditional independence between <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> given <mathjax>$Z$</mathjax></figcaption>
+</figure>
+<p>The following belief network triple also represents the conditional independence of <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> given <mathjax>$Z$</mathjax>, in particular, <mathjax>$P(X,Y|Z) \varpropto P(Z|X)P(X)P(Y|Z)$</mathjax>.</p>
+<figure><img alt="Also represents conditional independence between $X$ and $Y$ given $Z$" src="../assets/bn_triple_01.svg" /><figcaption>Also represents conditional independence between <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> given <mathjax>$Z$</mathjax></figcaption>
+</figure>
+<p>The following belief network triple represents the graphical conditional dependence of <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax>, that is <mathjax>$P(X,Y|Z) \varpropto P(Z|X,Y) P(X) P(Y)$</mathjax>.</p>
+<figure><img alt="Represents graphical conditional dependence of $X$ and $Y$" src="../assets/bn_triple_02.svg" /><figcaption>Represents graphical conditional dependence of <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax></figcaption>
+</figure>
+<p>Here <mathjax>$Z$</mathjax> is a <strong>collider</strong>, since its neighbors are pointing to it.</p>
+<p>Generally, if there is a path between <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> which contains a collider, and this collider is not in the conditioning set, nor are any of its descendants, we cannot induce dependence between <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> from this path. We say such a path is <strong>blocked</strong>.</p>
+<p>Similarly, if there is a non-collider along the path which is in the conditioning set, we cannot induce dependence between <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> from this path - such a path is also said to be blocked.</p>
+<p>If all paths between <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> are blocked, we say they are <strong>d-separated</strong>.</p>
+<p>However, if there are no colliders, or the colliders that are there are in the conditioning set or their descendants, and no non-collider conditioning variables in the path, we say this path <strong>d-connects</strong> <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> and we say they are graphically dependent.</p>
+<p>Note that colliders are relative to a path.</p>
+<p>For example, in the accompanying figure, <mathjax>$C$</mathjax> is a collider for the path <mathjax>$A-B-C-D$</mathjax> but not for the path <mathjax>$A-B-C-E$</mathjax>.</p>
+<figure><img alt="Collider example" src="../assets/collider_example.svg" /><figcaption>Collider example</figcaption>
+</figure>
+<p>Consider the belief network <mathjax>$A \to B \leftarrow C$</mathjax>. Here <mathjax>$A$</mathjax> and <mathjax>$C$</mathjax> are conditionally independent. However, if we condition them on <mathjax>$B$</mathjax>, i.e. <mathjax>$P(A,C|B)$</mathjax>, then they become graphically dependent. That is, we belief the root "causes" of <mathjax>$A$</mathjax> and <mathjax>$C$</mathjax> to be independent, but given <mathjax>$B$</mathjax> we learn something about both the causes of <mathjax>$A$</mathjax> and <mathjax>$C$</mathjax>, which couples them, making them (graphically) dependent.</p>
+<p>Note that the term "causes" is used loosely here; belief networks really only make independence statements, not necessarily causal ones.</p>
+<p>(TODO the below is another set of notes for bayes' nets, incorporate these two)</p>
+<p>Independence allows us to more compactly represent joint probability distributions, in that independent random variables can be represented as smaller, separate probability distributions.</p>
+<p>For example, if we have binary random variables <mathjax>$A,B,C,D$</mathjax>, we would have a joint probability table of <mathjax>$2^4$</mathjax> entries. However, if we know that <mathjax>$A,B$</mathjax> is independent of <mathjax>$C,D$</mathjax>, then we only need two joint probability tables of <mathjax>$2^2$</mathjax> entries each.</p>
+<p>Typically, independent is too strong an assumption to make for real-world applications, but we can often make the weaker, yet still useful assumption of conditional independence.</p>
+<p>Conditional independence is when one variable makes another variable irrelevant (because the other variable adds no additional information), i.e. <mathjax>$P(A|B,C) = P(A|B)$</mathjax>; knowing <mathjax>$C$</mathjax> adds no more information when we know <mathjax>$B$</mathjax>.</p>
+<p>For example, if <mathjax>$C$</mathjax> causes <mathjax>$B$</mathjax> and <mathjax>$B$</mathjax> causes <mathjax>$A$</mathjax>, then knowledge of <mathjax>$B$</mathjax> already implies <mathjax>$C$</mathjax>, so knowing about <mathjax>$C$</mathjax> is kind of useless for learning about <mathjax>$A$</mathjax> if we already know <mathjax>$B$</mathjax>.</p>
+<p>As a more concrete example, given random variables traffic <mathjax>$T$</mathjax>, umbrella <mathjax>$U$</mathjax>, and raining <mathjax>$R$</mathjax>, we could reasonably assume that <mathjax>$U$</mathjax> is conditionally independent of <mathjax>$T$</mathjax> given <mathjax>$R$</mathjax>, because rain is the common cause of the two and there is no direct relationship between <mathjax>$U$</mathjax> and <mathjax>$T$</mathjax>; the relationship is through <mathjax>$R$</mathjax>.</p>
+<p>Similarly, given fire, smoke and an alarm, we could say that fire and alarm are conditionally independent given smoke.</p>
+<p>As mentioned earlier, we can apply conditional independence to simplify joint distributions.</p>
+<p>Take the traffic/umbrella/rain example from before. Their joint distribution is <mathjax>$P(T,R,U$</mathjax>, which we can decompose using the chain rule:</p>
+<p><mathjax>$$
+P(T,R,U) = P(R)P(T|R)P(U|R,T)
+$$</mathjax></p>
+<p>If we make the conditional independence assumption from before (<mathjax>$U$</mathjax> and <mathjax>$T$</mathjax> are conditionally independent given <mathjax>$R$</mathjax>), then we can simplify this:</p>
+<p><mathjax>$$
+P(T,R,U) = P(R)P(T|R)P(U|R)
+$$</mathjax></p>
+<p>That is, we simplified <mathjax>$P(U|R,T)$</mathjax> to <mathjax>$P(U|R)$</mathjax>.</p>
+<p>We can describe complex joint distributions more simply with these conditional independence assumptions, and we can do so with Bayes' nets (i.e. graphical models), which provide additional insight into the structure of these distributions (in particular, how variables interact locally, and how these local interactions propagate to more distant indirect interactions).</p>
+<p>A Bayes' net is a directed acyclic graph.</p>
+<p>The nodes in the graph are the variables (with domains). They may be assigned (observed) or unassigned (unobserved).</p>
+<p>The arcs in the graphs are interactions between variables (similar to constraints in CSPs). They indicate "direct influence" between variables (not that this is <em>not</em> necessarily the same as causation, it's about the information that observation of one variable gives about the other, which can mean causation, but not necessarily, e.g. it could simply be a hidden common underlying cause), which is to say that they encode conditional independences.</p>
+<p>For each node, we have a conditional distribution over the variable that node represents, conditioned on its parents' values.</p>
+<p>Bayes' nets implicitly encode joint distributions as a product of local conditional distributions:</p>
+<p><mathjax>$$
+P(x_1, x_2, \dots, x_n) = \prod_{i=1}^n P(x_i | \text{parents}(X_i))
+$$</mathjax></p>
+<p>This simply comes from the chain rule:</p>
+<p><mathjax>$$
+P(x_1, x_2, \dots, x_n) = \prod_{i=1}^n P(x_i | x_1, \dots, x_{i-1})
+$$</mathjax></p>
+<p>And then applying conditional independence assumptions.</p>
+<p>The graph must be acyclic so that we can come up with a consistent ordering when we apply the chain rule (that is, decide the order for expanding the distributions). If the graph has cycles, we can't come up with a consistent ordering because we will have loops.</p>
+<p>Note that arcs can be "reversed" (i.e. parent and children can be swapped) and encode the same joint distribution - so joint distributions can be represented by multiple Bayes' nets. But some Bayes' nets are better representations than others - some will be easier to work with; in particular, if the arcs <em>do</em> represent causality, the network will be easier to work with.</p>
+<p>Bayes' nets are much smaller than representing such joint distributions without conditional independence assumptions.</p>
+<p>A joint distribution over <mathjax>$N$</mathjax> boolean variables takes <mathjax>$2^n$</mathjax> space (as demonstrated earlier).</p>
+<p>A Bayes' net, on the other hand, where the <mathjax>$N$</mathjax> nodes each have at most <mathjax>$k$</mathjax> parents, only requires size <mathjax>$O(N * 2^{k+1})$</mathjax>.</p>
+<p>The Bayes' net also encodes additional conditional independence assumptions in its structure.</p>
+<p>For example, the Bayes' net <mathjax>$X \to Y \to Z \to W$</mathjax> encodes the joint distribution:</p>
+<p><mathjax>$$
+P(X,Y,Z,W) = P(X) P(Y|X) P(Z|Y) P(W|Z)
+$$</mathjax></p>
+<p>This structure implies other conditional independence assumptions, e.g. that <mathjax>$Z$</mathjax> is conditionally independent of <mathjax>$X$</mathjax> given <mathjax>$Y$</mathjax>, i.e. <mathjax>$P(Z|Y) = P(Z|X,Y)$</mathjax>.</p>
+<p>More generally we might ask: given two nodes, are they independent given certain evidence and the structure of the graph (i.e. assignments of intermediary nodes)?</p>
+<p>We can use the <em>d-separation</em> algorithm to answer this question.</p>
+<p>First, we consider three configurations of <em>triples</em> as base cases, which we can use to deal with more complex networks. That is, any Bayes' net can be decomposed into these three triple configurations.</p>
+<p>A simple configuration of nodes in the form of <mathjax>$X \to Y \to Z$</mathjax> is called a <em>causal chain</em> and encodes the joint distribution <mathjax>$P(x,y,z) = P(x) P(y|x) P(z|y)$</mathjax>.</p>
+<p><mathjax>$X$</mathjax> is not guaranteed to be (unconditionally) independent of <mathjax>$Z$</mathjax>.</p>
+<p>However, is <mathjax>$X$</mathjax> guaranteed to be conditionally independent of <mathjax>$Z$</mathjax> given <mathjax>$Y$</mathjax>?</p>
+<p>From the definition of conditional probability, we know that:</p>
+<p><mathjax>$$
+P(z|x,y) = \frac{P(x,y,z)}{P(x,y)}
+$$</mathjax></p>
+<p>With the Bayes' net, we can simplify this (the numerator comes from the joint distribution the graph encodes, as demonstrated previously, and the denominator comes from applying the product rule):</p>
+<p><mathjax>$$
+P(z|x,y) = \frac{P(x)P(y|x)P(z|y)}{P(x)P(y|x)}
+$$</mathjax></p>
+<p>Then, canceling a few things out:</p>
+<p><mathjax>$$
+P(z|x,y) = P(z|y)
+$$</mathjax></p>
+<p>So yes, <mathjax>$X$</mathjax> is guaranteed to be conditionally independent of <mathjax>$Z$</mathjax> given <mathjax>$Y$</mathjax> (i.e. once <mathjax>$Y$</mathjax> is observed). We say that evidence along the chain "blocks" the influence.</p>
+<p>Another configuration of nodes is a <strong>common cause</strong> configuration:</p>
+<figure><img alt="Common cause configuration" src="../assets/common_cause.svg" /><figcaption>Common cause configuration</figcaption>
+</figure>
+<p>The encoded joint distribution is <mathjax>$P(x,y,z) = P(y)P(x|y)P(z|y)$</mathjax>.</p>
+<p>Again, <mathjax>$X$</mathjax> is not guaranteed to be (unconditionally) independent of <mathjax>$Z$</mathjax>.</p>
+<p>Is <mathjax>$X$</mathjax> guaranteed to be conditionally independent of <mathjax>$Z$</mathjax> given <mathjax>$Y$</mathjax>?</p>
+<p>Again, we start with the definition of conditional probability:</p>
+<p><mathjax>$$
+P(z|x,y) = \frac{P(x,y,z)}{P(x,y)}
+$$</mathjax></p>
+<p>Apply the product rule to the denominator and replace the numerator with the Bayes' net's joint distribution:</p>
+<p><mathjax>$$
+P(z|x,y) = \frac{P(y)P(x|y)P(z|y)}{P(y)P(x|y)}
+$$</mathjax></p>
+<p>Yielding:</p>
+<p><mathjax>$$
+P(z|x,y) = P(z|y)
+$$</mathjax></p>
+<p>So again, yes, <mathjax>$X$</mathjax> is guaranteed to be conditionally independent of <mathjax>$Z$</mathjax> given <mathjax>$Y$</mathjax>.</p>
+<p>Another triple configuration is the <strong>common effect</strong> configuration (also called <strong>v-structures</strong>):</p>
+<figure><img alt="Common effect configuration" src="../assets/common_effect.svg" /><figcaption>Common effect configuration</figcaption>
+</figure>
+<p><mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> <em>are</em> (unconditionally) independent here.</p>
+<p>However, is <mathjax>$X$</mathjax> guaranteed to be conditionally independent of <mathjax>$Y$</mathjax> given <mathjax>$Z$</mathjax>?</p>
+<p>No - observing <mathjax>$Z$</mathjax> puts <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> in competition as the explanation for <mathjax>$Z$</mathjax> (this is called <strong>causal competition</strong>). That is, having observed <mathjax>$Z$</mathjax>, we think that <mathjax>$X$</mathjax> or <mathjax>$Y$</mathjax> was the cause, but not both, so now they are dependent on each other (if one happened, the other didn't, and vice versa).</p>
+<p>Consider the following Bayes' net:</p>
+<figure><img alt="Example Bayes' Net" src="../assets/example_bayes_net_01.svg" /><figcaption>Example Bayes' Net</figcaption>
+</figure>
+<p>Where our random variables are rain <mathjax>$R$</mathjax>, dripping roof <mathjax>$D$</mathjax>, low pressure <mathjax>$L$</mathjax>, traffic <mathjax>$T$</mathjax>, baseball game <mathjax>$B$</mathjax>.</p>
+<p>The relationships assumed here are: low pressure fronts cause rain, rain or a baseball game causes traffic, and rain causes your friend's roof to drip.</p>
+<p>Given that you observe traffic, the probability that your friend's roof is dripping goes up - since perhaps the traffic is caused by rain, which would cause the roof to drip. This relationship is encoded in the graph the path between <mathjax>$T$</mathjax> and <mathjax>$D$</mathjax>.</p>
+<p>However - if we observe that it is raining, then observation of traffic has no more effect on <mathjax>$D$</mathjax> - intuitively, this makes sense - we already know it's raining, so seeing traffic doesn't tell us more about the roof dripping. In this sense, observing <mathjax>$R$</mathjax> "blocks" the path between <mathjax>$T$</mathjax> and <mathjax>$D$</mathjax>.</p>
+<p>One exception here is the v-structure with <mathjax>$R,B,T$</mathjax>. Observing that a baseball game is happening affects our belief about it raining <em>only</em> if we have observed <mathjax>$T$</mathjax>. Otherwise, they are independent. So v-structures are "reversed" in some sense.</p>
+<p>That is, we must observe <mathjax>$T$</mathjax> to <strong>activate</strong> the path between <mathjax>$R$</mathjax> and <mathjax>$B$</mathjax>.</p>
+<p>Thus we make the distinction between <strong>active</strong> triples, in which information "flows" as it did with the path between <mathjax>$T$</mathjax> and <mathjax>$D$</mathjax> and between <mathjax>$R$</mathjax> and <mathjax>$B$</mathjax> when <mathjax>$T$</mathjax> is observed, and <strong>inactive</strong> triples, in which this information is "blocked".</p>
+<p>Active triples are chain and common cause configurations in which the central node is <em>not</em> observed and common effect configurations in which the central node <em>is</em> observed, <em>or</em> common effect configurations in which some child node of the central node is observed.</p>
+<p>An example for the last case:</p>
+<figure><img alt="Triple example" src="../assets/bayes_net_triple.svg" /><figcaption>Triple example</figcaption>
+</figure>
+<p>If <mathjax>$Z$</mathjax>, <mathjax>$A$</mathjax>, <mathjax>$B$</mathjax> or <mathjax>$C$</mathjax> are observed, then the triple is active.</p>
+<p>Inactive triples are chain and common cause configurations in which the central node <em>is</em> observed and common effect configurations in which the central node is <em>not</em> observed.</p>
+<p>So now, if we want to know if two nodes <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> are conditionally independent given some evidence variables <mathjax>$\{Z\}$</mathjax>, we check all undirected paths from <mathjax>$X$</mathjax> to <mathjax>$Y$</mathjax> and see if there are any active paths (by checking all its constituent triples). If there are none, then they are conditionally independent, and we say that they are <strong>d-separated</strong>. Otherwise, conditional independence is not guaranteed. This is the <strong>d-separation</strong> algorithm.</p>
+<p>You can apply d-separation to a Bayes net and get a complete list of conditional independences that are necessarily true given certain evidence. This tells you the set of probability distributions that can be represented.</p>
+<h3>Conditional independence assumptions</h3>
+<ul>
+<li>Sally comes home and hears the alarm (<mathjax>$A=1$</mathjax>)</li>
+<li>Has she been burgled? (<mathjax>$B=1$</mathjax>)</li>
+<li>Or was the alarm triggered by an earthquake? (<mathjax>$E=1$</mathjax>)</li>
+<li>She hears on the radio that there was an earthquake (<mathjax>$R=1$</mathjax>)</li>
+</ul>
+<p>We start with <mathjax>$P(A,B,E,R)$</mathjax> and apply the chain rule of probability:</p>
+<p><mathjax>$$
+P(A,B,E,R) = P(A|B,E,R) P(R|B,E) P(E|B) P(B)
+$$</mathjax></p>
+<p>Then we can make some conditional independence assumptions:</p>
+<ul>
+<li>The radio report has no effect on the alarm: <mathjax>$P(A|B,E,R) \to P(A|B,E)$</mathjax></li>
+<li>A burglary has no effect on the radio report: <mathjax>$P(R|B,E) \to P(R|E)$</mathjax></li>
+<li>A burglary would have no effect on the earthquake: <mathjax>$P(E|B) \to P(E)$</mathjax></li>
+</ul>
+<p>Thus we have simplified the computation of the joint probability distribution:</p>
+<p><mathjax>$$
+P(A,B,E,R) = P(A|B,E) P(R|E) P(E) P(B)
+$$</mathjax></p>
+<p>We can also construct a belief network out of these conditional independence assumptions:</p>
+<figure><img alt="A simple belief network" src="../assets/simple_belief_net.svg" /><figcaption>A simple belief network</figcaption>
+</figure>
+<p>Say we are given the following probabilities:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(B=1) &amp;= 0.01 \\
+P(E=1) &amp;= 0.0000001 \\
+P(A=1|B=1, E=1) &amp;= 0.9999 \\
+P(A=1|B=0, E=1) &amp;= 0.99 \\
+P(A=1|B=1, E=0) &amp;= 0.99 \\
+P(A=1|B=0, E=0) &amp;= 0.0001 \\
+P(R=1|E=1) &amp;= 1 \\
+P(R=1|E=0) &amp;= 0
+\end{aligned}
+$$</mathjax></p>
+<p>First consider if Sally has not yet heard the radio; that is, she has only heard the alarm (so the only evidence she has is <mathjax>$A=1$</mathjax>). Sally wants to know if she's been burgled, so her question is <mathjax>$P(B=1|A=1)$</mathjax>:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(B=1|A=1) &amp;= \frac{P(B=1, A=1)}{P(A=1)} &amp;\text{(Bayes' rule)} \\
+&amp;= \frac{\sum_{E,R} P(B=1,A=1,E,R)}{\sum_{B,E,R} P(B,E,A=1,R)} &amp;\text{(marginal prob to joint prob)} \\
+&amp;= \frac{\sum_{E,R} P(A=1|B=1, E) P(B=1) P(E) P(R|E)}{\sum_{B,E,R} P(A=1|B,E) P(B) P(E) P(R|E)} &amp;\text{(chain rule w/ our indep. assumps)} \\
+&amp;\approx 0.99
+\end{aligned}
+$$</mathjax></p>
+<p>Now consider that Sally has also heard the report, i.e. <mathjax>$R=1$</mathjax>. Now her question is <mathjax>$P(B=1|A=1, R=1)$</mathjax>:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(B=1|A=1) &amp;= \frac{P(B=1,A=1,R=1)}{P(A=1,R=1)} &amp;\text{(Bayes' rule)} \\
+&amp;= \frac{\sum_E P(B=1,A=1,R=1,E)}{\sum_{B,E} P(A=1,R=1,B,E)} &amp;\text{(marginal prob to joint prob)} \\
+&amp;= \frac{\sum_E P(A=1|B=1,E) P(B=1) P(E) P(R=1|E)}{\sum_{B,E}P(A=1|B,E)P(B)P(E)P(R=1|E)} &amp;\text{(chain rule w/ our indep. assumps)} \\
+&amp;\approx 0.01
+\end{aligned}
+$$</mathjax></p>
+<p>So hearing the report and learning that there was an earthquake makes the burglary much less likely.</p>
+<p>We may, however, only have <strong>soft</strong> or <strong>uncertain evidence</strong>.</p>
+<p>For instance, say Sally is only 70% sure that she heard the alarm.</p>
+<p>We denote our soft evidence of the alarm's ringing as <mathjax>$\tilde A = (0.7, 0.3)$</mathjax>, which is to say <mathjax>$P(A=1) = 0.7$</mathjax> and <mathjax>$P(A=0) = 0.3$</mathjax>.</p>
+<p>We're ignoring the case with the report (<mathjax>$R=1$</mathjax>) for simplicity, but with this uncertain evidence we would calculate:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(B=1| \tilde A) &amp;= \sum_A P(B=1|A) P(A|\tilde A) \\
+&amp;= 0.7 P(B=1|A=1) + 0.3 P(B=1|A=0)
+\end{aligned}
+$$</mathjax></p>
+<p><strong>Unreliable evidence</strong> is distinct from <em>uncertain</em> evidence.</p>
+<p>Say we represent Sally's <em>uncertainty</em> of hearing the alarm, as described before, as <mathjax>$P(S|A) = 0.7$</mathjax>.</p>
+<p>Now say for some reason we feel that Sally is <em>unreliable</em> for other reasons (maybe she lies a lot). We would then replace the term <mathjax>$P(S|A)$</mathjax> with our own interpretation <mathjax>$P(H|A)$</mathjax>. For example, if Sally tells us her alarm went off, maybe we think that means there's a 60% chance that the alarm actually went off.</p>
+<p>This new term <mathjax>$P(H|A)$</mathjax> is our <strong>virtual evidence</strong>, also called <strong>likelihood evidence</strong>.</p>
+<h3>Properties of belief networks</h3>
+<p>A note on the following graphics: the top part shows the belief network, where a faded node means it has been marginalized out, and a filled node means it has been observed/conditioned on. The bottom part shows the relationship between <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> after the marginalization/conditioning.</p>
+<figure><img alt="" src="../assets/bn_prop_00.svg" /><figcaption></figcaption>
+</figure>
+<p><mathjax>$P(A,B,C) = P(C|A,B) P(A) P(B)$</mathjax></p>
+<p><mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> are independent and determine <mathjax>$C$</mathjax>.</p>
+<figure><img alt="" src="../assets/bn_prop_01.svg" /><figcaption></figcaption>
+</figure>
+<p>If we marginalize over <mathjax>$C$</mathjax> (thus "removing" it), <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> are made conditionally independent. That is, <mathjax>$P(A,B) = P(A)P(B)$</mathjax>.</p>
+<figure><img alt="" src="../assets/bn_prop_02.svg" /><figcaption></figcaption>
+</figure>
+<p>If we instead condition on <mathjax>$C$</mathjax>, <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> become graphically dependent. Although <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> are a priori independent, knowing something about <mathjax>$C$</mathjax> tells us a bit about <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax>.</p>
+<figure><img alt="" src="../assets/bn_prop_03.svg" /><figcaption></figcaption>
+</figure>
+<p>If we introduce <mathjax>$D$</mathjax> as a child to <mathjax>$C$</mathjax>, i.e. <mathjax>$D$</mathjax> is a descendant of a collider <mathjax>$C$</mathjax>, then conditioning on <mathjax>$D$</mathjax> also makes <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> graphically dependent.</p>
+<figure><img alt="" src="../assets/bn_prop_04.svg" /><figcaption></figcaption>
+</figure>
+<p>In this arrangement, <mathjax>$C$</mathjax> is the "cause" and <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> are independent effects: <mathjax>$P(A,B,C) = P(A|C) P(B|C) P(C)$</mathjax>.</p>
+<figure><img alt="" src="../assets/bn_prop_05.svg" /><figcaption></figcaption>
+</figure>
+<p>Here, marginalizing over <mathjax>$C$</mathjax> makes <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> graphically dependent. In general, <mathjax>$P(A,B) \neq P(A)P(B)$</mathjax> because they share the same cause.</p>
+<figure><img alt="" src="../assets/bn_prop_06.svg" /><figcaption></figcaption>
+</figure>
+<p>Conditioning on <mathjax>$C$</mathjax> makes <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> independent: <mathjax>$P(A,B|C) = P(A|C)P(B|C)$</mathjax>. This is because if you know the "cause" <mathjax>$C$</mathjax> then you know how the effects <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> occur independent of each other.</p>
+<figure><img alt="" src="../assets/bn_prop_07.svg" /><figcaption></figcaption>
+</figure>
+<p>The same applies for this arrangement - here <mathjax>$A$</mathjax> "causes" <mathjax>$C$</mathjax> and <mathjax>$C$</mathjax> "causes" <mathjax>$B$</mathjax>. Conditioning on <mathjax>$C$</mathjax> blocks <mathjax>$A$</mathjax>'s ability to influence <mathjax>$B$</mathjax>.</p>
+<figure><img alt="" src="../assets/bn_prop_08.svg" /><figcaption></figcaption>
+</figure>
+<p>These graphs all encode the same conditional independence assumptions.</p>
+<p>For both directed and undirected graphs, two graphs are <strong>Markov equivalent</strong> if they both represent the same set of conditional independence statements.</p>
+<h3>Example</h3>
+<p>Consider a joint distribution over the following random variables:</p>
+<ul>
+<li><mathjax>$G$</mathjax>, grade: <mathjax>$g^1$</mathjax> for A, <mathjax>$g^2$</mathjax> for B, <mathjax>$g^3$</mathjax> for C</li>
+<li><mathjax>$I$</mathjax>, intelligence, binary: <mathjax>$-i$</mathjax> for low, <mathjax>$+i$</mathjax> for high</li>
+<li><mathjax>$D$</mathjax>, difficulty of the course, binary: <mathjax>$-d$</mathjax> for easy, <mathjax>$+d$</mathjax> for hard</li>
+<li><mathjax>$S$</mathjax>, SAT score, binary: <mathjax>$-s$</mathjax> for low, <mathjax>$+s$</mathjax> for high</li>
+<li><mathjax>$L$</mathjax>, reference letter, binary: <mathjax>$-l$</mathjax> for not received, <mathjax>$+l$</mathjax> for received</li>
+</ul>
+<p>We can encode some conditional independence assumptions about these random variables into a belief net:</p>
+<figure><img alt="An example belief network for this scenario" src="../assets/bn_example_00.svg" /><figcaption>An example belief network for this scenario</figcaption>
+</figure>
+<ul>
+<li>the grade depends on the student's intelligence and difficulty of the course</li>
+<li>the student's SAT score seems dependent on only their intelligence</li>
+<li>whether or not a student receives a recommendation letter depends on their grade</li>
+</ul>
+<p>Note that we could add the assumption that intelligence students are likely to take more difficult courses, if we felt strongly about it:</p>
+<figure><img alt="An alternative belief network for this scenario" src="../assets/bn_example_01.svg" /><figcaption>An alternative belief network for this scenario</figcaption>
+</figure>
+<p>To turn this graph into a probability distribution, we can represent each node as a CPD:</p>
+<figure><img alt="The belief network annotated with nodes' distributions" src="../assets/bn_example_02.svg" /><figcaption>The belief network annotated with nodes' distributions</figcaption>
+</figure>
+<p>Then we can apply the <em>chain rule</em> of Bayesian networks which just multiplies all the CPDs:</p>
+<p><mathjax>$$
+P(D,I,G,S,L) = P(D) P(I) P(G|I,D) P(S|I) P(L|G)
+$$</mathjax></p>
+<p>A Bayesian network (BN) is a directed acyclic graph where its nodes represent the random variables <mathjax>$X_1, \dots, X_n$</mathjax>. For each node <mathjax>$X_i$</mathjax> we have a CPD <mathjax>$P(X_i | \text{Par}_G (X_i)$</mathjax>, where <mathjax>$\text{Par}_G(X_i)$</mathjax> refers to the parents of <mathjax>$X_i$</mathjax> in the graph <mathjax>$G$</mathjax>.</p>
+<p>In whole, the BN represents a joint distribution via the chain rule for BNs:</p>
+<p><mathjax>$$
+P(X_1, \dots, X_n) = \prod_i P(X_i|\text{Par}_G(X_i))
+$$</mathjax></p>
+<p>We say a probability distribution <mathjax>$P$</mathjax> <em>factorizes</em> over a BN graph <mathjax>$G$</mathjax> if the B chain rule holds for <mathjax>$P$</mathjax>.</p>
+<p>There are three types of reasoning that occur with a BN:</p>
+<table>
+<thead>
+<tr>
+<th>- <strong>Causal reasoning</strong> includes conditioning on an ancestor to determine a descendant's probability, e.g. $P(L=1</th>
+<th>I=0)$.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- <strong>Intercausal reasoning</strong> - consider $P(I=1</td>
+<td>G=3,D=1)<mathjax>$. The $</mathjax>D<mathjax>$ node is not directly connected to the $</mathjax>I$ node, yet conditioning on it does affect the probability.</td>
+</tr>
+</tbody>
+</table>
+<p>As the simplest example of intercausal reasoning, consider an <code>OR</code> gate:</p>
+<figure><img alt="An OR gate as a belief network" src="../assets/bn_or_gate.svg" /><figcaption>An OR gate as a belief network</figcaption>
+</figure>
+<p>Knowing <mathjax>$Y$</mathjax> and <mathjax>$X_1$</mathjax> (or <mathjax>$X_2$</mathjax>) tells you the value of <mathjax>$X_2$</mathjax> (or <mathjax>$X_1$</mathjax>) even though <mathjax>$X_1$</mathjax> and <mathjax>$X_2$</mathjax> are not directly linked. Knowing <mathjax>$Y$</mathjax> alone does not tell you anything about <mathjax>$X_1$</mathjax> or <mathjax>$X_2$</mathjax>'s values.</p>
+<p>There are a few different structures in which a variable <mathjax>$X$</mathjax> can <strong>influence</strong> a variable <mathjax>$Y$</mathjax>, i.e. change beliefs in <mathjax>$Y$</mathjax> when conditioned on <mathjax>$X$</mathjax>:</p>
+<ul>
+<li><mathjax>$X \to Y$</mathjax></li>
+<li><mathjax>$X \leftarrow Y$</mathjax></li>
+<li><mathjax>$X \to W \to Y$</mathjax></li>
+<li><mathjax>$X \leftarrow W \leftarrow Y$</mathjax></li>
+<li><mathjax>$X \leftarrow W \to Y$</mathjax></li>
+</ul>
+<p>Which the different reasonings described above capture.</p>
+<p>The one structure which "blocks" influence is <mathjax>$X \to W \leftarrow Y$</mathjax>. That is, where two causes have a joint effect. This is called a <strong>v-structure</strong>.</p>
+<p>A <strong>trail</strong> is a sequence of nodes that are connected to each other by single edges in the graph. A trail <mathjax>$X_1 - \dots - X_k$</mathjax> is <strong>active</strong> (if there is no evidence) if it has no v-structures <mathjax>$X_{i-1} \to X_i \leftarrow X_{i+1}$</mathjax>, where <mathjax>$X_i$</mathjax> is the block.</p>
+<p>When can variable <mathjax>$X$</mathjax> can influence a variable <mathjax>$Y$</mathjax> given evidence <mathjax>$Z$</mathjax>?</p>
+<ul>
+<li><mathjax>$X \to Y$</mathjax></li>
+<li><mathjax>$X \leftarrow Y$</mathjax></li>
+</ul>
+<p><mathjax>$X$</mathjax> may influence <mathjax>$Y$</mathjax> given evidence <mathjax>$Z$</mathjax> under certain conditions, depending on whether or not node <mathjax>$W$</mathjax> is part of the evidence <mathjax>$Z$</mathjax>:</p>
+<ul>
+<li><mathjax>$X \to W \to Y$</mathjax>, if <mathjax>$W \notin Z$</mathjax></li>
+<li><mathjax>$X \leftarrow W \leftarrow Y$</mathjax>, if <mathjax>$W \notin Z$</mathjax></li>
+<li><mathjax>$X \leftarrow W \to Y$</mathjax>, if <mathjax>$W \notin in Z$</mathjax></li>
+<li><mathjax>$X \to W \leftarrow Y$</mathjax>, if either <mathjax>$W \in Z$</mathjax> or one of <mathjax>$W$</mathjax>'s descendants <mathjax>$\in Z$</mathjax> (intercausal reasoning)</li>
+</ul>
+<p>A trail <mathjax>$X_1 - \dots - X_k$</mathjax> is <em>active</em> given evidence <mathjax>$Z$</mathjax> if, for any v-structure <mathjax>$X_{i-1} \to X_i \leftarrow X_{i+1}$</mathjax> we have that <mathjax>$X_i$</mathjax> or one of its descendants is in <mathjax>$Z$</mathjax> and no other <mathjax>$X_i$</mathjax> (not in v-structures) is in <mathjax>$Z$</mathjax>.</p>
+<h3>Independence</h3>
+<p>For events <mathjax>$\alpha, \beta$</mathjax>, we say <mathjax>$P$</mathjax> satisfies the independence of <mathjax>$\alpha$</mathjax> and <mathjax>$\beta$</mathjax>, notated <mathjax>$P \vDash \alpha \perp \beta$</mathjax> if:</p>
+<ul>
+<li><mathjax>$P(\alpha,\beta) = P(\alpha)P(\beta)$</mathjax></li>
+<li><mathjax>$P(\alpha|\beta) = P(\alpha)$</mathjax></li>
+<li><mathjax>$P(\beta|\alpha) = P(\beta)$</mathjax></li>
+</ul>
+<p>This can be generalized to random variables:</p>
+<p><mathjax>$X, Y, P \vDash X \perp Y$</mathjax> if:</p>
+<ul>
+<li><mathjax>$P(X,Y) = P(X)P(Y)$</mathjax></li>
+<li><mathjax>$P(X|Y) = P(X)$</mathjax></li>
+<li><mathjax>$P(Y|X) = P(Y)$</mathjax></li>
+</ul>
+<h3>Conditional independence</h3>
+<p>For (sets of) random variables <mathjax>$X,Y,Z, P \vDash (X \perp Y | Z)$</mathjax> if:</p>
+<ul>
+<li><mathjax>$P(X,Y|Z) = P(X|Z) P(Y|Z)$</mathjax></li>
+<li><mathjax>$P(X|Y,Z) = P(X|Z)$</mathjax></li>
+<li><mathjax>$P(Y|X,Z) = P(Y|Z)$</mathjax></li>
+<li><mathjax>$P(X,Y,Z) \varpropto \phi_1(X,Z) \phi_2(Y,Z)$</mathjax>; that is, the probability of the joint distribution <mathjax>$P(X,Y,Z)$</mathjax> is proportional to a product of the two factors <mathjax>$\phi_1(X,Z)$</mathjax> and <mathjax>$\phi_2(Y,Z)$</mathjax></li>
+</ul>
+<p>For example:</p>
+<figure><img alt="Coin toss example" src="../assets/bn_coin_toss.svg" /><figcaption>Coin toss example</figcaption>
+</figure>
+<p>There are two coins, one is fair and one is biased to show heads 90% of the time.</p>
+<p>You pick a coin, toss it, and it comes up heads.</p>
+<p>The probability of heads is <em>higher</em> in the second toss. You don't know what coin you have but heads on the first toss makes it more likely that you have the bias coin, thus a higher chance of heads on the second toss. So <mathjax>$X_1$</mathjax> and <mathjax>$X_2$</mathjax> are not independent. But if you know what coin you have, the tosses are then independent; the first toss doesn't tell you anything about the second anymore. That is, <mathjax>$X_1 \perp X_2 | C$</mathjax>.</p>
+<p>But note that conditioning can also lose you independence. For example, using the previous student example, <mathjax>$I \perp D$</mathjax>, but if we condition on grade <mathjax>$G$</mathjax>, they are no longer independent (this is the same as the <code>OR</code> gate example).</p>
+<figure><img alt="Student example" src="../assets/bn_student_or.svg" /><figcaption>Student example</figcaption>
+</figure>
+<p>We say that <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> are <strong>d-separated</strong> in <mathjax>$G$</mathjax> given <mathjax>$Z$</mathjax> if there is no active trail in <mathjax>$G$</mathjax> between <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> given <mathjax>$Z$</mathjax>. This is notated <mathjax>$\text{d-sep}_G(X,Y|Z)$</mathjax>.</p>
+<p>If <mathjax>$P$</mathjax> factorizes over <mathjax>$G$</mathjax> and <mathjax>$\text{d-sep}_G(X,Y|Z)$</mathjax>, then <mathjax>$P$</mathjax> satisfies <mathjax>$X \perp Y |Z)$</mathjax>.</p>
+<p>Any node is d-separated from its non-descendants given its parents.</p>
+<p>So if a distribution <mathjax>$P$</mathjax> factorizes over <mathjax>$G$</mathjax>, then in <mathjax>$P$</mathjax>, any variable is independent of its non-descendants given its parents.</p>
+<p>We can notate the set of independencies implicit in a graph <mathjax>$G$</mathjax>, that is, all of the independence statements that correspond to d-separation statements in the graph <mathjax>$G$</mathjax>, as <mathjax>$I(G)$</mathjax>:</p>
+<p><mathjax>$$
+I(G) = \{(X \perp Y | Z) | \text{d-sep}_G (X,Y|Z) \}
+$$</mathjax></p>
+<p>If <mathjax>$P$</mathjax> satisfies <mathjax>$I(G)$</mathjax>, then we say that <mathjax>$G$</mathjax> is an I-map (<strong>independency map</strong>) of <mathjax>$P$</mathjax>.</p>
+<p>This does not mean <mathjax>$G$</mathjax> must imply <em>all</em> independencies in <mathjax>$P$</mathjax>, just that those that it does imply are in fact present in <mathjax>$P$</mathjax>.</p>
+<p>SO if <mathjax>$P$</mathjax> factorizes over <mathjax>$G$</mathjax>, then <mathjax>$G$</mathjax> is an I-map for <mathjax>$P$</mathjax>. The converse also holds: if <mathjax>$G$</mathjax> is an I-map for <mathjax>$P$</mathjax>, then <mathjax>$P$</mathjax> factorizes over <mathjax>$G$</mathjax>.</p>
+<h3>Template models</h3>
+<p>Within a model you may have structures which repeat throughout or you may want to reuse common structures between/across models.</p>
+<p>In these cases we may use <strong>template variables</strong>.</p>
+<p>A template variable <mathjax>$X(U_1, \dots, U_k)$</mathjax> is instantiated multiple times. <mathjax>$U_1, \dots, U_k$</mathjax> are the <em>arguments</em>.</p>
+<p>A <strong>template model</strong> is a language which specifies how "ground" variables inherit dependency models from templates.</p>
+<h3>Temporal models</h3>
+<p>A common example of template models are <strong>temporal models</strong>, used for systems which evolve over time.</p>
+<p>When representing a distribution over continuous time, you typically want to <em>discretize</em> time so that it is not continuous. To do this, you pick a <em>time granularity</em> <mathjax>$\Delta$</mathjax>.</p>
+<p>We also have a set of template variables. <mathjax>$X^{(t)}$</mathjax> describes an instance of a template variable <mathjax>$X$</mathjax> at time <mathjax>$t\Delta$</mathjax>.</p>
+<p><mathjax>$$
+X^{(t:t')} = \{X^{(t)}, \dots, X^{(t')}\} \text{where} t \leq t'
+$$</mathjax></p>
+<p>That is, <mathjax>$X^{(t:t')}$</mathjax> denotes the set of random template variables that spans these time points.</p>
+<p>We want to represent <mathjax>$P(X^{(t:t')})$</mathjax> for any <mathjax>$t, t'$</mathjax>.</p>
+<p>To simplify this, we can use the <strong>Markov assumption</strong>, a type of conditional independence assumption.</p>
+<p>Without this assumption, we have:</p>
+<p><mathjax>$$
+P(X^{(0:T)} = P(X^{(0)}) \prod_{t=0}^{T-1} P(X^{(t+1)}|X^{(0:t)})
+$$</mathjax></p>
+<p>(this is just using the chain rule for probability)</p>
+<p>Then the Markov assumption is <mathjax>$(X^{(t+1)} \perp X^{(0:t-1)} | X^{(t)})$</mathjax>. That is, any time point is independent of the past, given the present.</p>
+<p>So then we can simplify our distribution:</p>
+<p><mathjax>$$
+P(X^{(0:T)} = P(X^{(0)}) \prod_{t=0}^{T-1} P(X^{(t+1)}|X^{(t)})
+$$</mathjax></p>
+<p>The Markov assumption isn't always appropriate, or it may be too strong.</p>
+<p>You can make it a better approximation by adding other variables about the state, in addition to <mathjax>$X^{(t)}$</mathjax>.</p>
+<p>The second assumption we make is of <strong>time invariance</strong>.</p>
+<p>We use a template probability model <mathjax>$P(X'|X)$</mathjax> where <mathjax>$X'$</mathjax> denotes the next time point and <mathjax>$X$</mathjax> denotes the current time point. We assume that this model is replicated for every single time point.</p>
+<p>That is, for all <mathjax>$t$</mathjax>:</p>
+<p><mathjax>$$
+P(X^{(t+1)}|X^{(t)}) = P(X'|X)
+$$</mathjax></p>
+<p>That is, the probability distribution is not influenced by the time <mathjax>$t$</mathjax>.</p>
+<p>Again, this is an approximation and is not always appropriate. Traffic, for example, has a different dynamic depending on what time of day it is.</p>
+<p>Again, you can include extra variables to capture other aspects of the state of the world to improve the approximation.</p>
+<h4>Temporal model example (transition model)</h4>
+<figure><img alt="Temporal model example" src="../assets/bn_temporal_ex_00.svg" /><figcaption>Temporal model example</figcaption>
+</figure>
+<ul>
+<li><mathjax>$W$</mathjax> = weather</li>
+<li><mathjax>$V$</mathjax> = velocity</li>
+<li><mathjax>$L$</mathjax> = location</li>
+<li><mathjax>$F$</mathjax> = failure</li>
+<li><mathjax>$O$</mathjax> = observation</li>
+</ul>
+<p>The left column of the graph is at time slice <mathjax>$t$</mathjax>, and the right side is at time slice <mathjax>$t+1$</mathjax>.</p>
+<p>The edges connecting the nodes at <mathjax>$t$</mathjax> to the nodes at <mathjax>$t+1$</mathjax>, e.g. <mathjax>$F \to F'$</mathjax>, is an <strong>inter-time-slice</strong>, and the edges connecting nodes at <mathjax>$t+1$</mathjax> to the observation, e.g. <mathjax>$F' \to O'$</mathjax>, are <strong>intra-time-slices</strong>.</p>
+<p>We can describe a conditional probability distribution (CPD) for our prime variables as such:</p>
+<p><mathjax>$$
+P(W', V', L', F', O' | W, V, L, F)
+$$</mathjax></p>
+<p>We don't need a CPD for the non-prime variables because they have already "happened".</p>
+<p>We can rewrite this distribution with the independence assumptions in the graph:</p>
+<p><mathjax>$$
+P(W', V', L', F', O' | W, V, L, F) = P(W'|W) P(V'|W,V) P(L'|L,V) P(F'|F,W) P(O'|L',F')
+$$</mathjax></p>
+<p>Here the observation <mathjax>$O'$</mathjax> is conditioned on variables in the same time slice (<mathjax>$L', F'$</mathjax>) because we assume the observation is "immediate". This is a relation known as an <em>intra-time-slice</em>.</p>
+<p>All the other variables are conditioned on the previous time slice, i.e. they are <em>inter-time-slice</em> relations.</p>
+<p>Now we start with some initial state (time slice 0, <mathjax>$t_0$</mathjax>):</p>
+<figure><img alt="Temporal model example initial state" src="../assets/bn_temporal_ex_01.svg" /><figcaption>Temporal model example initial state</figcaption>
+</figure>
+<p>Then we add on the next time slice, <mathjax>$t_1$</mathjax>:</p>
+<figure><img alt="Temporal model example at $t_1$" src="../assets/bn_temporal_ex_02.svg" /><figcaption>Temporal model example at <mathjax>$t_1$</mathjax></figcaption>
+</figure>
+<p>And we can repeatedly do this to represent all subsequent time slices <mathjax>$t_2, \dots$</mathjax>, where each is conditioned on the previous time slice.</p>
+<p>So we have a <strong>2-time-slice Bayesian network</strong> (2TBN). A transition model (2TBN) over <mathjax>$X_1, \dots, X_n$</mathjax> is specified as a BN <strong>fragment</strong> such that:</p>
+<ul>
+<li>the nodes include <mathjax>$X_1', \dots, X_n'$</mathjax> (next time slice <mathjax>$t+1$</mathjax>) and a subset of <mathjax>$X_1, \dots, X_n$</mathjax> (time slice <mathjax>$t$</mathjax>).</li>
+<li>only the nodes <mathjax>$X_1', \dots, X_n'$</mathjax> have parents and a CPD</li>
+</ul>
+<p>The 2TBN defines a conditional distribution using the chain rule:</p>
+<p><mathjax>$$
+P(X'|X) = \prod_{i=1}^n P(X_i'|\text{Pa}(X_i'))
+$$</mathjax></p>
+<h3>Markov Models</h3>
+<p>We can consider a Markov model as a chain-structured Bayes' Net, so our reasoning there applies here as well.</p>
+<p>Each node is a state in the sequence and each node is identically distributed (stationary) and depends on the previous state, i.e. <mathjax>$P(X_t|X_{t-1})$</mathjax> (except for the initial state <mathjax>$P(X_1)$</mathjax>). This is essentially just a conditional independence assumption (i.e. that <mathjax>$P(X_t)$</mathjax> is conditionally independent of <mathjax>$X_{t-2}, X_{t-3}, \dots, X_1$</mathjax> given <mathjax>$X_{t-1}$</mathjax>).</p>
+<p>The parameters of a Markov model are the <strong>transition probabilities</strong> (or <strong>dynamics</strong>) and the initial state probabilities (i.e. the initial distribution <mathjax>$P(X_1)$</mathjax>.</p>
+<p>Say we want to know <mathjax>$P(X)$</mathjax> at time <mathjax>$t$</mathjax>. A Markov model algorithm for solving this is the <strong>forward algorithm</strong>, which is just an instance of variable elimination (in the order <mathjax>$X_1, X_2, \dots$</mathjax>). A simplified version:</p>
+<p><mathjax>$$
+P(x_t) = \sum_{x_{t-1}} P(x_t|x_{t-1}) P(x_{t-1})
+$$</mathjax></p>
+<p>Assuming <mathjax>$P(x_1)$</mathjax> is known.</p>
+<p><mathjax>$P(X_t)$</mathjax> converges as <mathjax>$t \to \infty$</mathjax>, and it converges to the same values regardless of the initial state. This converged distribution, independent of the initial state, is called the <strong>stationary distribution</strong>. The influence of the initial state fades away as <mathjax>$t \to \infty$</mathjax>.</p>
+<p>The key insight for a stationary distribution is that <mathjax>$P(X_t) = P(X_{t-1})$</mathjax>, and that this is independent of the initial distribution.</p>
+<p>Formally, the stationary distribution satisfies:</p>
+<p><mathjax>$$
+P_{\infty}(X) = P_{\infty+1}(X) = \sum_x P_{t+1|t}(X|x) P_{\infty}(x)
+$$</mathjax></p>
+<h3>Dynamic Bayes Networks (DBNs)</h3>
+<p>A dynamic Bayes' net (DBN) is a Bayes' net replicated through time, i.e. variables at time <mathjax>$t$</mathjax> can be conditioned on those from time <mathjax>$t-1$</mathjax> (the structure is reminiscent of a recurrent neural network).</p>
+<p>A dynamic Bayesian network over <mathjax>$X_1, \dots, X_n$</mathjax> is defined by a:</p>
+<ul>
+<li>2TBN <mathjax>$\text{BN}_{\to}$</mathjax> over <mathjax>$X_1, \dots, X_n$</mathjax></li>
+<li>a Bayesian network <mathjax>$\text{BN}^{(0)}$</mathjax> over <mathjax>$X_1^{(0)}, \dots, X_n^{(0)}$</mathjax> (time 0, i.e. the initial state)</li>
+</ul>
+<h4>Ground network</h4>
+<p>For a trajectory over <mathjax>$0, \dots, T$</mathjax>, we define a <strong>ground (unrolled network)</strong> such that:</p>
+<ul>
+<li>the dependency model for <mathjax>$X_1^{(0)}, \dots, X_n^{(0)}$</mathjax> is copied from <mathjax>$\text{BN}^{(0)}$</mathjax></li>
+<li>the dependency model for <mathjax>$X_1^{(t)}, \dots, X_n^{(t)}$</mathjax> for all <mathjax>$t &gt; 0$</mathjax> is copied from <mathjax>$\text{BN}_{\to}$</mathjax></li>
+</ul>
+<p>That is, it is just an aggregate ("unrolled") of the previously shown network up to time slice <mathjax>$t_T$</mathjax>.</p>
+<h4>Hidden Markov Models (HMMs)</h4>
+<p>![Hidden Markov Model](../assets/hmm.svg textwidth=0.5)</p>
+<p>Often we have a sequence of observations and we want to use these observations to learn something about the underlying process that generated them. As such we need to introduce time or space to our models.</p>
+<p>An <strong>Hidden Markov Model</strong> (HMM) is a simple dynamic Bayes' net. In particular, it is a Markov model in which we don't directly observe the state. That is, there is a Markov chain where we don't see <mathjax>$S_t$</mathjax> but rather we see some evidence/observations/emissions/outputs/effects/etc <mathjax>$O_t$</mathjax>.</p>
+<p>The actual observations are stochastic (e.g. an underlying state may produce one of many observations with some probability). We try to infer the state based on these observations.</p>
+<p>For example, imagine we are in a windowless room and we want to know if it's raining. We can't directly observe whether it's raining, but we can see if people have brought umbrellas with them.</p>
+<p>It is also a 2TBN.</p>
+<p>HMMs are used to analyze or to predict time series involving noise or uncertainty.</p>
+<p>There is a sequence of states <mathjax>$s_1 \to s_2 \to s_3 \to \dots \to S_N$</mathjax>. This sequence is a Markov chain (each state depends only on the previous state).</p>
+<p>Each state <strong>emits</strong> a measurement/observation, e.g. <mathjax>$s_1$</mathjax> emits <mathjax>$z_1$</mathjax> (<mathjax>$s_1 \to z_1$</mathjax>), <mathjax>$s_2$</mathjax> emits <mathjax>$z_2$</mathjax> (<mathjax>$s_2 \to z_2$</mathjax>), and so on. We don't deserve the states directly; we only observe these measurements (hence, the underlying Markov model is "hidden").</p>
+<p>Together, these define a Bayes network that is at the core of HMMs.</p>
+<p>An HMM is defined by:</p>
+<ul>
+<li>a state variable <mathjax>$S$</mathjax> and an <em>observation</em> (sometimes called <strong>emission</strong>) variable <mathjax>$O$</mathjax></li>
+<li>the initial distribution <mathjax>$P(S_0)$</mathjax></li>
+<li>the transition model <mathjax>$P(S'|S)$</mathjax></li>
+<li>the observation model <mathjax>$P(O|X)$</mathjax> (the probability of seeing evidence given the hidden state, also called an <em>emissions model</em>)</li>
+</ul>
+<p>We introduce an additional conditional independence assumption - that the current observation is independent of everything else given the current state.</p>
+<figure><img alt="Basic HMM" src="../assets/bn_simple_hmm.svg" /><figcaption>Basic HMM</figcaption>
+</figure>
+<p>You can unroll this:</p>
+<figure><img alt="Basic HMM, unrolled" src="../assets/bn_simple_hmm_unrolled.svg" /><figcaption>Basic HMM, unrolled</figcaption>
+</figure>
+<p>HMMs, however, may also have internal structures, more commonly in the transition model, but sometimes in the observation model as well.</p>
+<p>TODO in the following <mathjax>$X$</mathjax> is switched with <mathjax>$S$</mathjax>, make it consistent</p>
+<h4>Example</h4>
+<p>Say we have the following HMM:</p>
+<figure><img alt="Hidden Markov Model Example" src="../assets/hmm_example.svg" /><figcaption>Hidden Markov Model Example</figcaption>
+</figure>
+<p>We don't know the starting state, but we know the probabilities:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(R_0) &amp;= \frac{1}{2} \\
+P(S_0) &amp;= \frac{1}{2}
+\end{aligned}
+$$</mathjax></p>
+<p>Say on the first day we see that this person is happy and we want to know whether or not it is raining. That is:</p>
+<p><mathjax>$$
+P(R_1|H_1)
+$$</mathjax></p>
+<p>We can use Bayes' rule to compute this posterior:</p>
+<p><mathjax>$$
+P(R_1|H_1) = \frac{P(H_1|R_1)P(R_1)}{P(H_1)}
+$$</mathjax></p>
+<p>We can compute these values by hand:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(R_1) &amp;= P(R_1|R_0)P(R_0) + P(R_1|S_0)P(S_0) \\
+P(H_1) &amp; = P(H_1|R_1)P(R_1) + P(H_1|S_1)P(S_1)
+\end{aligned}
+$$</mathjax></p>
+<p><mathjax>$P(H_1|R_1)$</mathjax> can be pulled directly from the graph.</p>
+<p>Then you can just run the numbers.</p>
+<h5>Inference base cases in an HMM</h5>
+<p>The first base case: consider the start of an HMM:</p>
+<p><mathjax>$$
+P(X_1) \to P(E_1|X_1)
+$$</mathjax></p>
+<p>Inferring <mathjax>$P(X_1|e_1)$</mathjax>, that is, <mathjax>$P(X_1)$</mathjax> given we observe a piece of evidence <mathjax>$e_1$</mathjax>, is straightforward:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(x_1|e_1) &amp;= \frac{P(x_1, e_1)}{P(e_1)} \\
+&amp;= \frac{P(e_1|x_1)P(x_1)}{P(e_1)} \\
+&amp;\varpropto_{X_1} P(e_1|x_1)P(x_1)
+\end{aligned}
+$$</mathjax></p>
+<p>That is, we applied the definition of conditional probability and then expanded the numerator with the product rule.</p>
+<p>For an HMM, <mathjax>$P(E_1|X_1)$</mathjax> and <mathjax>$P(X_1)$</mathjax> are specified, so we have the information needed to compute this. We just compute <mathjax>$P(e_1|X_1)P(X_1)$</mathjax> and normalize the resulting vector.</p>
+<p>The second base case:</p>
+<p>Say we want to infer <mathjax>$P(X_2)$</mathjax>, and we just have the HMM:</p>
+<p><mathjax>$$
+X_1 \to X_2
+$$</mathjax></p>
+<p>That is, rather than observing evidence, time moves forward one step.</p>
+<p>For an HMM, <mathjax>$P(X_1)$</mathjax> and <mathjax>$P(X_2|X_1)$</mathjax> are specified.</p>
+<p>So we can compute <mathjax>$P(X_2)$</mathjax> like so:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(x_2) &amp;= \sum_{x_1} P(x_2, x_1) \\
+&amp;= \sum_{x_1} P(x_2|x_1)P(x_1)
+\end{aligned}
+$$</mathjax></p>
+<p>From these two base cases we can do all that we need with HMMs.</p>
+<h6>Passage of time</h6>
+<p>Assume that we have the current belief <mathjax>$P(X|\text{evidence to date})$</mathjax>:</p>
+<p><mathjax>$$
+B(X_t) = P(X_t|e_{1:t})
+$$</mathjax></p>
+<p>After one time step passes, we have:</p>
+<p><mathjax>$$
+P(X_{t+1}|e_{1:t}) = \sum_{x_t} P(X_{t+1}|x_t) P(x_t|e_{1:t})
+$$</mathjax></p>
+<p>Which can be written compactly as:</p>
+<p><mathjax>$$
+B'(X_{t+1}) = \sum_{x_t} P(X'|x)B(x_t)
+$$</mathjax></p>
+<p>Intuitively, what is happening here is: we look at each place we could have been, <mathjax>$x_t$</mathjax>, consider how likely it was that we were there to begin with, <mathjax>$B(x_t)$</mathjax>, and multiply it by the probability of getting to <mathjax>$X'$</mathjax> had you been there.</p>
+<h6>Observing evidence</h6>
+<p>Assume that we have the current belief <mathjax>$P(X|\text{previous evidence})$</mathjax>:</p>
+<p><mathjax>$$
+B'(X_{t+1}) = P(X_{t+1}|e_{1:t})
+$$</mathjax></p>
+<p>Then:</p>
+<p><mathjax>$$
+P(X_{t+1}|e_{1:t+1}) \varpropto P(e_{t+1}|X_{t+1}) P(X_{t+1}|e_{1:t})
+$$</mathjax></p>
+<p>See the above base case for observing evidence - this is just that, and remember, renormalize afterwards.</p>
+<p>Another way of putting this:</p>
+<p><mathjax>$$
+B(X_{t+1}) \varpropto P(e|X) B'(X_{t+1})
+$$</mathjax></p>
+<h5>The Forward Algorithm</h5>
+<p>Now we can consider the forward algorithm (the one presented previously was a simplification).</p>
+<p>We are given evidence at each time and want to know:</p>
+<p><mathjax>$$
+B_t(X) = P(X_t|e_{1:t})
+$$</mathjax></p>
+<p>We can derive the following updates:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(x_t|e_{1:t}) &amp;\varpropto_X P(x_t, e{1:t}) \\
+&amp;= \sum_{x_{t-1}} P(x_{t-1}, x_t, e_{1:t}) \\
+&amp;= \sum_{x_{t-1}} P(x_{t-1}, e_{1:t-1}) P(x_t|x_{t-1})P(e_t|x_t) \\
+&amp;= P(e_t|x_t) \sum_{x_{t-1}} P(x_{t-1}, e_{1:t-1})
+\end{aligned}
+$$</mathjax></p>
+<p>Which we can normalize at each step (if we want <mathjax>$P(x|e)$</mathjax> at each time step) or all together at the end.</p>
+<p>This is just variable elimination with the order <mathjax>$X_1, X_2, \dots$</mathjax>.</p>
+<p>This computation is proportional to the square number of states.</p>
+<h5>Most Likely Explanation</h5>
+<p>With <strong>Most Likely Explanation</strong>, the concern is not the state at time <mathjax>$t$</mathjax>, but the most likely sequence of states that led to time <mathjax>$t$</mathjax>, given observations.</p>
+<p>For MLE, we use an HMM and instead we want to know:</p>
+<p><mathjax>$$
+\argmax_{x_{1:t}} P(x_{1:t}|e_{1:t})
+$$</mathjax></p>
+<p>We can use the <strong>Viterbi algorithm</strong> to solve this, which is essentially just the forward algorithm where the <mathjax>$\sum$</mathjax> is changed to a <mathjax>$\max$</mathjax>:</p>
+<p><mathjax>$$
+\begin{aligned}
+m_t[x_t] &amp;= \max_{x_{1:t-1}} P(x_{1:t-1}, x_t, e_{1:t}) \\
+&amp;= P(e_t|x_t) \max_{x_{t-1}} P(x_t|x_{t-1}) m_{t-1}[x_{t-1}]
+\end{aligned}
+$$</mathjax></p>
+<p>In contrast, the forward algorithm:</p>
+<p><mathjax>$$
+\begin{aligned}
+f_t[x_t] &amp;= P(x_t, e_{1:t}) \\
+&amp;= P(e_t|x_t) \sum_{x_{t-1}} P(x_t|x_{t-1}) f_{t-1}[x_{t-1}]
+\end{aligned}
+$$</mathjax></p>
+<h3>Plate models</h3>
+<p>A common template model is a <strong>plate model</strong>.</p>
+<p>Say we are repeatedly flipping a coin.</p>
+<figure><img alt="Simple plate model" src="../assets/bn_plate_model.svg" /><figcaption>Simple plate model</figcaption>
+</figure>
+<p>The surrounding box is the <strong>plate</strong>. The idea is that these are "stacked", one for each toss <mathjax>$t$</mathjax>. That is, they are indexed by <mathjax>$t$</mathjax>.</p>
+<p>The <mathjax>$\theta$</mathjax> node denotes the CPD parameters. This is outside the plate, i.e. it is not indexed by <mathjax>$t$</mathjax>.</p>
+<p>Another way of visualizing this:</p>
+<figure><img alt="Simple plate model, alternative representation" src="../assets/bn_plate_model_alt.svg" /><figcaption>Simple plate model, alternative representation</figcaption>
+</figure>
+<p>Where <mathjax>$o(t_i)$</mathjax> is the outcome at time <mathjax>$t_i$</mathjax>. This representation makes it more obvious that each of these plates is a copy of a template.</p>
+<p>Another example:</p>
+<figure><img alt="A plate model for students" src="../assets/bn_plate_model_02.svg" /><figcaption>A plate model for students</figcaption>
+</figure>
+<p>Plates may be <em>nested</em>:</p>
+<figure><img alt="A nested plate model for students" src="../assets/bn_plate_model_02_nested.svg" /><figcaption>A nested plate model for students</figcaption>
+</figure>
+<p>If we were to draw this out for two courses and two students:</p>
+<figure><img alt="Unrolled student plate model" src="../assets/bn_plate_model_02_unrolled.svg" /><figcaption>Unrolled student plate model</figcaption>
+</figure>
+<p>One oddity here is that now intelligence depends on both the student <mathjax>$s$</mathjax> and the course <mathjax>$c$</mathjax>, whereas before it depends only on the student <mathjax>$s$</mathjax>. Maybe this is desired, but let's say we want what we had before. That is, we want intelligence to be independent of the course <mathjax>$c$</mathjax>.</p>
+<p>Instead, we can use <em>overlapping</em> plates:</p>
+<figure><img alt="An overlapping plate model for students" src="../assets/bn_plate_model_02_overlapping.svg" /><figcaption>An overlapping plate model for students</figcaption>
+</figure>
+<p>Plate models allow for <strong>collective inference</strong>, i.e. they allow us to look at the aggregate of these individual instances in order to find broader patterns.</p>
+<p>More formally, a <strong>plate dependency model</strong>:</p>
+<p>For a template variable <mathjax>$A(U_1, \dots, U_k)$</mathjax> we have template parents <mathjax>$B_1(U_1), \dots, B_m(U_m)$</mathjax>; that is, an index cannot appear in the parent which does not appear in the child. This is a particular limitation of plate models.</p>
+<p>We get the following template CPD: <mathjax>$P(A|B_1, \dots, B_m)$</mathjax>.</p>
+<h3>Structured CPDs</h3>
+<p>We can represent CPDs in tables, e.g.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><mathjax>$g_1$</mathjax></th>
+<th><mathjax>$g_2$</mathjax></th>
+<th><mathjax>$g_3$</mathjax></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><mathjax>$i_0, d_0$</mathjax></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><mathjax>$i_0, d_1$</mathjax></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><mathjax>$i_1, d_0$</mathjax></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><mathjax>$i_1, d_1$</mathjax></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>But as we start to have more variables, this table can explode in size.</p>
+<p>More generally, we can just represent a CPD <mathjax>$P(X|Y_1, \dots, Y_k)$</mathjax>, which specifies a distribution over <mathjax>$X$</mathjax> for each assignment <mathjax>$Y_1, \dots, Y_k$</mathjax> using any function which specifies a factor <mathjax>$\phi(X, Y_1, \dots, Y_k)$</mathjax> such that:</p>
+<p><mathjax>$$
+\sum_x \phi(x, y_1, \dots, y_k) = 1
+$$</mathjax></p>
+<p>for all <mathjax>$y_1, \dots, y_k$</mathjax>.</p>
+<p>There are many models for representing CPDs, including:</p>
+<ul>
+<li>deterministic CPDs</li>
+<li>tree-structured CPDs</li>
+<li>logistic CPDs and generalizations</li>
+<li>noisy OR/AND</li>
+<li>linear Gaussians and generalizations</li>
+</ul>
+<p><strong>Context-specific independence</strong> shows up in some CPD representations. It is a type of independence where we have a particular assignment <mathjax>$c$</mathjax>, from some set of variables <mathjax>$C$</mathjax>, <mathjax>$P \vDash (X \perp_c Y | Z, c)$</mathjax></p>
+<p>Which is to say this independence holds only for particular values of <mathjax>$c$</mathjax>, rather than all values of <mathjax>$c$</mathjax>.</p>
+<p>For example, consider:</p>
+<figure><img alt="An OR gate as a belief network" src="../assets/bn_or_gate.svg" /><figcaption>An OR gate as a belief network</figcaption>
+</figure>
+<p>Where <mathjax>$X$</mathjax> is a deterministic <code>OR</code> of <mathjax>$Y_1, Y_2$</mathjax>.</p>
+<p>Consider:</p>
+<ul>
+<li><mathjax>$X \perp Y_1 | y_2^0$</mathjax>. When <mathjax>$Y_2$</mathjax> is false, <mathjax>$X$</mathjax> just takes on the value of <mathjax>$Y_1$</mathjax>, so there's no context-specific independence here.</li>
+<li><mathjax>$X \perp Y_1 | y_2^1$</mathjax>. When <mathjax>$Y_2$</mathjax> is true, then it doesn't matter what value <mathjax>$Y_1$</mathjax> takes, since <mathjax>$X$</mathjax> will be true too. Thus we have context-specific independence.</li>
+<li><mathjax>$Y_1 \perp Y_2 | x^0$</mathjax>. If we know <mathjax>$X$</mathjax> is false, we already know <mathjax>$Y_1, Y_2$</mathjax> are false, independent of each other. So we have context-specific independence here.</li>
+<li><mathjax>$Y_1 \perp Y_2 | x^1$</mathjax>. We don't have context-specific independence here.</li>
+</ul>
+<h4>Tree-structured CPDs</h4>
+<p>Say we have the following model:</p>
+<figure><img alt="Simple model" src="../assets/bn_tree_cpd_00.svg" /><figcaption>Simple model</figcaption>
+</figure>
+<p>That is, whether or not a student gets a job <mathjax>$J$</mathjax> depends on:</p>
+<ul>
+<li><mathjax>$A$</mathjax> - if they applied (<mathjax>$+a, -a$</mathjax>)</li>
+<li><mathjax>$L$</mathjax> - if they have a letter of recommendation (<mathjax>$+l, -l$</mathjax>)</li>
+<li><mathjax>$S$</mathjax> - if they scored well on the SAT (<mathjax>$+s, -s$</mathjax>)</li>
+</ul>
+<p>We can represent the CPD as a tree structure.</p>
+<figure><img alt="Tree-structured CPD" src="../assets/bn_tree_cpd_01.svg" /><figcaption>Tree-structured CPD</figcaption>
+</figure>
+<p>Note that the notation at the leaf nodes is the probability of not getting the job and of getting it, i.e. <mathjax>$(P(-j), P(+j)$</mathjax>.</p>
+<p>A bit more detail: we're assuming its possible that the student gets the job without applying, e.g. via a recruiter, in which case the SAT score and letter aren't important.</p>
+<p>We also assume that if the student scored well on the SAT, the letter is unimportant.</p>
+<p>We have three binary random variables. If we represented this CPD as a table, it have <mathjax>$2^3=8$</mathjax> conditional probability distributions. However, in certain contexts we only need 4 distributions since we have some context-specific independences:</p>
+<ul>
+<li><mathjax>$J \perp_c L| +a, +s$</mathjax></li>
+<li><mathjax>$J \perp_c L,S| -a$</mathjax></li>
+<li><mathjax>$J \perp_c L| +s, A$</mathjax></li>
+</ul>
+<p>This last one is just a compact representation of:</p>
+<ul>
+<li><mathjax>$J \perp_c L| +s, +a$</mathjax></li>
+<li><mathjax>$J \perp_c L| +s, -a$</mathjax></li>
+</ul>
+<p>Consider another model:</p>
+<figure><img alt="Another model" src="../assets/bn_tree_cpd_02.svg" /><figcaption>Another model</figcaption>
+</figure>
+<p>Where the student chooses only one letter to submit.</p>
+<p>The tree might look like:</p>
+<figure><img alt="Tree-structured CPD" src="../assets/bn_tree_cpd_03.svg" /><figcaption>Tree-structured CPD</figcaption>
+</figure>
+<p>Here the choice variable <mathjax>$C$</mathjax> determines the dependence of one set of circumstances on another set of circumstances.</p>
+<p>This scenario has context-specific independence but also non-context-specific independence:</p>
+<p><mathjax>$$
+L_1 \perp L_2 | J, C
+$$</mathjax></p>
+<p>Because, if you break it down into its individual cases:</p>
+<ul>
+<li><mathjax>$L_1 \perp_c L_2 | J, c_1$</mathjax></li>
+<li><mathjax>$L_1 \perp_c L_2 | J, c_2$</mathjax></li>
+</ul>
+<p>both are true.</p>
+<p>This scenario relates to a class of CPDs called <em>multiplexer</em> CPDs:</p>
+<figure><img alt="Multiplexer CPD" src="../assets/bn_multiplexer_cpd.svg" /><figcaption>Multiplexer CPD</figcaption>
+</figure>
+<p><mathjax>$Y$</mathjax> has two lines around it to indicate deterministic dependence.</p>
+<p>Here we have some variables <mathjax>$Z_1, \dots, Z_k$</mathjax> and <mathjax>$A$</mathjax> is a copy of <em>one</em> of these variables.</p>
+<p><mathjax>$A$</mathjax> is the <strong>multiplexer</strong>, i.e. the "selector variable", taking a value from <mathjax>$\{1, \dots, k\}$</mathjax>.</p>
+<p>For a multiplexer CPD, we have:</p>
+<p><mathjax>$$
+P(Y|A,Z_1, \dots, Z_k) = \begin{cases}
+1 &amp; Y=Z_a \\
+0 &amp; \text{otherwise}
+\end{cases}
+$$</mathjax></p>
+<p>That is, the value of <mathjax>$A$</mathjax> just determines which <mathjax>$Z$</mathjax> value <mathjax>$Y$</mathjax> takes on.</p>
+<h4>Noisy OR CPDs</h4>
+<figure><img alt="Noisy OR CPD" src="../assets/bn_noisy_or_cpd.svg" /><figcaption>Noisy OR CPD</figcaption>
+</figure>
+<p>In a noise OR CPD we introduce intermediary variables between <mathjax>$x_i$</mathjax> and <mathjax>$Y$</mathjax>. These intermediary variables <mathjax>$z$</mathjax> take on 1 if its parent value satisfies its criteria. <mathjax>$Y$</mathjax> becomes an OR variable which is true if any of the <mathjax>$z$</mathjax> variables are true.</p>
+<p>That is:</p>
+<p><mathjax>$$
+P(z_i=1|x_i) = \begin{cases}
+0 &amp;\text{if $x_i=0$} \\
+\lambda_i &amp;\text{if $x_i=1$}
+\end{cases}
+$$</mathjax></p>
+<p>Where <mathjax>$\lambda_i \in [0,1]$</mathjax>.</p>
+<p>So if <mathjax>$x_i=0$</mathjax>, <mathjax>$z_i$</mathjax> never gets turned on. If <mathjax>$x_i=1$</mathjax>, <mathjax>$z_i$</mathjax> gets turned on with probability <mathjax>$lambda_i$</mathjax>.</p>
+<p><mathjax>$z_0$</mathjax> is a "leak" probability which is the probability that <mathjax>$Y$</mathjax> gets turned on by itself. <mathjax>$P(z_0=1) = \lambda_0$</mathjax>.</p>
+<p>We can write this as a probability and consider the CPD of <mathjax>$Y=0$</mathjax> given our <mathjax>$x$</mathjax> variables. That is, what is the probability that all the <mathjax>$x$</mathjax> variables fail to turn on their corresponding <mathjax>$z$</mathjax> variables?</p>
+<p><mathjax>$$
+P(Y=0|X_1, \dots, X_k) = (1-\lambda_0) \prod_{i:x_i=1} (1- \lambda_i)
+$$</mathjax></p>
+<p>where <mathjax>$(1-\lambda_0)$</mathjax> is the probability that <mathjax>$Y$</mathjax> doesn't get turned on by the leak.</p>
+<p>Thus:</p>
+<p><mathjax>$$
+P(Y=1|X_1, \dots, X_k) = 1 - P(Y=0|X_1, \dots, X_k)
+$$</mathjax></p>
+<p>A noisy OR CPD demonstrates <strong>independence of causal influence</strong>. We are assuming that we have a bunch of causes <mathjax>$x_1, \dots, x_k$</mathjax> for a variable <mathjax>$Y$</mathjax>, which each act independently to affect the truth of the <mathjax>$Y$</mathjax>. That is, there is no interaction between the causes.</p>
+<p>Other CPDs for independence of causal influence include noisy AND, noisy MAX, etc.</p>
+<h4>Continuous variables</h4>
+<p>Consider:</p>
+<figure><img alt="Continuous variable example (simple)" src="../assets/bn_continuous_ex_00.svg" /><figcaption>Continuous variable example (simple)</figcaption>
+</figure>
+<p>We have the temperature in a room and a sensor which measures the temperature.</p>
+<p>The sensor is not perfect, so it usually around the right temperature, but not exactly.</p>
+<p>We can represent this by saying the sensor reading <mathjax>$S$</mathjax> is a normal distribution around the true temperature <mathjax>$T$</mathjax> with some standard deviation, i.e.:</p>
+<p><mathjax>$$
+S \sim N(T; \sigma_S^2)
+$$</mathjax></p>
+<p>This model is a <em>linear Gaussian</em>.</p>
+<p>We can make it more complex, assuming that the outside temperature will also affect the room temperature:</p>
+<figure><img alt="Continuous variable example (more complex)" src="../assets/bn_continuous_ex_01.svg" /><figcaption>Continuous variable example (more complex)</figcaption>
+</figure>
+<p>Where <mathjax>$T'$</mathjax> is the temperature in a few moments and <mathjax>$O$</mathjax> is the outside temperature. We may say that <mathjax>$T'$</mathjax> is also a linear Gaussian:</p>
+<p><mathjax>$$
+T' \sim N(\alpha T + (1-\alpha) O; \sigma_T^2)
+$$</mathjax></p>
+<p>The <mathjax>$\alpha T + (1-\alpha) O$</mathjax> term is just a mixture of the current temperature and the outside temperature.</p>
+<p>We can take it another step. Say there is a door <mathjax>$D$</mathjax> in the room which is either opened or closed (i.e. it is a binary random variable).</p>
+<figure><img alt="Continuous variable example (even more complex)" src="../assets/bn_continuous_ex_02.svg" /><figcaption>Continuous variable example (even more complex)</figcaption>
+</figure>
+<p>Now <mathjax>$T'$</mathjax> is described as:</p>
+<p><mathjax>$$
+\begin{aligned}
+T' &amp;\sim N(\alpha_0 T + (1-\alpha_0) O; \sigma_{0T}^2) \text{if $D=0$} \\
+T' &amp;\sim N(\alpha_1 T + (1-\alpha_1) O; \sigma_{1T}^2) \text{if $D=1$}
+\end{aligned}
+$$</mathjax></p>
+<p>This is a <em>conditional</em> linear Gaussian model since its parameters are conditioned on the discrete variable <mathjax>$D$</mathjax>.</p>
+<p>Generally, a linear Gaussian model looks like:</p>
+<figure><img alt="Basic linear Gaussian" src="../assets/bn_linear_gaussian.svg" /><figcaption>Basic linear Gaussian</figcaption>
+</figure>
+<p><mathjax>$$
+Y \sim N(w_0 + \sum w_i X_i ; \sigma^2)
+$$</mathjax></p>
+<p>Where <mathjax>$w_0 + \sum w_i X_i$</mathjax> is the mean (a linear function of the parents) and <mathjax>$\sigma^2$</mathjax> is not related to the parents/doesn't depend on the parents.</p>
+<p>Then, conditional linear Gaussians introduce one or more discrete parents (only one, <mathjax>$A$</mathjax>, is depicted below), and this is just a linear gaussian whose parameters depend on the value of <mathjax>$A$</mathjax>:</p>
+<p><mathjax>$$
+Y \sim N(w_{a0} + \sum w_{ai} X_i; \sigma_a^2)
+$$</mathjax></p>
+<h3>Querying Bayes's nets</h3>
+<h4>Conditional probability queries</h4>
+<p>PGMs can be used to answer many queries, but the most common is probably <strong>conditional probability queries</strong>:</p>
+<p>Given evidence <mathjax>$e$</mathjax> about some variables <mathjax>$E$</mathjax>, we have a query which is a subset of variables <mathjax>$Y$</mathjax>, and our task is to compute <mathjax>$P(Y|E=e)$</mathjax>.</p>
+<p>Unfortunately, the problem of inference on graphical models is NP-Hard. In particular, the following are NP-Hard:</p>
+<ul>
+<li><strong>exact inference</strong></li>
+<li>given a PGM <mathjax>$P_{\Phi}$</mathjax>, a variable <mathjax>$X$</mathjax> and a value <mathjax>$x \in \text{Val}(X)$</mathjax>, compute <mathjax>$P_{\Phi}(X=x)$</mathjax></li>
+<li>even just deciding if <mathjax>$P_{\Phi}(X=x) &gt; 0$</mathjax> is NP-hard</li>
+<li><strong>approximate inference</strong></li>
+<li>let <mathjax>$\epsilon &lt; 0.5$</mathjax>. Given a PGM <mathjax>$P_{\Phi}$</mathjax>, a variable <mathjax>$X$</mathjax>, a value <mathjax>$x \in \text{Val}(X)$</mathjax>, and an observation <mathjax>$e \in \text{Val}(E)$</mathjax>, find a number <mathjax>$p$</mathjax> that has <mathjax>$|P_{\Phi}(X=x|E=e) - p| &lt; \epsilon$</mathjax>.</li>
+</ul>
+<p>However, NP-Hard is the worst case result and their are algorithms that perform for most common cases.</p>
+<p>Some conditional probability inference algorithms:</p>
+<ul>
+<li>variable elimination</li>
+<li>message passing over a graph</li>
+<li>belief propagation</li>
+<li>variational approximations</li>
+<li>random sampling instantiations</li>
+<li>Markov Chain Monte Carlo (MCMC)</li>
+<li>importance sampling</li>
+</ul>
+<h4>MAP (maximum a posteriori) queries</h4>
+<p>PGMs can also answer MAP queries:</p>
+<p>We have a set of evidence <mathjax>$E=e$</mathjax>, the query is all other variables <mathjax>$Y$</mathjax>, i.e. <mathjax>$Y = \{X_1, \dots, X_n\} - E$</mathjax>. Our task is to compute <mathjax>$\text{MAP}(Y|E=e) = \argmax_y P(Y=y|E=e)$</mathjax>. There may be more than one possible solution.</p>
+<p>This is also a NP-hard problem, but there are also many algorithms to solve these efficiently for most cases.</p>
+<p>Some MAP inference algorithms:</p>
+<ul>
+<li>variable elimination</li>
+<li>message passing over a graph</li>
+<li>max-product belief propagation</li>
+<li>using methods for integer programming</li>
+<li>for some networks, graph-cut methods</li>
+<li>combinatorial search</li>
+</ul>
+<h3>Inference in Bayes' nets</h3>
+<p>Given a query, i.e. a joint probability distribution we are interested in getting a value for, we can infer an answer for that query from a Bayes' net.</p>
+<p>The simplest approach is <strong>inference by enumeration</strong> in which we extract the conditional probabilities from the Bayes' net and appropriately combine them together.</p>
+<p>But this is very inefficient, especially because variables that aren't in the query require us to enumerate over all possible values for them. We lose most of the benefit of having this compact representation of joint distributions.</p>
+<p>An alternative approach is <strong>variable elimination</strong>, which is still NP-hard, but faster than enumeration.</p>
+<p>Variable elimination requires the notion of <em>factors</em>. Here are some factors:</p>
+<ul>
+<li>a joint distribution: <mathjax>$P(X,Y)$</mathjax>, which is just all entries <mathjax>$P(x,y)$</mathjax> for all <mathjax>$x,y$</mathjax> and sums to 1.</li>
+</ul>
+<p>Example:</p>
+<p><mathjax>$$
+P(T,W)
+$$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>T</th>
+<th>W</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hot</td>
+<td>sun</td>
+<td>0.4</td>
+</tr>
+<tr>
+<td>hot</td>
+<td>rain</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>cold</td>
+<td>sun</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>cold</td>
+<td>rain</td>
+<td>0.3</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>a selected joint: <mathjax>$P(x,Y)$</mathjax>, i.e. we fix <mathjax>$X=x$</mathjax>, then look at all entries <mathjax>$P(x,y)$</mathjax> for all <mathjax>$y$</mathjax>, and sums to <mathjax>$P(x)$</mathjax>. This is a "slice" of the joint distribution.</li>
+</ul>
+<p>Example:</p>
+<p><mathjax>$$
+P(\text{cold}, W)
+$$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>T</th>
+<th>W</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cold</td>
+<td>sun</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>cold</td>
+<td>rain</td>
+<td>0.3</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>a single conditional: <mathjax>$P(Y|x)$</mathjax>, i.e. we fix <mathjax>$X=x$</mathjax>, then look at all entries <mathjax>$P(y|x)$</mathjax> for all <mathjax>$y$</mathjax>, and sums to 1.</li>
+</ul>
+<p>Example:</p>
+<p><mathjax>$$
+P(W|\text{cold})
+$$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>T</th>
+<th>W</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cold</td>
+<td>sun</td>
+<td>0.4</td>
+</tr>
+<tr>
+<td>cold</td>
+<td>rain</td>
+<td>0.6</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>a family of conditionals: <mathjax>$P(X,Y)$</mathjax>, i.e. we have multiple conditions, all entries <mathjax>$P(x|y)$</mathjax> for all <mathjax>$x, y$</mathjax>, and sums to <mathjax>$|Y|$</mathjax>.</li>
+</ul>
+<p>Example:</p>
+<p><mathjax>$$
+P(W|T)
+$$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>T</th>
+<th>W</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hot</td>
+<td>sun</td>
+<td>0.8</td>
+</tr>
+<tr>
+<td>hot</td>
+<td>rain</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>cold</td>
+<td>sun</td>
+<td>0.4</td>
+</tr>
+<tr>
+<td>cold</td>
+<td>rain</td>
+<td>0.6</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>a specified family: <mathjax>$P(y|X)$</mathjax>, i.e. we fix <mathjax>$y$</mathjax> and look at all entries <mathjax>$P(y|x)$</mathjax> for all <mathjax>$x$</mathjax>. Can sum to anything;</li>
+</ul>
+<p>Example:</p>
+<p><mathjax>$$
+P(\text{rain}|T)
+$$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>T</th>
+<th>W</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hot</td>
+<td>rain</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>cold</td>
+<td>rain</td>
+<td>0.6</td>
+</tr>
+</tbody>
+</table>
+<p>In general, when we write <mathjax>$P(Y_1, \dots, Y_N | X_1, \dots, X_M)$</mathjax>, we have a factor, i.e. a multi-dimensional array for which the values are all instantiations <mathjax>$P(y_1, \dots, y_N|x_1, \dots, x_M)$</mathjax>.</p>
+<p>Any assigned/instantiated <mathjax>$X$</mathjax> or <mathjax>$Y$</mathjax> is a dimension missing (selected) from the array, which leads to smaller factors - when we fix values, we don't have to consider every possible instantiation of that variable anymore, so we have less possible combinations of variable values to consider.</p>
+<p>For example, if <mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> are both binary random variables, if we don't fix either of them we have four to consider (<mathjax>$(X=0,Y=0), (X=1,Y=0), (X=0,Y=1), (X=1,Y=1)$</mathjax>) . If we fix, say <mathjax>$X=1$</mathjax>, then we only have two to consider (<mathjax>$(X=1,Y=0), (X=1,Y=1)$</mathjax>).</p>
+<p>Consider a simple Bayes' net:</p>
+<p><mathjax>$$
+R \to T \to L
+$$</mathjax></p>
+<p>Where <mathjax>$R$</mathjax> is whether or not it is raining, <mathjax>$T$</mathjax> is whether or not there is traffic, and <mathjax>$L$</mathjax> is whether or not we are late for class.</p>
+<p>We are given the following factors for this Bayes' net:</p>
+<p><mathjax>$P(R)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+r</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>0.9</td>
+</tr>
+</tbody>
+</table>
+<p><mathjax>$P(T|R)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>T</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+r</td>
+<td>+t</td>
+<td>0.8</td>
+</tr>
+<tr>
+<td>+r</td>
+<td>-t</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>+t</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>-t</td>
+<td>0.9</td>
+</tr>
+</tbody>
+</table>
+<p><mathjax>$P(L|T)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>T</th>
+<th>L</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+t</td>
+<td>+l</td>
+<td>0.3</td>
+</tr>
+<tr>
+<td>+t</td>
+<td>-l</td>
+<td>0.7</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>+l</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>-l</td>
+<td>0.9</td>
+</tr>
+</tbody>
+</table>
+<p>For example, if we observe <mathjax>$L=+l$</mathjax>, so we can fix that value and shrink the last factor <mathjax>$P(L|T)$</mathjax>:</p>
+<p><mathjax>$P(+l|T)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>T</th>
+<th>L</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+t</td>
+<td>+l</td>
+<td>0.3</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>+l</td>
+<td>0.1</td>
+</tr>
+</tbody>
+</table>
+<p>We can <em>join</em> factors, which gives us a new factor over the union of the variables involved.</p>
+<p>For example, we can join on <mathjax>$R$</mathjax>, which involves picking all factors involving <mathjax>$R$</mathjax>, i.e. <mathjax>$P(R)$</mathjax> and <mathjax>$P(T|R)$</mathjax>, giving us <mathjax>$P(R,T)$</mathjax>. The join is accomplished by computing the entry-wise products, e.g. for each <mathjax>$r,t$</mathjax>, compute <mathjax>$P(r,t) = P(r) P(t|r)$</mathjax>:</p>
+<p><mathjax>$P(R,T)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>T</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+r</td>
+<td>+t</td>
+<td>0.08</td>
+</tr>
+<tr>
+<td>+r</td>
+<td>-t</td>
+<td>0.02</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>+t</td>
+<td>0.09</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>-t</td>
+<td>0.81</td>
+</tr>
+</tbody>
+</table>
+<p>After completing this join, the resulting factor <mathjax>$P(R,T)$</mathjax> replaces <mathjax>$P(R)$</mathjax> and <mathjax>$P(T|R)$</mathjax>, so our Bayes' net is now:</p>
+<p><mathjax>$$
+(R,T) \to L
+$$</mathjax></p>
+<p>We can then join on <mathjax>$T$</mathjax>, which involves <mathjax>$P(L|T)$</mathjax> and <mathjax>$P(R,T)$</mathjax>, giving us <mathjax>$P(R,T,L)$</mathjax>:</p>
+<p><mathjax>$P(R,T,L)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>T</th>
+<th>L</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+r</td>
+<td>+t</td>
+<td>+l</td>
+<td>0.024</td>
+</tr>
+<tr>
+<td>+r</td>
+<td>+t</td>
+<td>-l</td>
+<td>0.056</td>
+</tr>
+<tr>
+<td>+r</td>
+<td>-t</td>
+<td>+l</td>
+<td>0.002</td>
+</tr>
+<tr>
+<td>+r</td>
+<td>-t</td>
+<td>-l</td>
+<td>0.018</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>+t</td>
+<td>+l</td>
+<td>0.027</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>+t</td>
+<td>-l</td>
+<td>0.063</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>-t</td>
+<td>+l</td>
+<td>0.081</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>-t</td>
+<td>-l</td>
+<td>0.729</td>
+</tr>
+</tbody>
+</table>
+<p>Now we have this joint distribution, and we can use the <strong>marginalization</strong> operation (also called <strong>elimination</strong>) on this factor - that is, we can sum out a variable to shrink the factor. We can only do this if the variable appears in only one factor.</p>
+<p>For example, say we still had our factor <mathjax>$P(R,T)$</mathjax> and we wanted to get <mathjax>$P(T)$</mathjax>. We can do so by summing out <mathjax>$R$</mathjax>:</p>
+<p><mathjax>$P(T)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>T</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+t</td>
+<td>0.17</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>0.83</td>
+</tr>
+</tbody>
+</table>
+<p>So we can take our full joint distribution <mathjax>$P(R,T,L)$</mathjax> and get <mathjax>$P(T,L)$</mathjax> by elimination (in particular, by summing out <mathjax>$R$</mathjax>):</p>
+<p><mathjax>$P(T,L)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>T</th>
+<th>L</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+t</td>
+<td>+l</td>
+<td>0.051</td>
+</tr>
+<tr>
+<td>+t</td>
+<td>-l</td>
+<td>0.119</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>+l</td>
+<td>0.083</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>-l</td>
+<td>0.747</td>
+</tr>
+</tbody>
+</table>
+<p>Then we can further sum out <mathjax>$T$</mathjax> to get <mathjax>$P(L)$</mathjax>:</p>
+<p><mathjax>$P(L)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>L</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+l</td>
+<td>0.134</td>
+</tr>
+<tr>
+<td>-l</td>
+<td>0.866</td>
+</tr>
+</tbody>
+</table>
+<p>This approach is equivalent to inference by enumeration (building up the full joint distribution, then taking it apart to get to the desired quantity).</p>
+<p>However, we can use these operations (join and elimination) to find "shortcuts" to the desired quantity (i.e. marginalize early without needing to build the entire joint distribution first). This method is <strong>variable elimination</strong>.</p>
+<p>For example, we can compute <mathjax>$P(L)$</mathjax> in a shorter route:</p>
+<ul>
+<li>join on <mathjax>$R$</mathjax>, as before, to get <mathjax>$P(R,T)$</mathjax></li>
+<li>then eliminate (sum out) <mathjax>$R$</mathjax> from <mathjax>$P(R,T)$</mathjax> to get <mathjax>$P(T)$</mathjax></li>
+<li>then join on <mathjax>$T$</mathjax>, i.e. with <mathjax>$P(T)$</mathjax> and <mathjax>$P(L|T)$</mathjax>, giving us <mathjax>$P(T,L)$</mathjax></li>
+<li>the eliminate <mathjax>$T$</mathjax>, giving us <mathjax>$P(L)$</mathjax></li>
+</ul>
+<p>In contrast, the enumeration method required:</p>
+<ul>
+<li>join on <mathjax>$R$</mathjax> to get <mathjax>$P(R,T)$</mathjax></li>
+<li>join on <mathjax>$T$</mathjax> to get <mathjax>$P(R,T,L)$</mathjax></li>
+<li>eliminate <mathjax>$R$</mathjax> to get <mathjax>$P(T)$</mathjax></li>
+<li>eliminate <mathjax>$T$</mathjax> to get <mathjax>$P(L)$</mathjax></li>
+</ul>
+<p>The advantage of variable elimination is that we never build a factor of more than two variables (i.e. the full joint distribution <mathjax>$P(R,T,L)$</mathjax>), thus saving time and space. The largest factor typically has the greatest influence over the computation complexity.</p>
+<p>In this case, we had no evidence (i.e. no fixed values) to work with. If we had evidence, we would first shrink the factors involving the observed variable, and the evidence would be retained in the final factor (since we can't sum it out once it's observed).</p>
+<p>For example, say we observed <mathjax>$R=+r$</mathjax>.</p>
+<p>We would take our initial factors and shrink those involving <mathjax>$R$</mathjax>:</p>
+<p><mathjax>$P(+r)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+r</td>
+<td>0.1</td>
+</tr>
+</tbody>
+</table>
+<p><mathjax>$P(T|+r)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>T</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+r</td>
+<td>+t</td>
+<td>0.8</td>
+</tr>
+<tr>
+<td>+r</td>
+<td>-t</td>
+<td>0.2</td>
+</tr>
+</tbody>
+</table>
+<p>And we would eventually end up with:</p>
+<p><mathjax>$P(+r, L)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>L</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+r</td>
+<td>+l</td>
+<td>0.026</td>
+</tr>
+<tr>
+<td>+r</td>
+<td>-l</td>
+<td>0.074</td>
+</tr>
+</tbody>
+</table>
+<p>And then we could get <mathjax>$P(L|+r)$</mathjax> by normalizing <mathjax>$P(+r, L)$</mathjax>:</p>
+<p><mathjax>$P(L|+r)$</mathjax></p>
+<table>
+<thead>
+<tr>
+<th>L</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+l</td>
+<td>0.26</td>
+</tr>
+<tr>
+<td>-l</td>
+<td>0.74</td>
+</tr>
+</tbody>
+</table>
+<p>More concretely, the general variable elimination algorithm is such:</p>
+<ul>
+<li>start with a query <mathjax>$P(Q|E_1 = e_1, \dots, E_k = e_k)$</mathjax>, where <mathjax>$Q$</mathjax> are your query variables</li>
+<li>start with initial factors (i.e. local conditional probability tables instantiated by the evidence <mathjax>$E_1, \dots, E_k$</mathjax>, i.e. shrink factors involving the evidence)</li>
+<li>while there are still hidden variables (i.e. those in the net that are not <mathjax>$Q$</mathjax> or any of the evidence <mathjax>$E_1, \dots, E_k$</mathjax>)</li>
+<li>pick a hidden variable <mathjax>$H$</mathjax></li>
+<li>join all factors mentioning <mathjax>$H$</mathjax></li>
+<li>eliminate (sum out) <mathjax>$H$</mathjax></li>
+<li>then join all remaining factors and normalize. The resulting distribution will be <mathjax>$P(Q | e_1, \dots, e_k)$</mathjax>.</li>
+</ul>
+<p>The order in which you eliminate variables affects computational complexity in that some orderings generate larger factors than others. Again, the factor size is what influences complexity, so you want to use orderings that produce small factors.</p>
+<p>For example, if a variable is mentioned in many factors, you generally want to avoid computing that until later on (usually last). This is because a variable mentioned in many factors means joining over many factors, which will probably produce a very large factor.</p>
+<p>We can encode this in the algorithm by telling it to choose the next hidden variable that would produce the smallest factor (since factor sizes are relatively easy to compute without needing to actually produce the factor, just look at the number and sizes of tables that would have to be joined).</p>
+<p>Unfortunately there isn't always an ordering with small factors, so variable elimination is great in many situations, but not all.</p>
+<h4>Sampling</h4>
+<p>Another method for Bayes' net inference is <strong>sampling</strong>. This is an <em>approximate</em> inference method, but it can be much faster. Here, "sampling" essentially means "repeated simulation".</p>
+<p>The basic idea:</p>
+<ul>
+<li>draw <mathjax>$N$</mathjax> samples from a sampling distribution <mathjax>$S$</mathjax></li>
+<li>compute an approximate posterior probability</li>
+<li>with enough samples, this converges to the true probability <mathjax>$P$</mathjax></li>
+</ul>
+<p>Sampling from a given distribution:</p>
+<ol>
+<li>Get sample <mathjax>$u$</mathjax> from a uniform distribution over <mathjax>$[0,1]$</mathjax></li>
+<li>Convert this sample <mathjax>$u$</mathjax> into an outcome for the given distribution by having each outcome associated with a sub-interval of <mathjax>$[0,1)$</mathjax> with sub-interval size equal to the probability of the outcome</li>
+</ol>
+<p>For example, if we have the following distribution:</p>
+<table>
+<thead>
+<tr>
+<th>C</th>
+<th>P(C)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>red</td>
+<td>0.6</td>
+</tr>
+<tr>
+<td>green</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>blue</td>
+<td>0.3</td>
+</tr>
+</tbody>
+</table>
+<p>Then we can map <mathjax>$u$</mathjax> to <mathjax>$C$</mathjax> in this way:</p>
+<p><mathjax>$$
+c =
+\begin{cases}
+\text{red} &amp; \text{if} 0 \leq u &lt; 0.6 \\
+\text{green} &amp; \text{if} 0.6 \leq u &lt; 0.7 \\
+\text{blue} &amp; \text{if} 0.7 \leq u &lt; 1
+\end{cases}
+$$</mathjax></p>
+<p>There are many different sampling strategies for Bayes' nets:</p>
+<ul>
+<li>prior sampling</li>
+<li>rejection sampling</li>
+<li>likelihood weighting</li>
+<li>Gibbs sampling</li>
+</ul>
+<p>In practice, you typically want to use either likelihood weighting or Gibbs sampling.</p>
+<h5>Prior sampling</h5>
+<p>We have a Bayes' net, and we want to sample the full joint distribution it encodes, but we don't want to have to build the full joint distribution.</p>
+<p>Imagine we have the following Bayes' net:</p>
+<p><mathjax>$$
+\begin{aligned}
+P(C) \to P(R|C) \\
+P(C) \to P(S|C) \\
+P(R|C) \to P(W|S,R) \\
+P(S|C) \to P(W|S,R)
+\end{aligned}
+$$</mathjax></p>
+<p>Where <mathjax>$C,R,S,W$</mathjax> are binary variables (i.e. <mathjax>$C$</mathjax> can be <mathjax>$+c$</mathjax> or <mathjax>$-c$</mathjax>).</p>
+<p>We start from <mathjax>$P(C)$</mathjax> and sample a value <mathjax>$c$</mathjax> from that distribution. Then we sample <mathjax>$r$</mathjax> from <mathjax>$P(R|C)$</mathjax> and <mathjax>$s$</mathjax> from <mathjax>$P(S|C)$</mathjax> conditioned on the value <mathjax>$c$</mathjax> we sampled from <mathjax>$P(C)$</mathjax>. Then we sample from <mathjax>$P(W|S,R)$</mathjax> conditioned on the sampled <mathjax>$r,s$</mathjax> values.</p>
+<p>Basically, we walk through the graph, sampling from the distribution at each node, and we choose a path through the graph such that we can condition on previously-sampled variables. This generates <em>one</em> final sample across the different variables. If we want more samples, we have to repeat this process.</p>
+<p>Prior sampling (<mathjax>$S_{PS}$</mathjax>) generates samples with probability:</p>
+<p><mathjax>$$
+S_{PS}(x_1, \dots, x_n) = \prod_{i=1}^n P(x_i|\text{Parents}(X_i)) = P(x_1, dots, x_n)
+$$</mathjax></p>
+<p>That is, it generates samples from the actual joint distribution the Bayes' net encodes, which is to say that this sampling procedure is <strong>consistent</strong>. This is worth mentioning because this isn't always the case; some sampling strategies sample from a different distribution and compensate in other ways.</p>
+<p>Then we can use these samples to estimate <mathjax>$P(W)$</mathjax> or other quantities we may be interested in, but we need many samples to get good estimates.</p>
+<h5>Rejection sampling</h5>
+<p>Prior sampling can be overkill, since we typically keep samples which are irrelevant to the problem at hand. We can instead use the same approach but discard irrelevant samples.</p>
+<p>For instance, if we want to compute <mathjax>$P(W)$</mathjax>, we only care about values that <mathjax>$W$</mathjax> takes on, so we don't need to keep the corresponding values for <mathjax>$C,S,R$</mathjax>. Similarly, maybe we are interested in <mathjax>$P(C|+s)$</mathjax> - so we should only be keeping samples where <mathjax>$S=+s$</mathjax>.</p>
+<p>This method is called <strong>rejection sampling</strong> because we are rejecting samples that are irrelevant to our problem. This method is also consistent.</p>
+<h5>Likelihood Weighting</h5>
+<p>A problem with rejection sampling is that if the evidence is unlikely, we have to reject a lot of samples.</p>
+<p>For example, if we wanted to estimate <mathjax>$P(C|+s)$</mathjax> and <mathjax>$S=+s$</mathjax> is generally very rare, then many of our samples will be rejected.</p>
+<p>We could instead fix the evidence variables, i.e. when it comes to sample <mathjax>$S$</mathjax>, just say <mathjax>$S=+s$</mathjax>. But then our sample distribution is not consistent.</p>
+<p>We can fix this by weighting each sample by the probability of the evidence (e.g. <mathjax>$S=+s$</mathjax>) given its parents (e.g. <mathjax>$P(+s|\text{Parents})$</mathjax>).</p>
+<h5>Gibbs sampling</h5>
+<p>With likelihood weighting, we consider the evidence only for variables sampled after we fixed the evidence (that is, that come after the evidence node in our walk through the Bayes' net). Anything we sampled before did not take the evidence into account. It's possible that what we sample before we get to our evidence is very inconsistent with the evidence, i.e. makes it very unlikely and gives us a very low weight for our sample.</p>
+<p>With Gibbs sampling, we fix our evidence and then instantiate of all our other variables, <mathjax>$x_1, \dots, x_n$</mathjax>. This instantiation is arbitrary but it must be consistent with the evidence.</p>
+<p>Then, we sample a new value for one variable at a time, conditioned on the rest, though we keep the evidence fixed. We repeat this many times.</p>
+<p>If we repeat this infinitely many times, the resulting sample comes from the correct distribution, and it is conditioned on both the upstream (pre-evidence) and downstream (post-evidence) variables.</p>
+<p>Gibbs sampling is essentially a Markov model (hence it is a <em>Markov Chain</em> Monte Carlo method) in which the stationary distribution is the conditional distribution we are interested in.</p>
+<h2>Markov Networks</h2>
+<p><strong>Markov networks</strong> are also called <strong>Markov random fields</strong>.</p>
+<p>The simplest subclass is <strong>pairwise Markov networks</strong>.</p>
+<p>Say we have the following scenario:</p>
+<figure><img alt="Simple pairwise Markov network" src="../assets/markov_network_00.svg" /><figcaption>Simple pairwise Markov network</figcaption>
+</figure>
+<p>An idea is floating around and when, for example, Alice &amp; Bob are hanging out, they may share the idea - they influence each other. We don't use a directed graph because the influence flows in both directions.</p>
+<p>But how do you parametrize an undirected graph? We no longer have a notion of a conditional - that is, one variable conditioning another.</p>
+<p>Well, we can just use factors:</p>
+<figure><img alt="Simple pairwise Markov network" src="../assets/markov_network_01.svg" /><figcaption>Simple pairwise Markov network</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><mathjax>$\phi_1 [A,B]$</mathjax></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><mathjax>$-a, -b$</mathjax></td>
+<td>30</td>
+</tr>
+<tr>
+<td><mathjax>$-a, +b$</mathjax></td>
+<td>5</td>
+</tr>
+<tr>
+<td><mathjax>$+a, -b$</mathjax></td>
+<td>1</td>
+</tr>
+<tr>
+<td><mathjax>$+a, +b$</mathjax></td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>These factors are sometimes called <strong>affinity functions</strong> or <strong>compatibility functions</strong> or <strong>soft constraints</strong>.</p>
+<p>What do these numbers mean?</p>
+<p>They indicate the "<em>local happiness</em>" of the variables <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> to take a particular joint assignment. Here <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax> are "happiest" when <mathjax>$-a, -b$</mathjax>.</p>
+<p>We can define factors for the other edges as well:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><mathjax>$\phi_2 [B,C]$</mathjax></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><mathjax>$-b, -c$</mathjax></td>
+<td>100</td>
+</tr>
+<tr>
+<td><mathjax>$-b, +c$</mathjax></td>
+<td>1</td>
+</tr>
+<tr>
+<td><mathjax>$+b, -c$</mathjax></td>
+<td>1</td>
+</tr>
+<tr>
+<td><mathjax>$+b, +c$</mathjax></td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><mathjax>$\phi_3 [C,D]$</mathjax></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><mathjax>$-c, -d$</mathjax></td>
+<td>1</td>
+</tr>
+<tr>
+<td><mathjax>$-c, +d$</mathjax></td>
+<td>100</td>
+</tr>
+<tr>
+<td><mathjax>$+c, -d$</mathjax></td>
+<td>100</td>
+</tr>
+<tr>
+<td><mathjax>$+c, +d$</mathjax></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><mathjax>$\phi_4 [D,A]$</mathjax></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><mathjax>$-d, -a$</mathjax></td>
+<td>100</td>
+</tr>
+<tr>
+<td><mathjax>$-d, +a$</mathjax></td>
+<td>1</td>
+</tr>
+<tr>
+<td><mathjax>$+d, -a$</mathjax></td>
+<td>1</td>
+</tr>
+<tr>
+<td><mathjax>$+d, +a$</mathjax></td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<p>Then we have:</p>
+<p><mathjax>$$
+\tilde P(A,B,C,D) = \phi_1(A,B) \phi_2(B,C) \phi_3(C,D) \phi_4(A,D)
+$$</mathjax></p>
+<p>This isn't a probability distribution because its numbers aren't in <mathjax>$[0,1]$</mathjax> (hence the tilde over <mathjax>$P$</mathjax>, which indicates an unnormalized measure).</p>
+<p>We can normalize it to get a probability distribution:</p>
+<p><mathjax>$$
+P(A,B,C,D) = \frac{1}{Z} \tilde P(A,B,C,D)
+$$</mathjax></p>
+<p><mathjax>$Z$</mathjax> is known as a <strong>partition function</strong>.</p>
+<p>There unfortunately is no natural mapping from the pairwise factors and the marginal probabilities from the distribution they generate.</p>
+<p>For instance, say we are given the marginal probabilities of <mathjax>$P_{\Phi} (A,B)$</mathjax> (the <mathjax>$\Phi$</mathjax> indicates the probability was computed using a set of factors <mathjax>$\Phi = \{\phi_1, \dots, \phi_n \}$</mathjax>):</p>
+<table>
+<thead>
+<tr>
+<th><mathjax>$A$</mathjax></th>
+<th><mathjax>$B$</mathjax></th>
+<th><mathjax>$P_{\Phi}(A,B)$</mathjax></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><mathjax>$-a$</mathjax></td>
+<td><mathjax>$-b$</mathjax></td>
+<td>0.13</td>
+</tr>
+<tr>
+<td><mathjax>$-a$</mathjax></td>
+<td><mathjax>$+b$</mathjax></td>
+<td>0.69</td>
+</tr>
+<tr>
+<td><mathjax>$+a$</mathjax></td>
+<td><mathjax>$-b$</mathjax></td>
+<td>0.14</td>
+</tr>
+<tr>
+<td><mathjax>$+a$</mathjax></td>
+<td><mathjax>$+b$</mathjax></td>
+<td>0.04</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><mathjax>$\phi_1 [A,B]$</mathjax></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><mathjax>$-a, -b$</mathjax></td>
+<td>30</td>
+</tr>
+<tr>
+<td><mathjax>$-a, +b$</mathjax></td>
+<td>5</td>
+</tr>
+<tr>
+<td><mathjax>$+a, -b$</mathjax></td>
+<td>1</td>
+</tr>
+<tr>
+<td><mathjax>$+a, +b$</mathjax></td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>The most likely joint assignment is <mathjax>$-a, +b$</mathjax>, which doesn't seem to correspond to the factor. This is a result of the other factors in the network.</p>
+<p>This is unlike Bayesian networks where the nodes were just conditional probabilities.</p>
+<p>Formally, a <em>pairwise Markov network</em> is an undirected graph whose nodes are <mathjax>$X_1, \dots, X_n$</mathjax> and each edge <mathjax>$X_i - X_j$</mathjax> is associated with a factor (aka <em>potential</em>) <mathjax>$\phi_{ij}(X_i-X_j)$</mathjax>.</p>
+<p>Pairwise Markov networks cannot represent all of the probability distributions we may be interested in. A pairwise Markov network with <mathjax>$n$</mathjax> random variables, each with <mathjax>$d$</mathjax> values, has <mathjax>$O(n^2 d^2)$</mathjax> parameters. On the other hand, if we consider a probability distribution over <mathjax>$n$</mathjax> random variables, each with <mathjax>$d$</mathjax> values, it has <mathjax>$O(d^n)$</mathjax> parameters, which is far greater than <mathjax>$O(n^2 d^2)$</mathjax>.</p>
+<p>Thus we generalize beyond pairwise Markov networks.</p>
+<h3>Gibbs distribution</h3>
+<p>A <strong>Gibbs distribution</strong> is parameterized by a set of general factors <mathjax>$\Phi = \{\phi_1 (D_1), \dots, \phi_k(D_k) \}$</mathjax> which can have a scope of <mathjax>$\geq 2$</mathjax> variables (whereas pairwise Markov networks were limited to two variable scopes). As a result, this can express any probability distribution because we can just define a factor over all the random variables.</p>
+<p>We also have:</p>
+<p><mathjax>$$
+\begin{aligned}
+\tilde P_{\Phi} (X_1, \dots, X_n) &amp;= \prod_{i=1}^k \phi_i (D_i) \\
+Z_{\Phi} &amp;= \sum_{X_1, \dots, X_n} \tilde P_{\Phi} (X_1, \dots, X_n)
+\end{aligned}
+$$</mathjax></p>
+<p>Where <mathjax>$Z_{\Phi}$</mathjax> is the partition function, i.e. the normalizing constant.</p>
+<p>Thus we have:</p>
+<p><mathjax>$$
+P_{\Phi} (X_1, \dots, X_n) = \frac{1}{Z_{\Phi}} \tilde P_{\Phi} (X_1, \dots, X_n)
+$$</mathjax></p>
+<p>We can generate an <strong>induced Markov network</strong> <mathjax>$H_{\Phi}$</mathjax> from a set of factors <mathjax>$\Phi$</mathjax>. For each factor in the set, we connect any variables which are in the same scope.</p>
+<p>For example, <mathjax>$\phi_1(A,B,C), \phi_2(B,C,D)$</mathjax> leads to:</p>
+<figure><img alt="Example induced Markov network" src="../assets/markov_network_induced.svg" /><figcaption>Example induced Markov network</figcaption>
+</figure>
+<p>So multiple set of factors can induce the same graph. We can go from a set of factors to a graph, but we can't go the other way.</p>
+<p>We say a probability distribution <mathjax>$P$</mathjax> factorizes over a Markov network <mathjax>$H$</mathjax> if there exists a set of factors <mathjax>$\Phi$</mathjax> such that <mathjax>$P = P_{\Phi}$</mathjax> and <mathjax>$h$</mathjax> is the induced graph for <mathjax>$\Phi$</mathjax>.</p>
+<p>We have <strong>active trails</strong> in Markov networks as well: a trail <mathjax>$X_1 - \dots - X_n$</mathjax> is active given the set of observed variables <mathjax>$Z$</mathjax> if no <mathjax>$X_i$</mathjax> is in <mathjax>$Z$</mathjax>.</p>
+<h3>Conditional Random Fields</h3>
+<p>A commonly-used variant of Markov networks is <strong>conditional random fields</strong> (CRFs).</p>
+<p>This kind of model is used to deal with <em>task-specific prediction</em>, where we have a set of input/observed variables <mathjax>$X$</mathjax> and a set of target variables <mathjax>$Y$</mathjax> that we are trying to predict.</p>
+<p>Using the graphical models we have seen so far is not the best because we don't want to model <mathjax>$P(X,Y)$</mathjax> - we are already given <mathjax>$X$</mathjax>. Instead, we just want to model <mathjax>$P(Y|X)$</mathjax>. That way we don't have to worry about how features of <mathjax>$X$</mathjax> are correlated or independent, and we don't have to model their distributions.</p>
+<p>In this scenario, we can use a <em>conditional random field</em> representation:</p>
+<p><mathjax>$$
+\begin{aligned}
+\Phi &amp;= \{\phi_1(D_1), \dots, \phi_k (D_k)\} \\
+\tilde P_{\Phi}(X,Y) &amp;= \prod_{i=1}^k \phi_i (D_i)
+\end{aligned}
+$$</mathjax></p>
+<p>This looks just like a Gibbs distribution. The difference is in the partition function:</p>
+<p><mathjax>$$
+Z_{\Phi}(X) = \sum_Y \tilde P_{\Phi}(X,Y)
+$$</mathjax></p>
+<p>So a CRF is parameterized the same as a Gibbs distribution, but it is normalized differently.</p>
+<p>The end result is:</p>
+<p><mathjax>$$
+P_{\Phi}(Y|X) = \frac{1}{Z_{\Phi}(X)} \tilde P_{\Phi}(X,Y)
+$$</mathjax></p>
+<p>Which is a family of conditional distributions, one for each possible value of <mathjax>$X$</mathjax>.</p>
+<p>In a Markov network, we have the concept of <strong>separation</strong>, which is like d-separation in Bayesian networks but we drop the "d" because they are not directed.</p>
+<p><mathjax>$X$</mathjax> and <mathjax>$Y$</mathjax> are separated in <mathjax>$H$</mathjax> given observed evidence <mathjax>$Z$</mathjax> if there is no active trail in <mathjax>$H$</mathjax> (that is, no node along the trail is in <mathjax>$Z$</mathjax>).</p>
+<p>For example:</p>
+<figure><img alt="Markov network separation example" src="../assets/markov_network_separation.svg" /><figcaption>Markov network separation example</figcaption>
+</figure>
+<p>We can separate <mathjax>$A$</mathjax> and <mathjax>$E$</mathjax> in a few ways:</p>
+<ul>
+<li><mathjax>$A$</mathjax> and <mathjax>$E$</mathjax> are separated given <mathjax>$B$</mathjax> and <mathjax>$D$</mathjax></li>
+<li><mathjax>$A$</mathjax> and <mathjax>$E$</mathjax> are separated given <mathjax>$D$</mathjax></li>
+<li><mathjax>$A$</mathjax> and <mathjax>$E$</mathjax> are separated given <mathjax>$B$</mathjax> and <mathjax>$C$</mathjax></li>
+</ul>
+<p>Like with Bayesian networks, we have a theorem: if <mathjax>$P$</mathjax> factorizes over <mathjax>$H$</mathjax> and <mathjax>$\text{sep}_H (X,Y|Z)$</mathjax>, then <mathjax>$P$</mathjax> satisfies <mathjax>$(X \perp Y|Z)$</mathjax>.</p>
+<p>We can say the independences induced by the graph <mathjax>$H$</mathjax>, <mathjax>$I(H)$</mathjax>, is:</p>
+<p><mathjax>$$
+I(H) = \{(X \perp Y|Z) | \text{sep}_H (X,Y|Z) \}
+$$</mathjax></p>
+<p>If <mathjax>$P$</mathjax> satisfies <mathjax>$I(H)$</mathjax>, we say that <mathjax>$H$</mathjax> is an I-map (independency map) of <mathjax>$P$</mathjax> (this is similar to I-maps in the context of Bayesian networks).</p>
+<p>We can also say that if <mathjax>$P$</mathjax> factorizes over <mathjax>$H$</mathjax>, then <mathjax>$H$</mathjax> is an I-map of <mathjax>$P$</mathjax>.</p>
+<p>The converse is also true: for a positive distribution <mathjax>$P$</mathjax>, if <mathjax>$H$</mathjax> is an I-map for <mathjax>$P$</mathjax>, then <mathjax>$P$</mathjax> factorizes over <mathjax>$H$</mathjax>.</p>
+<p>If a graph <mathjax>$G$</mathjax> is an I-map of <mathjax>$P$</mathjax>, it does not necessarily need to encode all independences of <mathjax>$P$</mathjax>, just those that it does encode are in fact in <mathjax>$P$</mathjax>.</p>
+<p>How well can we capture a distribution <mathjax>$P$</mathjax>'s independences in a graphical model?</p>
+<p>We can denote all independences that hold in <mathjax>$P$</mathjax> as:</p>
+<p><mathjax>$$
+I(P) = \{(X \perp Y|Z) | P \vDash (X \perp Y|Z)\}
+$$</mathjax></p>
+<p>We know that if <mathjax>$P$</mathjax> factorizes over <mathjax>$G$</mathjax>, then <mathjax>$G$</mathjax> is an I-map for <mathjax>$P$</mathjax>:</p>
+<p><mathjax>$$
+I(G) \subseteq I(P)
+$$</mathjax></p>
+<p>The converse doesn't hold; <mathjax>$P$</mathjax> may have some independences not in <mathjax>$G$</mathjax>.</p>
+<p>We want graphs which encode more independences because they are sparser (less parameters) and more informative.</p>
+<p>So for sparsity, we want a <strong>minimal I-map</strong>; that is, an I-map without redundant edges. But it is still not sufficient for capturing <mathjax>$I(P)$</mathjax>.</p>
+<p>Ideally, we want a <strong>perfect map</strong>, which is an I-map such that <mathjax>$I(G) = I(P)$</mathjax>. Unfortunately, not ever distribution has a perfect map, although sometimes a distribution may have a perfect map as a Markov network and not as a Bayesian network, and vice versa.</p>
+<p>It is possible that a perfect map for a distribution is not unique; that is, there may be other graphs which model the same set of independence assumptions and thus are also perfect maps.</p>
+<p>When graphs model the same independence assumptions, we say they are <strong>I-equivalent</strong>. Most graphs have many I-equivalent variants.</p>
+<h3>Log-linear models</h3>
+<p>Log-linear models allow us to incorporate local structure into undirected models.</p>
+<p>In the original representation of unnormalized density, we had:</p>
+<p><mathjax>$$
+\tilde P = \prod_i \phi_i(D_i)
+$$</mathjax></p>
+<p>We turn this into a linear form:</p>
+<p><mathjax>$$
+\tilde P = \exp(- \sum_j w_j f_j(D_j))
+$$</mathjax></p>
+<p>Hence the name "log-linear", because the log is a linear function.</p>
+<p>Each feature <mathjax>$f_j$</mathjax> has a scope <mathjax>$D_j$</mathjax>. Different features can have the same scope.</p>
+<p>We can further write it in the form:</p>
+<p><mathjax>$$
+\tilde P = \prod_j \exp(-w_j f_j(D_j))
+$$</mathjax></p>
+<p>which effectively turns the <mathjax>$\exp(-w_j f_j(D_j))$</mathjax> term into a factor with one parameter <mathjax>$w_j$</mathjax>.</p>
+<p>For example, say we have binary variables <mathjax>$X_1$</mathjax> and <mathjax>$X_2$</mathjax>:</p>
+<p><mathjax>$$
+\phi(X_1,X_2) = \begin{bmatrix}
+a_{00} &amp; a_{01} \\
+a_{10} &amp; a_{11}
+\end{bmatrix}
+$$</mathjax></p>
+<p>We must define the following features using indicator functions (1 if true, else 0):</p>
+<p><mathjax>$$
+\begin{aligned}
+f_{12}^{00} &amp;= \mathbb{1} \{X_1=0, X_2=0\} \\
+f_{12}^{01} &amp;= \mathbb{1} \{X_1=0, X_2=1\} \\
+f_{12}^{10} &amp;= \mathbb{1} \{X_1=1, X_2=0\} \\
+f_{12}^{11} &amp;= \mathbb{1} \{X_1=1, X_2=1\}
+\end{aligned}
+$$</mathjax></p>
+<p>So we have the log-linear model:</p>
+<p><mathjax>$$
+\phi(X_1, X_2) = \exp(- \sum_{kl} w_{kl} f_{ij}^{kl} (X_1, X_2))
+$$</mathjax></p>
+<p>So we can represent any factor as a log-linear model by including the appropriate features.</p>
+<p>For example, say you want to develop a language model for labeling entities in text.</p>
+<p>You have target labels <mathjax>$Y = \{\text{PERSON}, \text{LOCATION}, \dots\}$</mathjax> and input words <mathjax>$X$</mathjax>.</p>
+<p>You could, for instance, have the following features:</p>
+<p><mathjax>$$
+\begin{aligned}
+f(Y_i, X_i) &amp;= \mathbb{1} \{Y_i=\text{PERSON}, X_i \text{ is capitalized}\} \\
+f(Y_i, X_i) &amp;= \mathbb{1} \{Y_i=\text{LOCATION}, X_i \text{ appears in an atlas}\}
+\end{aligned}
+$$</mathjax></p>
+<p>and so on.</p>
+<h2>References</h2>
+<ul>
+<li><em>Bayesian Reasoning and Machine Learning</em>. David Barber.</li>
+<li><a href="https://www.coursera.org/course/pgm">Probabilistic Graphical Models</a>. Daphne Koller. Stanford University/Coursera.</li>
+<li><a href="http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-034-artificial-intelligence-fall-2010/">MIT 6.034 (Fall 2010): Artificial Intelligence</a>. Patrick H. Winston. MIT.</li>
+<li><a href="https://www.edx.org/course/artificial-intelligence-uc-berkeleyx-cs188-1x">CS188: Artificial Intelligence</a>. Dan Klein, Pieter Abbeel. University of California, Berkeley (edX).</li>
+<li><a href="https://www.coursera.org/course/aiplan">Artificial Intelligence Planning</a>. Dr. Gerhard Wickler, Prof. Austin Tate. The University of Edinburgh (Coursera). 2015.</li>
+<li><a href="https://www.udacity.com/course/intro-to-artificial-intelligence--cs271">Intro to Artificial Intelligence</a>. CS271. Peter Norvig, Sebastian Thrun. Udacity.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

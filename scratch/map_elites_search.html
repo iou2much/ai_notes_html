@@ -1,0 +1,80 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>map_elites_search</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Mouret, J. B., &amp; Clune, J. (2015). <a href="https://arxiv.org/pdf/1504.04909.pdf">Illuminating search spaces by mapping elites</a>. arXiv preprint arXiv:1504.04909.</h1>
+<p>MAP-Elites (Multi-dimensional Archive of Phenotypic Elites) search</p>
+<p>Some optimization problems involve search spaces that are non-differentiable or cannot be expressed mathematically. We may have some performance metric to identify high-performing solutions, but we do not have access to the underlying function that determines the performance. In such cases we would use a "black box" optimization algorithm such as evolutionary algorithms.</p>
+<p>Note: in evolutionary algorithms, the feature space is sometimes called the "behavior space".</p>
+<p>General idea of MAP-Elites: searching in a high (potentially infinite-dimensional) space, user specifies some lower-dimensional feature space; performance of solutions is measured in this lower-dimensional space.</p>
+<p>"Illumination algorithm", contrasted with optimization algorithms (but can be used as optimization algorithms):</p>
+<blockquote>
+<p>designed to return the highest-performing solution at each point in the feature space. They thus illuminate the fitness potential of a each region of the feature space.</p>
+</blockquote>
+<p>Novelty search is an example of an illumination algorithm, as is MAP-Elites.</p>
+<p>MAP-Elites algorithm:</p>
+<ul>
+<li>create an empty <mathjax>$N$</mathjax>-dimensional map of elites (solutions <mathjax>$\mathcal X$</mathjax> and their performances <mathjax>$\mathcal P$</mathjax>)</li>
+<li>for <mathjax>$I$</mathjax> iterations (with iterator <mathjax>$i$</mathjax>), or until some termination criteria is satisfied<ul>
+<li>if <mathjax>$i &lt; G$</mathjax>, generate random solution <mathjax>$x'$</mathjax></li>
+<li>else randomly select an elite <mathjax>$x$</mathjax> from <mathjax>$\mathcal X$</mathjax><ul>
+<li>create randomly modified copy of <mathjax>$x$</mathjax>, <mathjax>$x'$</mathjax> (via mutation/crossover)</li>
+</ul>
+</li>
+<li>record <mathjax>$x'$</mathjax>'s feature descriptor <mathjax>$b'$</mathjax> (mapping it to a cell in the feature space)</li>
+<li>compute performance <mathjax>$p'$</mathjax> of <mathjax>$x'$</mathjax></li>
+<li>if <mathjax>$\mathcal P(b')$</mathjax> is empty or worse than <mathjax>$p'$</mathjax><ul>
+<li>set <mathjax>$\mathcal P(b') = p'$</mathjax></li>
+<li>set <mathjax>$\mathcal X(b') = x'$</mathjax></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>user chooses a performance measure (i.e. fitness function) <mathjax>$f(x)$</mathjax> that evaluates a solution <mathjax>$x$</mathjax></li>
+<li>user chooses <mathjax>$N$</mathjax> dimensions of interest; these define the feature space<ul>
+<li>e.g. with a robot it could be its height, weight, and energy consumption</li>
+</ul>
+</li>
+<li>the <mathjax>$N$</mathjax> dimensions are discretized at some granularity (either user-specifier or limited by computational resources). This discretization makes the feature space into a lattice (i.e. it's broken up into cells)</li>
+<li>we have a feature function (aka "behavior function") <mathjax>$b(x)$</mathjax> that maps a solution <mathjax>$x$</mathjax> to an <mathjax>$N$</mathjax>-dimensional vector describing its features (i.e. mapping it to the feature space). some of these features may need to be measured through e.g. simulation, such as energy consumption.</li>
+<li>search happens in the search space, where we search through genotypes/genomes <mathjax>$x$</mathjax> (rather than directly searching phenotypes)</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>
