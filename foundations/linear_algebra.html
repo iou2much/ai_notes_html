@@ -26,10 +26,12 @@
 \DeclareMathOperator{\Diag}{diag}
 \DeclareMathOperator{\Proj}{Proj}
 $$</mathjax></p>
+<h1>线性代数</h1>
 <h1>Linear Algebra</h1>
 <p>When working with data, we typically deal with many data points consisting of many <strong>dimensions</strong>. That is, each data point may have a several <strong>components</strong>; e.g. if people are your data points, they may be represented by their height, weight, and age, which constitutes three dimensions all together. These data points of many components are called <strong>vectors</strong>. These are contrasted with individual values, which are called <strong>scalars</strong>.</p>
 <p>We deal with these data points - vectors - simultaneously in aggregates known as <a href="#matrices"><em>matrices</em></a>.</p>
 <p>Linear algebra provides the tools needed to manipulate vectors and matrices.</p>
+<h2>向量</h2>
 <h2>Vectors</h2>
 <p>Vectors have <strong>magnitude</strong> and <strong>direction</strong>, e.g. 5 miles/hour going east. The magnitude can be thought of, in some sense, as the "length" of the vector (this isn't quite right however, as there are many concepts of "length" - see <a href="#norm">norms</a>).</p>
 <figure><img alt="A vector" src="../assets/vector.svg" /><figcaption>A vector</figcaption>
@@ -38,15 +40,18 @@ $$</mathjax></p>
 <p><mathjax>$$ \vec{v} = \begin{bmatrix} 5 \\ 0 \end{bmatrix} $$</mathjax></p>
 <p>since we are "moving" 5 on x-axis and 0 on the y-axis.</p>
 <p>Note that often the arrow is dropped, i.e. the vector is notated as just <mathjax>$v$</mathjax>.</p>
+<h3>实空间</h3>
 <h3>Real coordinate spaces</h3>
 <p>Vectors are plotted and manipulated in <em>space</em>. A two-dimensional vector, such as the previous example, may be represented in a two-dimensional space.</p>
 <p>A vector with three components would be represented in a three-dimensional space, and so on for any arbitrary <mathjax>$n$</mathjax> dimensions.</p>
 <p>A <strong>real coordinate space</strong> (that is, a space consisting of real numbers) of <mathjax>$n$</mathjax> dimensions is notated <mathjax>$\mathbb R^n$</mathjax>. Such a space encapsulates all possible vectors of that dimensionality, i.e. all possible vectors of the form <mathjax>$[v_1, v_2, \dots, v_n]$</mathjax>.</p>
 <p>To denote a vector of <mathjax>$n$</mathjax> dimensions, we write <mathjax>$x \in \mathbb R^n$</mathjax>.</p>
 <p>For example: the notation for the two-dimensional real coordinate space is notated <mathjax>$\mathbb R^2$</mathjax>, which is all possible real-valued 2-tuples (i.e. all 2D vectors whose components are real numbers, e.g. <mathjax>$[1, 2], [-0.4, 21.4], \dots$</mathjax>). If we wanted to describe an arbitrary two-dimensional vector, we could do so with <mathjax>$\vec v \in \mathbb R^2$</mathjax>.</p>
+<h3>列向量与行向量</h3>
 <h3>Column and row vectors</h3>
 <p>A vector <mathjax>$x \in \mathbb R^n$</mathjax> typically denotes a <strong>column vector</strong>, i.e. with <mathjax>$n$</mathjax> rows and 1 column.</p>
 <p>A <strong>row vector</strong> <mathjax>$x^T \in \mathbb R^n$</mathjax> has 1 row and <mathjax>$n$</mathjax> columns. The notation <mathjax>$x^T$</mathjax> is described below.</p>
+<h3>转置向量</h3>
 <h3>Transposing a vector</h3>
 <p><strong>Transposing</strong> a vector means turning its rows into columns:</p>
 <p><mathjax>$$
@@ -54,10 +59,13 @@ $$</mathjax></p>
 \vec{a}^T = \begin{bmatrix} x_1 &amp; x_2 &amp; x_3 &amp; x_4 \end{bmatrix}
 $$</mathjax></p>
 <p>So a column vector <mathjax>$x$</mathjax> can be represented as a row vector with <mathjax>$x^T$</mathjax>.</p>
+<h3>向量操作</h3>
 <h3>Vectors operations</h3>
+<h4>向量加法</h4>
 <h4>Vector addition</h4>
 <p>Vectors are added by adding the individual corresponding components:</p>
 <p><mathjax>$$ \begin{bmatrix} 6 \\ 2 \end{bmatrix} + \begin{bmatrix} -4 \\ 4 \end{bmatrix} = \begin{bmatrix} 6 + -4 \\ 2 + 4 \end{bmatrix} = \begin{bmatrix} 2 \\ 6 \end{bmatrix} $$</mathjax></p>
+<h4>标量乘以向量</h4>
 <h4>Multiplying a vector by a scalar</h4>
 <figure><img alt="Example: The red vector is before multiplying a scalar, blue is after." src="../assets/scaled_vector.svg" /><figcaption>Example: The red vector is before multiplying a scalar, blue is after.</figcaption>
 </figure>
@@ -65,6 +73,7 @@ $$</mathjax></p>
 <p><mathjax>$$ 3\begin{bmatrix} 2 \\ 1 \end{bmatrix} = \begin{bmatrix} 3 \times 2 \\ 3 \times 1
 \end{bmatrix} = \begin{bmatrix} 6 \\ 3 \end{bmatrix} $$</mathjax></p>
 <p>This changes the <em>magnitude</em> of the vector, but <em>not the direction</em>.</p>
+<h4>向量点积</h4>
 <h4>Vector dot products</h4>
 <p>The <strong>dot product</strong> (also called <strong>inner product</strong>) of two vectors <mathjax>$\vec{a}, \vec{b} \in \mathbb R^n$</mathjax> (note that this implies they must be of the same dimension) is notated:</p>
 <p><mathjax>$$ \vec{a} \cdot \vec{b} $$</mathjax></p>
@@ -81,6 +90,7 @@ $$</mathjax></p>
 <li><strong>Distributive property</strong>: You can distribute terms in dot products: <mathjax>$(\vec{v} + \vec{w}) \cdot \vec{x} = (\vec{v} \cdot \vec{x} + \vec{w} \cdot \vec{x})$</mathjax></li>
 <li><strong>Associative property</strong>: <mathjax>$(c\vec{v}) \cdot \vec{w} = c(\vec{v} \cdot \vec{w})$</mathjax></li>
 </ul>
+<h3>范数</h3>
 <h3>Norms</h3>
 <p>The <strong>norm</strong> of a vector <mathjax>$x \in \mathbb R^n$</mathjax>, denoted <mathjax>$||x||$</mathjax>, is the "length" of the vector. That is, norms are a generalization of "distance" or "length".</p>
 <p>There are many different norms, the most common of which is the <strong>Euclidean norm</strong> (also known as the <mathjax>$\ell_2$</mathjax> norm), denoted <mathjax>$||x||_2$</mathjax>, computed:</p>
@@ -109,11 +119,13 @@ $$</mathjax></p>
 <p><mathjax>$$
 ||A||_{\text{Fro}} = \sqrt{\sum_{n=1}^N \sum_{m=1}^M A_{n,m}^2}
 $$</mathjax></p>
+<h4>长度与点积</h4>
 <h4>Lengths and dot products</h4>
 <p>You may notice that the dot product of a vector with itself is the square of that vector's length:</p>
 <p><mathjax>$$ \vec{a} \cdot \vec{a} = a_1^2 + a_2^2 + \dots + a_n^2 = ||\vec{a}||^2 $$</mathjax></p>
 <p>So the length (Euclidean norm) of a vector can be written:</p>
 <p><mathjax>$$ ||\vec{a}|| = \sqrt{\vec{a} \cdot \vec{a}} $$</mathjax></p>
+<h3>单位向量</h3>
 <h3>Unit vectors</h3>
 <p>Each dimension in a space has a <strong>unit vector</strong>, generally denoted with a hat, e.g. <mathjax>$\hat u$</mathjax>, which is a vector constrained to that dimension (that is, it has 0 magnitude in all other dimensions), with length 1, e.g. <mathjax>$||\hat u|| = 1$</mathjax>.</p>
 <p>Unit vectors exists for all <mathjax>$\mathbb R^n$</mathjax>.</p>
@@ -136,6 +148,7 @@ $$</mathjax></p>
 <p><mathjax>$$ \hat{u} = \frac{1}{||\vec{a}||}\vec{a} = \frac{1}{\sqrt{61}}\begin{bmatrix}5 \\
         -6\end{bmatrix} = \begin{bmatrix} \frac{5}{\sqrt{61}} \\ \frac{-6}{\sqrt{61}}
         \end{bmatrix}$$</mathjax></p>
+<h3>向量间角度</h3>
 <h3>Angles between vectors</h3>
 <p>Say you have two non-zero vectors, <mathjax>$\vec{a}, \vec{b} \in \mathbb R^n$</mathjax>.</p>
 <p>We often notate the angle between two vectors as <mathjax>$\theta$</mathjax>.</p>
@@ -152,18 +165,21 @@ $$</mathjax></p>
 <li>If <mathjax>$c &gt; 0$</mathjax>, then <mathjax>$\theta = 0$</mathjax>.</li>
 <li>If <mathjax>$c &lt; 0$</mathjax>, then <mathjax>$\theta = 180^{\circ}$</mathjax></li>
 </ul>
+<h3>正交向量</h3>
 <h3>Perpendicular vectors</h3>
 <p>With the above angle calculation, you can see that if <mathjax>$\vec{a}$</mathjax> and <mathjax>$\vec{b}$</mathjax> are non-zero, and their dot product is 0, that is, <mathjax>$\vec{a} \cdot \vec{b} = \vec{0}$</mathjax>, then they are perpendicular to each other.</p>
 <p>Whenever a pair of vectors satisfies this condition <mathjax>$\vec{a} \cdot \vec{b} = \vec{0}$</mathjax>, it is said that the two vectors are <strong>orthogonal</strong> (i.e. perpendicular).</p>
 <p>Note that because any vector times the zero vector equals the zero vector: <mathjax>$\vec{0} \cdot \vec{x} = \vec{0}$</mathjax>.</p>
 <p>Thus the zero vector is orthogonal to <em>everything</em>.</p>
 <p>Technical detail: So if the vectors are both non-zero and orthogonal, then the vectors are <em>both</em> perpendicular and orthogonal. But of course, since the zero vector is not non-zero, it cannot be perpendicular to anything, but it is orthogonal to everything.</p>
+<h3>法向量</h3>
 <h3>Normal vectors</h3>
 <p>A <strong>normal</strong> vector is one which is perpendicular to all the points/vectors on a plane.</p>
 <p>That is for any vector <mathjax>$\vec{a}$</mathjax> on the plane, and a normal vector, <mathjax>$\vec{n}$</mathjax>, to that plane, we have:</p>
 <p><mathjax>$$ \vec{n} \cdot \vec{a} = \vec{0} $$</mathjax></p>
 <p>For example: given an equation of a plane, <mathjax>$Ax + By + Cz = D$</mathjax>, the normal vector is simply:</p>
 <p><mathjax>$$ \vec{n} = A\hat{i} + B\hat{j} + C\hat{k} $$</mathjax></p>
+<h3>正交向量</h3>
 <h3>Orthonormal vectors</h3>
 <p>Given <mathjax>$V = \{ \vec{v_1}, \vec{v_2}, \dots, \vec{v_k} \}$</mathjax> where:</p>
 <ul>
@@ -174,14 +190,17 @@ $$</mathjax></p>
 <p><mathjax>$$ \vec{v_i} \cdot \vec{v_j} = \begin{cases} 0 &amp; i \neq j \\ 1 &amp; i = j \end{cases} $$</mathjax></p>
 <p>This is an <strong>orthonormal</strong> set. The term comes from the fact that these vectors are all<br />
 orthogonal to each other, and they have all been normalized.</p>
+<h3>其他向量操作</h3>
 <h3>Additional vector operations</h3>
 <p>These vector operations are less common, but included for reference.</p>
+<h4>外积</h4>
 <h4>Vector outer products</h4>
 <p>For the <strong>outer product</strong>, the two vectors do not need to be of the same dimension (i.e. <mathjax>$x \in \mathbb R^n, y \in \mathbb R^m$</mathjax>), and the result is a matrix instead of a scalar:</p>
 <p><mathjax>$$
 x \otimes y \in \mathbb R^{n \times m} = \begin{bmatrix} x_1y_1 &amp; \cdots &amp; x_1y_m \\ \vdots &amp; \ddots &amp; \vdots \\ x_ny_1 &amp; \cdots &amp; x_ny_m \end{bmatrix}
 $$</mathjax></p>
 <p>Note that the outer product <mathjax>$x \otimes y$</mathjax> is equivalent to the matrix multiplication <mathjax>$xy^T$</mathjax>.</p>
+<h4>叉积</h4>
 <h4>Vector cross products</h4>
 <p><strong>Cross products</strong> are much more limited than dot products. Dot products can be calculated for any <mathjax>$\mathbb R^n$</mathjax>. Cross products are only defined in <mathjax>$\mathbb R^3$</mathjax>.</p>
 <p>Unlike the dot product, which results in a scalar, the cross product results in a vector which is orthogonal to the original vectors (i.e. it is orthogonal to the plane defined by the two original vectors).</p>
@@ -191,7 +210,9 @@ $$</mathjax></p>
 <p><mathjax>$$ \begin{bmatrix} 1 \\ -7 \\ 1 \end{bmatrix} \times \begin{bmatrix} 5 \\ 2 \\ 4
 \end{bmatrix} = \begin{bmatrix} -7\times4 - 1\times2 \\ 1\times5 - 1\times4 \\ 1\times2 - -7\times5 \end{bmatrix} =
 \begin{bmatrix} -30 \\ 1 \\ 37 \end{bmatrix} $$</mathjax></p>
+<h2>线性组合</h2>
 <h2>Linear Combinations</h2>
+<h3>线的参数化表示</h3>
 <h3>Parametric representations of lines</h3>
 <p>Any line in an <mathjax>$n$</mathjax>-dimensional space can be represented using vectors.</p>
 <p>Say you have a vector <mathjax>$\vec{v}$</mathjax> and a set <mathjax>$S$</mathjax> consisting of all scalar multiplications of that vector (where the scalar <mathjax>$c$</mathjax> is any real number):</p>
@@ -222,6 +243,7 @@ x &amp;= 0 + -2c = -2c \\
 y &amp;= 3 + 2c = 2c + 3
 \end{aligned}
 $$</mathjax></p>
+<h3>线性组合</h3>
 <h3>Linear combinations</h3>
 <p>Say you have the following vectors in <mathjax>$\mathbb R^m$</mathjax> :</p>
 <p><mathjax>$$ \vec{v_1}, \vec{v_2}, \dotsc, \vec{v_n} $$</mathjax></p>
@@ -232,6 +254,7 @@ $$</mathjax></p>
 <p>A linear combination would be:</p>
 <p><mathjax>$$ 0\vec{a} + 0\vec{b} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} $$</mathjax></p>
 <p><em>Any</em> vector in the space <mathjax>$\mathbb R^2$</mathjax> can represented by some linear combination of these two vectors.</p>
+<h3>张成</h3>
 <h3>Spans</h3>
 <p>The set of all linear combinations for some vectors is called the <strong>span</strong>.</p>
 <p>The span of some vectors can define an entire space. For instance, using our previously-defined vectors:</p>
@@ -242,6 +265,7 @@ $$</mathjax></p>
 <p>As another example, the span of the zero vector, <mathjax>$\Span(\vec{0})$</mathjax>, cannot represent all vectors in a space.</p>
 <p>Formally, the span is defined as:</p>
 <p><mathjax>$$ \Span(\vec{v_1}, \vec{v_2}, \dotsc, \vec{v_n}) = \{ c_1\vec{v_1} + c_2\vec{v_2}, + \dotsc + c_n\vec{v_n} \,|\, c_i \in \mathbb R \, \forall \, 1 \le i \le n \} $$</mathjax></p>
+<h3>线性无关</h3>
 <h3>Linear independence</h3>
 <p>The set of vectors in the previous collinear example:</p>
 <p><mathjax>$$ \left\lbrace \begin{bmatrix} -2 \\ -2 \end{bmatrix}, \begin{bmatrix} 2 \\ 2 \end{bmatrix} \right\rbrace $$</mathjax></p>
@@ -265,6 +289,7 @@ $$</mathjax></p>
 <p>Thus you can calculate the zero vector as a linear combination of the vectors where at least one constant is non-zero, which satifies the definition for linear dependence.</p>
 <p>So then a set is <strong>linearly independent</strong> if, to calculate the zero vector as a linear combination of the vectors, the coefficients must all be zero.</p>
 <p>Going back to spans, the span of set of size <mathjax>$n$</mathjax> which is <em>linearly independent</em> can describe that set's entire space (e.g. <mathjax>$\mathbb R^n$</mathjax>).</p>
+<h4>示例</h4>
 <h4>An example problem:</h4>
 <p>Say you have the set:</p>
 <p><mathjax>$$ S = \left\lbrace \begin{bmatrix} 1 \\ -1 \\ 2 \end{bmatrix}, \begin{bmatrix} 2 \\ 1
@@ -308,6 +333,7 @@ $$</mathjax></p>
 c_1 = c_2 = c_3 = 0
 $$</mathjax></p>
 <p>So we know this set is linearly independent.</p>
+<h2>矩阵</h2>
 <h2>Matrices</h2>
 <p>A <strong>matrix</strong> can, in some sense, be thought of as a vector of vectors.</p>
 <p>The notation <mathjax>$m \times n$</mathjax> in terms of matrices mean there are <mathjax>$m$</mathjax> rows and <mathjax>$n$</mathjax> columns.</p>
@@ -323,7 +349,9 @@ a_{m1} &amp; a_{m2} &amp; \dots &amp; a_{mn}
 $$</mathjax></p>
 <p>A matrix of these dimensions may also be notated <mathjax>$\mathbb R^{m \times n}$</mathjax> to indicate its membership in that set.</p>
 <p>We refer to the entry in the <mathjax>$i$</mathjax>th row and <mathjax>$j$</mathjax>th column with the notation <mathjax>$\mathbf A_{ij}$</mathjax>.</p>
+<h3>矩阵操作</h3>
 <h3>Matrix operations</h3>
+<h4>加法</h4>
 <h4>Matrix addition</h4>
 <p>Matrices must have the same dimensions in order to be added (or subtracted).</p>
 <p><mathjax>$$
@@ -352,6 +380,7 @@ a_{m1} + b_{m1} &amp; a_{m2} + b_{m2} &amp; \dots &amp; a_{mn} + b_{mn}
 \end{bmatrix}
 $$</mathjax></p>
 <p><mathjax>$$ \mathbf A + \mathbf B = \mathbf B + \mathbf A $$</mathjax></p>
+<h4>矩阵-标量乘法</h4>
 <h4>Matrix-scalar multiplication</h4>
 <p>Just distribute the scalar:</p>
 <p><mathjax>$$
@@ -370,6 +399,7 @@ ca_{21} &amp; ca_{22} &amp; \dots &amp; ca_{2n} \\
 ca_{m1} &amp; ca_{m2} &amp; \dots &amp; ca_{mn}
 \end{bmatrix}
 $$</mathjax></p>
+<h4>矩阵-向量积</h4>
 <h4>Matrix-vector products</h4>
 <p>To multiply a <mathjax>$m \times n$</mathjax> matrix with a vector, the vector must have <mathjax>$n$</mathjax> components (that is, the same number of components as there are columns in the matrix, i.e. <mathjax>$\vec{x} \in \mathbb R^n$</mathjax>):</p>
 <p><mathjax>$$
@@ -392,6 +422,7 @@ a_{m1}x_1 + a_{m2}x_2 + \dots + a_{mn}x_n
 \end{bmatrix}
 $$</mathjax></p>
 <p>This results in a <mathjax>$m \times 1$</mathjax> matrix.</p>
+<h5>矩阵-向量乘积,看作线性组合</h5>
 <h5>Matrix-vector products as linear combinations</h5>
 <p>If you interpret each column in a matrix <mathjax>$\mathbf A$</mathjax> as its own vector <mathjax>$\vec{v_i}$</mathjax>, such that:</p>
 <p><mathjax>$$ \mathbf A = \begin{bmatrix} \vec{v_1} &amp; \vec{v_2} &amp; \dots &amp; \vec{v_n} \end{bmatrix} $$</mathjax></p>
@@ -399,6 +430,7 @@ $$</mathjax></p>
 <p><mathjax>$$
 \mathbf A \vec{x} = x_1\vec{v_1} + x_2\vec{v_2} + \dots + x_n\vec{v_n}
 $$</mathjax></p>
+<h5>矩阵-向量乘积,看作线性转换</h5>
 <h5>Matrix-vector products as linear transformations</h5>
 <p>A matrix-vector product can also be seen as a linear transformation. You can describe it as a transformation:</p>
 <p><mathjax>$$
@@ -416,6 +448,7 @@ $$</mathjax></p>
 <li>any matrix-vector product is a linear transformation</li>
 <li>any linear transformation can be expressed in terms of a matrix-vector product</li>
 </ul>
+<h4>矩阵相乘</h4>
 <h4>Matrix-matrix products</h4>
 <p>To multiply two matrices, one must have the same number of columns as the other has rows. That is, you can only multiply an <mathjax>$m \times n$</mathjax> matrix with an <mathjax>$n \times p$</mathjax> matrix. The resulting matrix will be of <mathjax>$m \times p$</mathjax> dimensions.</p>
 <p>That is, if <mathjax>$A \in \mathbb R^{m \times n}, B \in \mathbb R^{n \times p}$</mathjax>, then <mathjax>$C = AB \in \mathbb R^{m \times p}$</mathjax>.</p>
@@ -489,12 +522,14 @@ $$</mathjax></p>
 \end{bmatrix}
 \end{aligned}
 $$</mathjax></p>
+<h5>矩阵相乘的属性</h5>
 <h5>Properties of matrix multiplication</h5>
 <p>Matrix multiplication is <em>not commutative</em>. That is, for matrices <mathjax>$\mathbf A$</mathjax> and <mathjax>$\mathbf B$</mathjax>, in general  <mathjax>$\mathbf A \times \mathbf B \neq \mathbf B \times \mathbf A$</mathjax>. They may not even be of the same dimension.</p>
 <p>Matrix multiplication is <em>associative</em>. For example, for matrices <mathjax>$\mathbf A, \mathbf B, \mathbf C$</mathjax>, we can say that:</p>
 <p><mathjax>$$ \mathbf A \times \mathbf B \times \mathbf C = \mathbf A \times (\mathbf B \times \mathbf C) = (\mathbf A \times \mathbf B) \times \mathbf C $$</mathjax></p>
 <p>There is also an <em>identity</em> matrix <mathjax>$\mathbf I$</mathjax>. For any matrix <mathjax>$\mathbf A$</mathjax>, we can say that:</p>
 <p><mathjax>$$ \mathbf A \times \mathbf I = \mathbf I \times \mathbf A = \mathbf A $$</mathjax></p>
+<h3>Hadamard积</h3>
 <h3>Hadamard product</h3>
 <p>The <strong>Hadamard product</strong>, sometimes called the <strong>element-wise product</strong>, is another way of multiplying matrices, but only for matrices of the same size. It is usually denoted with <mathjax>$\odot$</mathjax>. It is simply:</p>
 <p><mathjax>$$
@@ -507,6 +542,7 @@ $$</mathjax></p>
 <li><em>associativity</em>: <mathjax>$A \odot (B \odot C) = (A \odot B) \odot C$</mathjax></li>
 <li><em>distributivity</em>: <mathjax>$A \odot (B+C) = A \odot B + A \odot C$</mathjax></li>
 </ul>
+<h3>单位矩阵</h3>
 <h3>The identity matrix</h3>
 <p>The <strong>identity matrix</strong> is an <mathjax>$n \times n$</mathjax> matrix where every component is 0, except for those along the diagonal:</p>
 <p><mathjax>$$ \mathbf I_n = \begin{bmatrix}
@@ -521,6 +557,7 @@ $$</mathjax></p>
 <p><mathjax>$$ \mathbf I_n \vec{x} \, | \, \vec{x} \in \mathbb R^n = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\
         x_n \end{bmatrix} = \vec{x} $$</mathjax></p>
 <p>That is, a vector multiplied by the identity matrix equals itself.</p>
+<h3>对角矩阵</h3>
 <h3>Diagonal matrices</h3>
 <p>A <strong>diagonal matrix</strong> is a matrix where all non-diagonal elements are 0, typically denoted <mathjax>$\Diag(x_1, x_2, \dots, x_n)$</mathjax>, where</p>
 <p><mathjax>$$
@@ -531,16 +568,20 @@ d_i &amp; i=j \\
 \end{cases}
 $$</mathjax></p>
 <p>So the identity matrix is <mathjax>$I = \Diag(1, 1, \dots, 1)$</mathjax>.</p>
+<h3>三角矩阵</h3>
 <h3>Triangular matrices</h3>
 <p>We say that a matrix is <strong>upper-triangular</strong> if all of its elements below the diagonal are zero.</p>
 <p>Similarly, a matrix is <strong>lower-triangular</strong> if all of its elements above the diagonal are zero.</p>
 <p>A matrix is <strong>diagonal</strong> if it is both upper-triangular and lower-triangular.</p>
+<h3>矩阵的性质</h3>
 <h3>Some properties of matrices</h3>
+<h4>结合律</h4>
 <h4>Associative property</h4>
 <p><mathjax>$$ (AB)C = A(BC) $$</mathjax></p>
 <p>i.e. it doesn't matter where the parentheses are.</p>
 <p>This applies to compositions as well:</p>
 <p><mathjax>$$ (h \circ f) \circ g = h \circ (f \circ g) $$</mathjax></p>
+<h4>分配律</h4>
 <h4>Distributive property</h4>
 <p><mathjax>$$
 \begin{aligned}
@@ -548,6 +589,7 @@ A(B+C) &amp;= AB + AC \\
 (B+C)A &amp;= BA + CA
 \end{aligned}
 $$</mathjax></p>
+<h3>逆矩阵</h3>
 <h3>Matrix inverses</h3>
 <p>If <mathjax>$\mathbf A$</mathjax> is an <mathjax>$m \times m$</mathjax> matrix, and if it has an inverse, then:</p>
 <p><mathjax>$$ \mathbf A \mathbf A^{-1} = \mathbf A^{-1} \mathbf A = \mathbf I $$</mathjax></p>
@@ -560,6 +602,7 @@ $$</mathjax></p>
 <li><mathjax>$(AB)^{-1} = B^{-1}A^{-1}$</mathjax></li>
 <li><mathjax>$(A^{-1})^T = (A^T)^{-1}$</mathjax>; this matrix is often denoted <mathjax>$A^{-T}$</mathjax></li>
 </ul>
+<h4>伪逆</h4>
 <h4>Pseudo-inverses</h4>
 <p><mathjax>$A^{\dagger}$</mathjax> is a <strong>pseudo-inverse</strong> (sometimes called a <strong>Moore-Penrose inverse</strong>) of <mathjax>$A$</mathjax>, which may be non-square, if the following are satisfied:</p>
 <ul>
@@ -569,12 +612,14 @@ $$</mathjax></p>
 <li><mathjax>$(A^{\dagger}A)^T = A^{\dagger}A$</mathjax></li>
 </ul>
 <p>A pseudo-inverse exists and is unique for any matrix <mathjax>$A$</mathjax>. If <mathjax>$A$</mathjax> is invertible, <mathjax>$A^{-1} = A^{\dagger}$</mathjax>.</p>
+<h3>行列式</h3>
 <h3>Matrix determinants</h3>
 <p>The determinant of a square matrix <mathjax>$A \in \mathbb R^{n \times n}$</mathjax> is a function <mathjax>$\Det : \mathbb R^{n \times n} \to \mathbb R$</mathjax>, denoted <mathjax>$|A|$</mathjax>, <mathjax>$\Det(A)$</mathjax>, or sometimes with the parentheses dropped, <mathjax>$\Det A$</mathjax>.</p>
 <p>A more intuitive interpretation:</p>
 <p>Say we are in a 2D space and we have some shape. It has some area. Then we apply transformations to that space. The determinant describes how that shape's area has been scaled as a result of the transformation.</p>
 <p>This can be extended to 3D, replacing "area" with "volume".</p>
 <p>With this interpretation it's clear that a determinant of 0 means scaling area or volume to 0, which indicates that space has been "compressed" to a line or a point (or a plane in the case of 3D).</p>
+<h4><mathjax>$2 \times 2$</mathjax> 矩阵的逆和行列式</h4>
 <h4>Inverse and determinant for a <mathjax>$2 \times 2$</mathjax> matrix</h4>
 <p>Say you have the matrix:</p>
 <p><mathjax>$$ \mathbf A = \begin{bmatrix} a &amp; b \\ c &amp; d \end{bmatrix} $$</mathjax></p>
@@ -589,6 +634,7 @@ $$</mathjax></p>
 </ul>
 <p>The denominator <mathjax>$ad-bc$</mathjax> is called the <strong>determinant</strong>. It is notated as:</p>
 <p><mathjax>$$ \Det(\mathbf A) = |\mathbf A| = ad-db $$</mathjax></p>
+<h4><mathjax>$n \times n$</mathjax> 矩阵的逆和行列式</h4>
 <h4>Inverse and determinant for an <mathjax>$n \times n$</mathjax> matrix</h4>
 <p>Say we have an <mathjax>$n \times n$</mathjax> matrix <mathjax>$\mathbf A$</mathjax>.</p>
 <p>A submatrix of <mathjax>$\mathbf A_{ij}$</mathjax> is an <mathjax>$(n-1)\times(n-1)$</mathjax> matrix constructed from <mathjax>$\mathbf A$</mathjax> by ignoring the <mathjax>$i^{th}$</mathjax> row and the <mathjax>$j^{th}$</mathjax> column of <mathjax>$\mathbf A$</mathjax>, which we denote by <mathjax>$\mathbf A_{\lnot i, \lnot j}$</mathjax>.</p>
@@ -597,11 +643,14 @@ $$</mathjax></p>
 \Det(\mathbf A) = \sum_{j=1}^n (-1)^{i+j}a_{ij} \Det(\mathbf A_{\lnot i,\lnot j})
 $$</mathjax></p>
 <p>All the <mathjax>$\Det(\mathbf A_{ij})$</mathjax> eventually reduce to the determinant of a <mathjax>$2 \times 2$</mathjax> matrix.</p>
+<h4>行列式的标量乘法</h4>
 <h4>Scalar multiplication of determinants</h4>
 <p>For an <mathjax>$n \times n$</mathjax> matrix <mathjax>$\mathbf A$</mathjax>,</p>
 <p><mathjax>$$ \Det(k\mathbf A) = k^n \Det(\mathbf A) $$</mathjax></p>
+<h4>对角矩阵和三角矩阵的行列式</h4>
 <h4>Determinant of diagonal or triangular matrix</h4>
 <p>The determinant of a diagonal or triangular matrix is simply the product of the elements along its diagonal.</p>
+<h4>行列式的性质</h4>
 <h4>Properties of determinants</h4>
 <table>
 <thead>
@@ -651,6 +700,7 @@ $$</mathjax></p>
 </tr>
 </tbody>
 </table>
+<h3>矩阵转置</h3>
 <h3>Transpose of a matrix</h3>
 <p>The <strong>transpose</strong> of a matrix <mathjax>$\mathbf A$</mathjax> is that matrix with its columns and rows swapped, denoted <mathjax>$\mathbf A^T$</mathjax>.</p>
 <p>More formally, let <mathjax>$\mathbf A$</mathjax> be an <mathjax>$m \times n$</mathjax> matrix, and let <mathjax>$\mathbf B = \mathbf A^T$</mathjax>. Then <mathjax>$\mathbf B$</mathjax> is an <mathjax>$n \times m$</mathjax> matrix, and <mathjax>$B_{ij} = A_{ji}$</mathjax>.</p>
@@ -661,6 +711,7 @@ $$</mathjax></p>
 <li><strong>Transposes of multiplication</strong>: <mathjax>$(AB)^T = B^TA^T$</mathjax></li>
 <li><strong>Transpose of a vector</strong>: for two column vectors <mathjax>$\vec{a}, \vec{b}$</mathjax>, we know that <mathjax>$\vec{a} \cdot \vec{b} = \vec{b} \cdot \vec{a} = \vec{a}^T\vec{b}$</mathjax>, from which we can derive: <mathjax>$(\mathbf A \vec{x}) \cdot \vec{y} = \vec{x} \cdot (\mathbf A^T \vec{y})$</mathjax> (proof omitted).</li>
 </ul>
+<h3>对称矩阵</h3>
 <h3>Symmetric matrices</h3>
 <p>A square matrix <mathjax>$A \in \mathbb R^{n \times n}$</mathjax> is <strong>symmetric</strong> if <mathjax>$A = A^T$</mathjax>.</p>
 <p>It is <strong>anti-symmetric</strong> if <mathjax>$A = -A^T$</mathjax>.</p>
@@ -670,12 +721,14 @@ A = \frac{1}{2}(A + A^T) + \frac{1}{2}(A - A^T)
 $$</mathjax></p>
 <p>Symmetric matrices have many nice properties.</p>
 <p>The set of all symmetric matrices of dimension <mathjax>$n$</mathjax> is often denoted as <mathjax>$\mathbb S^n$</mathjax>, so you can denote a symmetric <mathjax>$n \times n$</mathjax> matrix <mathjax>$A$</mathjax> as <mathjax>$A \in \mathbb S^n$</mathjax>.</p>
+<h4>二次型</h4>
 <h4>The quadratic form</h4>
 <p>Given a square matrix <mathjax>$A \in \mathbb R^{n \times n}$</mathjax> and a vector <mathjax>$x \in \mathbb R$</mathjax>, the scalar value <mathjax>$x^TAx$</mathjax> is called a <strong>quadratic form</strong>:</p>
 <p><mathjax>$$
 x^TAx = \sum^n_{i=1} \sum^n_{j=1} A_{ij}x_ix_j
 $$</mathjax></p>
 <p>Here <mathjax>$A$</mathjax> is typically assumed to be symmetric.</p>
+<h4>对称矩阵的类型</h4>
 <h4>Types of symmetric matrices</h4>
 <p>Given a symmetric matrix <mathjax>$A \in \mathbb S^n$</mathjax>...</p>
 <ul>
@@ -711,6 +764,7 @@ $$</mathjax></p>
 </li>
 </ul>
 <p>Essentially, "positive semidefinite" is to matrices as "non-negative" is to scalar values (and "positive definite" as "positive" is to scalar values).</p>
+<h3>矩阵迹</h3>
 <h3>The Trace</h3>
 <p>The <strong>trace</strong> of a square matrix <mathjax>$A \in \mathbb R^{n \times n}$</mathjax> is denoted <mathjax>$\Tr(A)$</mathjax> and is the sum of the diagonal elements in the matrix:</p>
 <p><mathjax>$$
@@ -724,6 +778,7 @@ $$</mathjax></p>
 <li>If <mathjax>$AB$</mathjax> is square, then <mathjax>$\Tr(AB) = \Tr(BA)$</mathjax></li>
 <li>If <mathjax>$ABC$</mathjax> is square, then <mathjax>$\Tr(ABC) = \Tr(BCA) = \Tr(CAB)$</mathjax> and so on for the product of more matrices</li>
 </ul>
+<h3>正交矩阵</h3>
 <h3>Orthogonal matrix</h3>
 <p>Say we have a <mathjax>$n \times k$</mathjax> matrix <mathjax>$\mathbf C$</mathjax>, whose column rows form an orthonormal set.</p>
 <p>If <mathjax>$k=n$</mathjax> then <mathjax>$\mathbf C$</mathjax> is a square matrix (<mathjax>$n \times n$</mathjax>) and since <mathjax>$\mathbf C$</mathjax>'s columns are linearly independent, <mathjax>$\mathbf C$</mathjax> is invertible.</p>
@@ -741,6 +796,7 @@ $$</mathjax></p>
 <p>When <mathjax>$\mathbf C$</mathjax> is an <mathjax>$n \times n$</mathjax> matrix (i.e. square) whose columns form an orthonormal set, we say that <mathjax>$\mathbf C$</mathjax> is an <em>orthogonal matrix</em>.</p>
 <p>Orthogonal matrices have the property of <mathjax>$C^TC = I = CC^T$</mathjax>.</p>
 <p>Orthogonal matrices also have the property that operating on a vector with an orthogonal matrix will not change its Euclidean norm, i.e. <mathjax>$||Cx||_2 = ||x||_2$</mathjax> for any <mathjax>$x \in \mathbb R^n$</mathjax>.</p>
+<h4>正交矩阵角度和长度保留</h4>
 <h4>Orthogonal matrices preserve angles and lengths</h4>
 <p>For an orthogonal matrix  <mathjax>$\mathbf C$</mathjax>, when you multiply <mathjax>$\mathbf C$</mathjax> by some vector, the length and angle of the vector is preserved:</p>
 <p><mathjax>$$
@@ -749,12 +805,14 @@ $$</mathjax></p>
 \cos\theta &amp;= \cos\theta_{\mathbf C}
 \end{aligned}
 $$</mathjax></p>
+<h3>伴随矩阵</h3>
 <h3>Adjoints</h3>
 <p>The <strong>classical adjoint</strong>, often just called the <strong>adjoint</strong> of a matrix <mathjax>$A \in \mathbb R^{n \times n}$</mathjax> is denoted <mathjax>$\Adj(A)$</mathjax> and defined as:</p>
 <p><mathjax>$$
 \Adj(A)_{ij} = (-1)^{i+j}|A_{\lnot j, \lnot i}|
 $$</mathjax></p>
 <p>Note that the indices are switched in <mathjax>$A_{\lnot j, \lnot i}$</mathjax>.</p>
+<h2>子空间</h2>
 <h2>Subspaces</h2>
 <p>Say we have set of vectors <mathjax>$V$</mathjax> which is a subset of <mathjax>$\mathbb R^n$</mathjax>, that is, every vector in the set has <mathjax>$n$</mathjax> components.</p>
 <figure><img alt="A subspace" src="../assets/subspace.svg" /><figcaption>A subspace</figcaption>
@@ -765,6 +823,7 @@ $$</mathjax></p>
 <li>for a vector <mathjax>$\vec{x}$</mathjax> in <mathjax>$V$</mathjax>, <mathjax>$c\vec{x}$</mathjax> (where <mathjax>$c \in \mathbb R$</mathjax>) must also be in <mathjax>$V$</mathjax>, i.e. <em>closure under scalar multiplcation</em>.</li>
 <li>for a vector <mathjax>$\vec{a}$</mathjax> in <mathjax>$V$</mathjax> and a vector <mathjax>$\vec{b}$</mathjax> in <mathjax>$V$</mathjax>, <mathjax>$\vec{a} + \vec{b}$</mathjax> must also be in <mathjax>$V$</mathjax>, i.e. <em>closure under addition</em>.</li>
 </ul>
+<h4>示例:</h4>
 <h4>Example:</h4>
 <p>Say we have the set of vectors:</p>
 <p><mathjax>$$ S = \left\lbrace \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \in \mathbb R^2 \,:\, x_1 \ge 0 \right\rbrace $$</mathjax></p>
@@ -790,6 +849,7 @@ and thus is not contained within the set.</p>
 </li>
 </ul>
 <p>So no, this set is not a subspace of <mathjax>$\mathbb R^2$</mathjax>.</p>
+<h3>张成和子空间</h3>
 <h3>Spans and subspaces</h3>
 <p>Let's say we have the set:</p>
 <p><mathjax>$$ U = \Span(\vec{v_1}, \vec{v_2}, \vec{v_3}) $$</mathjax></p>
@@ -814,13 +874,16 @@ Is this a valid subspace of <mathjax>$\mathbb R^n$</mathjax>?</p>
 <p>that's also just another linear combination in the set.</p>
 </li>
 </ul>
+<h3>子空间的基</h3>
 <h3>Basis of a subspace</h3>
 <p>If we have a subspace <mathjax>$V = \Span(S)$</mathjax> where the set of vectors <mathjax>$S = \vec{v_1}, \vec{v_2}, \dots, \vec{v_n}$</mathjax> is linearly independent, then we can say that <mathjax>$S$</mathjax> is a <em>basis</em> for <mathjax>$V$</mathjax>.</p>
 <p>A set <mathjax>$S$</mathjax> is the <strong>basis</strong> for a subspace <mathjax>$V$</mathjax> if <mathjax>$S$</mathjax> is linearly independent and its span defines <mathjax>$V$</mathjax>. In other words, the basis is the <em>minimum</em> set of vectors that spans the subspace that it is a basis of.</p>
 <p>All bases for a subspace will have the same number of elements.</p>
 <p>Intuitively, the basis of a subspace is a set of vectors that can be linearly combined to describe any vector in that subspace. For example, the vectors [0,1] and [1,0] form a basis for <mathjax>$\mathbb R^2$</mathjax>.</p>
+<h3>子空间的维度</h3>
 <h3>Dimension of a subspace</h3>
 <p>The <em>dimension</em> of a subspace is the number of elements in a basis for that subspace.</p>
+<h3>矩阵的零空间</h3>
 <h3>Nullspace of a matrix</h3>
 <p>Say we have:</p>
 <p><mathjax>$$
@@ -846,18 +909,22 @@ $$</mathjax></p>
 <p><mathjax>$$ N(\mathbf A) = \{ \vec{x} \in \mathbb R^n \, | \, \mathbf A \vec{x} = \vec{0} \} $$</mathjax></p>
 <p>The nullspace for a matrix <mathjax>$A$</mathjax> may be notated <mathjax>$\mathcal N(A)$</mathjax>.</p>
 <p>To put nullspace (or "kernel") another way, it is space of all vectors that map to the zero vector after applying the transformation the matrix represents.</p>
+<h4>零空间与线性无关</h4>
 <h4>Nullspace and linear independence</h4>
 <p>If you take each column in a matrix <mathjax>$\mathbf A$</mathjax> as a vector <mathjax>$\vec{v_i}$</mathjax>, that set of vectors is linearly independent if the nullspace of <mathjax>$\mathbf A$</mathjax> consists of <em>only</em> the zero vector. That is, if:</p>
 <p><mathjax>$$ N(\mathbf A) = \{\vec{0}\} $$</mathjax></p>
 <p>The intuition behind this is because, if the linear combination of a set of vectors can only equal the zero vector if all of its coefficients are zero (that is, its coefficients are components of the zero vector), then it is linearly independent:</p>
 <p><mathjax>$$ x_1\vec{v_1} + x_2\vec{v_2} + \dots + x_n\vec{v_n} = \vec{0} \; \text{iff} \; \vec{x} =
 \begin{bmatrix} 0 \\ 0 \\ \vdots \\ 0 \end{bmatrix} $$</mathjax></p>
+<h4>零化</h4>
 <h4>Nullity</h4>
 <p>The <strong>nullity</strong> of a nullspace is its dimension, that is, it is the number of elements in a basis for that nullspace.</p>
 <p><mathjax>$$ \Dim(N(\mathbf A)) = \text{nullity}(N(\mathbf A)) $$</mathjax></p>
+<h4>左零空间</h4>
 <h4>Left nullspace</h4>
 <p>The <strong>left nullspace</strong> of a matrix <mathjax>$\mathbf A$</mathjax> is the nullspace of its transpose, that is <mathjax>$N(\mathbf A^T)$</mathjax> :</p>
 <p><mathjax>$$ N(\mathbf A^T)  = \{ \vec{x} \, | \, \vec{x}^T \mathbf A = \vec{0}^T \} $$</mathjax></p>
+<h3>列空间</h3>
 <h3>Columnspace</h3>
 <p>Again, a matrix can be represented as a set of column vectors.<br />
 The <strong>columnspace</strong> of a matrix (also called the <strong>range</strong> of the matrix) is all the linear combinations (i.e. the span) of these column vectors:</p>
@@ -878,12 +945,15 @@ $$</mathjax></p>
 $$</mathjax></p>
 <p>That is, for any vector in the space <mathjax>$\mathbb R^n$</mathjax>, multiplying the matrix by it just yields another linear combination of that matrix's column vectors. Therefore it is also in the columnspace.</p>
 <p>The columnspace (range) for a matrix <mathjax>$A$</mathjax> may be notated <mathjax>$\mathcal R(A)$</mathjax>.</p>
+<h4>列空间的秩</h4>
 <h4>Rank of a columnspace</h4>
 <p>The <strong>column rank</strong> of a columnspace is its dimension, that is, it is the number of elements in a basis for that columnspace (i.e. the largest number of columns of the matrix which constitute a linearly independent set):</p>
 <p><mathjax>$$ \Dim(C(\mathbf A)) = \Rank(C(\mathbf A)) $$</mathjax></p>
+<h4>行空间</h4>
 <h4>Rowspace</h4>
 <p>The <strong>rowspace</strong> of a matrix <mathjax>$\mathbf A$</mathjax> is the columnspace of <mathjax>$\mathbf A^T$</mathjax>, i.e. <mathjax>$C(\mathbf A^T)$</mathjax>.</p>
 <p>The <strong>row rank</strong> of a matrix is similarly the number of elements in a basis for that rowspace.</p>
+<h3>秩</h3>
 <h3>Rank</h3>
 <p>Note that for any matrix <mathjax>$A$</mathjax>, the column rank and the row rank are equal, so they are typically just referred to as <mathjax>$\Rank(A)$</mathjax>.</p>
 <p>The rank has some properties:</p>
@@ -895,6 +965,7 @@ $$</mathjax></p>
 </ul>
 <p>The rank of a transformation refers to the number of dimensions in the output.</p>
 <p>A matrix is full-rank if it has rank equal to the number of dimensions in its originating space. I.e. they represent a transformation that preserves the dimensionality (it does not collapse it to a lower dimension space).</p>
+<h3>标准基</h3>
 <h3>The standard basis</h3>
 <p>The set of column vectors in an identity matrix <mathjax>$\mathbf I_n$</mathjax> is known as the <strong>standard basis for <mathjax>$\mathbb R^n$</mathjax></strong>.</p>
 <p>Each of those column vectors is notated <mathjax>$\vec{e_i}$</mathjax>. E.g., in an identity matrix, the column vector:</p>
@@ -902,20 +973,22 @@ $$</mathjax></p>
 <p>For a transformation <mathjax>$T(\vec{x})$</mathjax>, its transformation matrix <mathjax>$\mathbf A$</mathjax> can be expressed as:</p>
 <p><mathjax>$$ \mathbf A = \begin{bmatrix} T(\vec{e_1}) &amp; T(\vec{e_2}) &amp; \dots &amp; T(\vec{e_n})
     \end{bmatrix} $$</mathjax></p>
-<h3>Orthogonal compliments</h3>
-<p>Given that <mathjax>$V$</mathjax> is some subspace of <mathjax>$\mathbb R^n$</mathjax>, the <strong>orthogonal compliment of <mathjax>$V$</mathjax></strong>, notated <mathjax>$V^{\perp}$</mathjax> :</p>
+<h3>正交互补</h3>
+<h3>Orthogonal complements</h3>
+<p>Given that <mathjax>$V$</mathjax> is some subspace of <mathjax>$\mathbb R^n$</mathjax>, the <strong>orthogonal complement of <mathjax>$V$</mathjax></strong>, notated <mathjax>$V^{\perp}$</mathjax> :</p>
 <p><mathjax>$$ V^{\perp} = \{ \vec{x} \in \mathbb R^n \, | \, \vec{x} \cdot \vec{v} = 0 \, \forall \, \vec{v} \in V \} $$</mathjax></p>
-<p>That is, the orthogonal compliment of a subspace <mathjax>$V$</mathjax> is the set of all vectors where the dot product of each vector with each vector from <mathjax>$V$</mathjax> is 0, that is where all vectors in the set are orthogonal to all vectors in <mathjax>$V$</mathjax>.</p>
+<p>That is, the orthogonal complement of a subspace <mathjax>$V$</mathjax> is the set of all vectors where the dot product of each vector with each vector from <mathjax>$V$</mathjax> is 0, that is where all vectors in the set are orthogonal to all vectors in <mathjax>$V$</mathjax>.</p>
 <p><mathjax>$V^{\perp}$</mathjax> is a subspace (proof omitted).</p>
+<h4>列空间, 零空间, 转置</h4>
 <h4>Columnspaces, nullspaces, and transposes</h4>
-<p><mathjax>$C(\mathbf A)$</mathjax> is the orthogonal compliment to <mathjax>$N(\mathbf A^T)$</mathjax>, and vice versa:</p>
+<p><mathjax>$C(\mathbf A)$</mathjax> is the orthogonal complement to <mathjax>$N(\mathbf A^T)$</mathjax>, and vice versa:</p>
 <p><mathjax>$$
 \begin{aligned}
 N(\mathbf A^T) &amp;= C(\mathbf A)^{\perp} \\
 N(\mathbf A^T)^{\perp} &amp;= C(\mathbf A)
 \end{aligned}
 $$</mathjax></p>
-<p><mathjax>$C(\mathbf A^T)$</mathjax> is the orthogonal compliment to <mathjax>$N(\mathbf A)$</mathjax>, and vice versa.</p>
+<p><mathjax>$C(\mathbf A^T)$</mathjax> is the orthogonal complement to <mathjax>$N(\mathbf A)$</mathjax>, and vice versa.</p>
 <p><mathjax>$$
 \begin{aligned}
 N(\mathbf A) &amp;= C(\mathbf A^T)^{\perp} \\
@@ -923,14 +996,17 @@ N(\mathbf A)^{\perp} &amp;= C(\mathbf A^T)
 \end{aligned}
 $$</mathjax></p>
 <p>As a reminder, columnspaces and nullspaces are spans, i.e. sets of linear combinations, i.e. lines, so these lines are orthogonal to each other.</p>
-<h4>Dimensionality and orthogonal compliments</h4>
+<h4>维度和正交补</h4>
+<h4>Dimensionality and orthogonal complements</h4>
 <p>For <mathjax>$V$</mathjax>, a subspace of <mathjax>$\mathbb R^n$</mathjax> :</p>
 <p><mathjax>$$ \Dim(V) + \Dim(V^{\perp}) = n$$</mathjax></p>
 <p>(proof omitted here)</p>
-<h4>The intersection of orthogonal compliments</h4>
-<p>Since the vectors between a subspace and its orthogonal compliment are all orthogonal:</p>
+<h4>正交补的交集</h4>
+<h4>The intersection of orthogonal complements</h4>
+<p>Since the vectors between a subspace and its orthogonal complement are all orthogonal:</p>
 <p><mathjax>$$ V \cap V^{\perp} = \{ \vec{0} \} $$</mathjax></p>
-<p>That is, the only vector which exists both in a subspace and its orthogonal compliment is the zero vector.</p>
+<p>That is, the only vector which exists both in a subspace and its orthogonal complement is the zero vector.</p>
+<h3>一组基下的坐标</h3>
 <h3>Coordinates with respect to a basis</h3>
 <p>With a subspace <mathjax>$V$</mathjax> of <mathjax>$\mathbb R^n$</mathjax>, we have <mathjax>$V$</mathjax>'s basis, <mathjax>$B$</mathjax>, as</p>
 <p><mathjax>$$ B = \{ \vec{v_1}, \vec{v_2}, \dots, \vec{v_k} \} $$</mathjax></p>
@@ -940,6 +1016,7 @@ $$</mathjax></p>
 <p>We can take these coefficients <mathjax>$c_1, c_2, \dots, c_k$</mathjax> as <strong>the coordinates of <mathjax>$\vec{a}$</mathjax> with respect to <mathjax>$B$</mathjax></strong>, notated as:</p>
 <p><mathjax>$$ [\vec{a}]_B = \begin{bmatrix} c_1 \\ c_2 \\ \vdots \\ c_k \end{bmatrix} $$</mathjax></p>
 <p>Basically what has happened here is a new coordinate system based off of the basis <mathjax>$B$</mathjax> is being used.</p>
+<h5>示例</h5>
 <h5>Example</h5>
 <p>Say we have <mathjax>$\vec{v_1} = \begin{bmatrix} 2 \\ 1 \end{bmatrix}, \vec{v_2} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}$</mathjax>, where <mathjax>$B = \{\vec{v_1}, \vec{v_2}\}$</mathjax> is the basis for <mathjax>$\mathbb R^2$</mathjax>.</p>
 <p>The point <mathjax>$(8,7)$</mathjax> in <mathjax>$\mathbb R^2$</mathjax> is equal to <mathjax>$3\vec{v_1} + 2\vec{v_2}$</mathjax>. If we set:</p>
@@ -949,6 +1026,7 @@ $$</mathjax></p>
 <p>which looks like:</p>
 <figure><img alt="Coordinates wrt a basis" src="../assets/coordinates_wrt_basis.svg" /><figcaption>Coordinates wrt a basis</figcaption>
 </figure>
+<h4>基变换</h4>
 <h4>Change of basis matrix</h4>
 <p>Given the basis:</p>
 <p><mathjax>$$ B = \{ \vec{v_1}, \vec{v_2}, \dots, \vec{v_k} \} $$</mathjax></p>
@@ -959,6 +1037,7 @@ $$</mathjax></p>
 <p>We can do:</p>
 <p><mathjax>$$ \mathbf C [\vec{a}]_B = \vec{a} $$</mathjax></p>
 <p>The matrix <mathjax>$\mathbf C$</mathjax> is known as the <em>change of basis matrix</em> and allows us to get <mathjax>$\vec{a}$</mathjax> in standard coordinates.</p>
+<h4>可逆基变换</h4>
 <h4>Invertible change of basis matrix</h4>
 <p>Given the basis of some subspace:</p>
 <p><mathjax>$$ B = \{ \vec{v_1}, \vec{v_2}, \dots, \vec{v_k} \} $$</mathjax></p>
@@ -977,6 +1056,7 @@ $$</mathjax></p>
 </ul>
 <p>Thus:</p>
 <p><mathjax>$$ [\vec{a}]_B = C^{-1}\vec{a} $$</mathjax></p>
+<h4>一组基下的转换矩阵</h4>
 <h4>Transformation matrix with respect to a basis</h4>
 <p>Say we have a linear transformation <mathjax>$T: \mathbb R^n \to \mathbb R^n$</mathjax>, which we can express as <mathjax>$T(\vec{x}) = \mathbf A \vec{x}$</mathjax>. This is with respect to the standard basis; we can say <mathjax>$\mathbf A$</mathjax> is the transformation for <mathjax>$T$</mathjax> with respect to the standard basis.</p>
 <p>Say we have another basis <mathjax>$B = \{ \vec{v_1}, \vec{v_2}, \dots, \vec{v_n} \}$</mathjax> for <mathjax>$\mathbb R^n$</mathjax>, that is, it is a basis for for <mathjax>$\mathbb R^n$</mathjax>.</p>
@@ -991,16 +1071,20 @@ $$</mathjax></p>
 <li><mathjax>$\mathbf A$</mathjax> is the transformation matrix for <mathjax>$T$</mathjax> with respect to the standard basis</li>
 <li><mathjax>$\mathbf C$</mathjax> is the change of basis matrix for <mathjax>$B$</mathjax></li>
 </ul>
+<h3>正交基</h3>
 <h3>Orthonormal bases</h3>
 <p>If <mathjax>$B$</mathjax> is an orthonormal set, it is linearly independent, and thus it could be a basis. If <mathjax>$B$</mathjax> <em>is</em> a basis, then it is an <strong>orthonormal basis</strong>.</p>
+<h4>正交基下的坐标</h4>
 <h4>Coordinates with respect to orthonormal bases</h4>
 <p>Orthonormal bases make good coordinate systems - it is much easier to find <mathjax>$[\vec{x}]_B$</mathjax> if <mathjax>$B$</mathjax> is an orthonormal basis. It is just:</p>
 <p><mathjax>$$ [\vec{x}]_B = \begin{bmatrix} c_1 \\ c_2 \\ \vdots \\ c_k \end{bmatrix} =
 \begin{bmatrix} \vec{v_1} \cdot \vec{x} \\ \vec{v_2} \cdot \vec{x} \\ \vdots \\ \vec{v_k}
 \cdot \vec{x} \end{bmatrix} $$</mathjax></p>
 <p>Note that the standard basis for <mathjax>$\mathbb R^n$</mathjax> is an orthonormal basis.</p>
+<h2>变换</h2>
 <h2>Transformations</h2>
 <p>A <strong>transformation</strong> is just a function which operates on vectors, which, instead of using <mathjax>$f$</mathjax>, is usually denoted <mathjax>$T$</mathjax>.</p>
+<h3>线性变换</h3>
 <h3>Linear transformations</h3>
 <p>A <strong>linear transformation</strong> is a transformation:</p>
 <p><mathjax>$$ T: \mathbb R^n \to \mathbb R^m $$</mathjax></p>
@@ -1034,10 +1118,13 @@ $$</mathjax></p>
 <p>Extending this further, you can think of matrix multiplication as a composition of transformations - each matrix represents one transformation; the resulting matrix product is a composition of those transformations.</p>
 <p>The matrix does not have to be square; i.e. it does not have to share dimensionality (in terms of the matrix's rows) with the space it's being applied to. The resulting transformation will have different dimensions.</p>
 <p>For example, a 3x2 matrix will transform a 2D space to a 3D space.</p>
+<h4>示例</h4>
 <h4>Linear transformation examples</h4>
 <p>These examples are all in <mathjax>$\mathbb R^2$</mathjax> since it's easier to visualize. But you can scale them up to any <mathjax>$\mathbb R^n$</mathjax>.</p>
+<h5></h5>
 <h5>Reflection</h5>
-<p>![An example of reflection.](../assets/reflection.svg textwidth=0.6)</p>
+<figure><img alt="An example of reflection." src="../assets/reflection.svg" /><figcaption>An example of reflection.</figcaption>
+</figure>
 <p>To get from the triangle on the left and reflect it over the <mathjax>$y$</mathjax>-axis to get the triangle on the right, all you're doing is changing the sign of all the <mathjax>$x$</mathjax> values.</p>
 <p>So a transformation would look like:</p>
 <p><mathjax>$$ T(\begin{bmatrix} x \\ y \end{bmatrix}) = \begin{bmatrix} -x \\ y \end{bmatrix} $$</mathjax></p>
@@ -1063,7 +1150,8 @@ $$</mathjax></p>
 <h3>Image of a subset of a domain</h3>
 <p>When you pass a set of vectors (i.e. a subset of a domain <mathjax>$\mathbb R^n$</mathjax>) through a transformation, the result is called the <strong>image</strong> of the set under the transformation. E.g. <mathjax>$T(S)$</mathjax> is the image of <mathjax>$S$</mathjax> under <mathjax>$T$</mathjax>.</p>
 <p>For example, say we have some vectors which define the triangle on the left. When a transformation is applied to that set, the image is the result on the right.</p>
-<p>![Example: Image of a triangle.](../assets/image.svg textwidth=0.6)</p>
+<figure><img alt="Example: Image of a triangle." src="../assets/image.svg" /><figcaption>Example: Image of a triangle.</figcaption>
+</figure>
 <p>Another example: if we have a transformation <mathjax>$T: X \to Y$</mathjax> and <mathjax>$A$</mathjax> which is a subset of <mathjax>$T$</mathjax>, then <mathjax>$T(A)$</mathjax> is the image of <mathjax>$A$</mathjax> under <mathjax>$T$</mathjax>, which is equivalent to the set of transformations for each vector in <mathjax>$A$</mathjax> :</p>
 <p><mathjax>$$ T(A) = \{ T(\vec{x}) \in Y \, | \, \vec{x} \in A \} $$</mathjax></p>
 <figure><img alt="$T: X \to Y$, where $A \subseteq X$." src="../assets/transformation.svg" /><figcaption><mathjax>$T: X \to Y$</mathjax>, where <mathjax>$A \subseteq X$</mathjax>.</figcaption>
