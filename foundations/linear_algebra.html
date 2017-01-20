@@ -1121,16 +1121,18 @@ $$</mathjax></p>
 <h4>示例</h4>
 <h4>Linear transformation examples</h4>
 <p>These examples are all in <mathjax>$\mathbb R^2$</mathjax> since it's easier to visualize. But you can scale them up to any <mathjax>$\mathbb R^n$</mathjax>.</p>
-<h5></h5>
+<h5>镜面</h5>
 <h5>Reflection</h5>
 <figure><img alt="An example of reflection." src="../assets/reflection.svg" /><figcaption>An example of reflection.</figcaption>
 </figure>
 <p>To get from the triangle on the left and reflect it over the <mathjax>$y$</mathjax>-axis to get the triangle on the right, all you're doing is changing the sign of all the <mathjax>$x$</mathjax> values.</p>
 <p>So a transformation would look like:</p>
 <p><mathjax>$$ T(\begin{bmatrix} x \\ y \end{bmatrix}) = \begin{bmatrix} -x \\ y \end{bmatrix} $$</mathjax></p>
+<h5>缩放</h5>
 <h5>Scaling</h5>
 <p>Say you want to double the size of the triangle instead of flipping it. You'd just scale up all of its values:</p>
 <p><mathjax>$$ T(\begin{bmatrix} x \\ y \end{bmatrix}) = \begin{bmatrix} 2x \\ 2y \end{bmatrix} $$</mathjax></p>
+<h4>线性变换组合</h4>
 <h4>Compositions of linear transformation</h4>
 <p>The composition of linear transformations <mathjax>$S(\vec{x}) = A\vec{x}$</mathjax> and <mathjax>$T(\vec{x}) = B\vec{x}$</mathjax> is denoted:</p>
 <p><mathjax>$$ T \circ S(\vec{x}) = T(S(\vec{x})) $$</mathjax></p>
@@ -1140,13 +1142,16 @@ $$</mathjax></p>
 <p><mathjax>$$ T \circ S(\vec{X}) = C\vec{x} $$</mathjax></p>
 <p>Where <mathjax>$C = BA$</mathjax> (proof omitted), so:</p>
 <p><mathjax>$$ T \circ S(\vec{X}) = BA\vec{x} $$</mathjax></p>
+<h3>核</h3>
 <h3>Kernels</h3>
 <p>The <strong>kernel</strong> of T, denoted <mathjax>$\Ker(T)$</mathjax>, is all of the vectors in the domain such that the transformation of those vectors is equal to the zero vector:</p>
 <p><mathjax>$$ \Ker(T) = \{ \vec{x} \in \mathbb R^n \, | \, T(\vec{x}) = \{ \vec{0} \} \} $$</mathjax></p>
 <p>You may notice that, because <mathjax>$T(\vec{x}) = \mathbf A \vec{x}$</mathjax>,</p>
 <p><mathjax>$$ \Ker(T) = N(\mathbf A) $$</mathjax></p>
 <p>That is, the kernel of the transformation is the same as the nullspace of the transformation matrix.</p>
+<h2>象</h2>
 <h2>Images</h2>
+<h3>定义域子集的象</h3>
 <h3>Image of a subset of a domain</h3>
 <p>When you pass a set of vectors (i.e. a subset of a domain <mathjax>$\mathbb R^n$</mathjax>) through a transformation, the result is called the <strong>image</strong> of the set under the transformation. E.g. <mathjax>$T(S)$</mathjax> is the image of <mathjax>$S$</mathjax> under <mathjax>$T$</mathjax>.</p>
 <p>For example, say we have some vectors which define the triangle on the left. When a transformation is applied to that set, the image is the result on the right.</p>
@@ -1159,14 +1164,17 @@ $$</mathjax></p>
 <p>Images describe surjective functions, that is, a surjective function <mathjax>$f : X \to Y$</mathjax> can also be written:</p>
 <p><mathjax>$$ \Img(f) = Y $$</mathjax></p>
 <p>since the image of the transformation encompasses the entire codomain <mathjax>$Y$</mathjax>.</p>
+<h3>子空间的象</h3>
 <h3>Image of a subspace</h3>
 <p>The image of a subspace under a transformation is also a subspace. That is, if <mathjax>$V$</mathjax> is a subspace, <mathjax>$T(V)$</mathjax> is also a subspace.</p>
+<h3>变换的象</h3>
 <h3>Image of a transformation</h3>
 <p>If, instead of a subset or subspace, you take the transformation of an entire space, i.e. <mathjax>$T(\mathbb R^n)$</mathjax>, the terminology is different: that is called the <em>image of <mathjax>$T$</mathjax></em>, notated <mathjax>$\Img(T)$</mathjax>.</p>
 <p>Because we know matrix-vector products are linear transformations:</p>
 <p><mathjax>$$ T(\vec{x}) = \mathbf A \vec{x} $$</mathjax></p>
 <p>The image of a linear transformation matrix <mathjax>$\mathbf A$</mathjax> is equivalent to its column space, that is:</p>
 <p><mathjax>$$ \Img(T) = C(\mathbf A) $$</mathjax></p>
+<h3>集合的原象</h3>
 <h3>Preimage of a set</h3>
 <p>The <strong>preimage</strong> is the inverse image. For instance, consider a transformation mapping from the domain <mathjax>$X$</mathjax> to the codomain <mathjax>$Y$</mathjax> :</p>
 <p><mathjax>$$ T: X \to Y $$</mathjax></p>
@@ -1175,6 +1183,7 @@ $$</mathjax></p>
 <p><mathjax>$$ T^{-1}(S) $$</mathjax></p>
 <p>Note that not every point in <mathjax>$S$</mathjax> needs to map back to <mathjax>$X$</mathjax>. That is, <mathjax>$S$</mathjax> may contain some points for which there are no corresponding points in <mathjax>$X$</mathjax>. Because of this, the image of the preimage of <mathjax>$S$</mathjax> is not necessarily equivalent to <mathjax>$S$</mathjax>, but we can be sure that it is at least a subset:</p>
 <p><mathjax>$$ T(T^{-1}(S)) \subseteq S $$</mathjax></p>
+<h2>投影</h2>
 <h2>Projections</h2>
 <p>A <strong>projection</strong> can kind of be thought of as a "shadow" of a vector:</p>
 <figure><img alt="Here, we have the projection of $\vec{x}$ - the red vector - onto the green line $L$. The projection is the dark red vector. This example is in $\mathbb R^2$ but this works in any $\mathbb R^n$." src="../assets/projection.svg" /><figcaption>Here, we have the projection of <mathjax>$\vec{x}$</mathjax> - the red vector - onto the green line <mathjax>$L$</mathjax>. The projection is the dark red vector. This example is in <mathjax>$\mathbb R^2$</mathjax> but this works in any <mathjax>$\mathbb R^n$</mathjax>.</figcaption>
@@ -1205,6 +1214,7 @@ $$</mathjax></p>
 <p><mathjax>$$ \mathbf A = \begin{bmatrix} u_1^2 &amp; u_2u_1 \\ u_1u_2 &amp; u_2^2 \end{bmatrix} $$</mathjax></p>
 <p>where <mathjax>$u_i$</mathjax> are components of the unit vector.</p>
 <p>Also note that the length of a projection (i.e. the scalar component of the projection) is given by the dot product of the two vectors. For example, in the accompanying figure, the length of <mathjax>$\Proj_{\vec a}(\vec b)$</mathjax> is <mathjax>$a \cdot b$</mathjax>.</p>
+<h3>投影到子空间</h3>
 <h3>Projections onto subspaces</h3>
 <p>Given that <mathjax>$V$</mathjax> is a subspace of <mathjax>$\mathbb R^n$</mathjax>, we know that <mathjax>$V^{\perp}$</mathjax> is also a subspace of <mathjax>$\mathbb R^n$</mathjax>, and we have a vector <mathjax>$\vec{x}$</mathjax> such that <mathjax>$\vec{x} \in \mathbb R^n$</mathjax>, we know that <mathjax>$\vec{x} = \vec{v} + \vec{w}$</mathjax> where <mathjax>$\vec{v} \in V$</mathjax> and <mathjax>$\vec{w} \in V^{\perp}$</mathjax>, then:</p>
 <p><mathjax>$$
@@ -1223,6 +1233,7 @@ V &amp;= \{ c\vec{v} \, | \, c \in \mathbb R \}
 \end{aligned}
 $$</mathjax></p>
 <p>So <mathjax>$\Proj_V \vec{x}$</mathjax> is the unique vector <mathjax>$\vec{v} \in V$</mathjax> such that <mathjax>$\vec{x} = \vec{v} + \vec{w}$</mathjax> where <mathjax>$\vec{w}$</mathjax> is a unique member of <mathjax>$V^{\perp}$</mathjax>.</p>
+<h4>作为线性变换的投影</h4>
 <h4>Projection onto a subspace as a linear transform</h4>
 <p><mathjax>$$ \Proj_V(\vec{x}) = \mathbf A (\mathbf A^T \mathbf A)^{-1}\mathbf A^T \vec{x} $$</mathjax></p>
 <p>where <mathjax>$V$</mathjax> is a subspace of <mathjax>$\mathbb R^n$</mathjax>.</p>
@@ -1230,24 +1241,29 @@ $$</mathjax></p>
 <p>Also <mathjax>$\vec{v} = \Proj_V\vec{x}$</mathjax>, so:</p>
 <p><mathjax>$$ \vec{x} = \Proj_V\vec{x} + \vec{w} $$</mathjax></p>
 <p>where <mathjax>$\vec{w}$</mathjax> is a unique member of <mathjax>$V^{\perp}$</mathjax>.</p>
+<h4>使用正交基投影到子空间</h4>
 <h4>Projections onto subspaces with orthonormal bases</h4>
 <p>Given that <mathjax>$V$</mathjax> is a subspace of <mathjax>$\mathbb R^n$</mathjax> and <mathjax>$B = \{ \vec{v_1}, \vec{v_2}, \dots, \vec{v_k} \}$</mathjax>  is an orthonormal basis for <mathjax>$V$</mathjax>. We have a vector <mathjax>$\vec{x} \in \mathbb R^n$</mathjax>, so <mathjax>$\vec{x} = \vec{v} + \vec{w}$</mathjax> where <mathjax>$\vec{v} \in V$</mathjax> and <mathjax>$\vec{w} \in V^{\perp}$</mathjax>.</p>
 <p>We know (see previously) that by definition:</p>
 <p><mathjax>$$ \Proj_V(\vec{x}) = \mathbf A (\mathbf A^T \mathbf A)^{-1}\mathbf A^T \vec{x} $$</mathjax></p>
 <p>which is quite complicated. It is much simpler for orthonormal bases:</p>
 <p><mathjax>$$ \Proj_V(\vec{x}) = \mathbf A \mathbf A^T \vec{x} $$</mathjax></p>
+<h2>识别变换的属性</h2>
 <h2>Identifying transformation properties</h2>
+<h3>是否满射</h3>
 <h3>Determining if a transformation is surjective</h3>
 <p>A transformation <mathjax>$T(\vec{x}) = \mathbf A \vec{x}$</mathjax> is surjective ("onto") if the column space of <mathjax>$\mathbf A$</mathjax> equals the codomain:</p>
 <p><mathjax>$$ \Span(a_1, a_2, \dots, a_n) = C(\mathbf A) = \mathbb R^m $$</mathjax></p>
 <p>which can also be stated as:</p>
 <p><mathjax>$$ \Rank(\mathbf A) = m $$</mathjax></p>
+<h3>是否单射</h3>
 <h3>Determining if a transformation is injective</h3>
 <p>A transformation <mathjax>$T(\vec{x}) = \mathbf A \vec{x}$</mathjax> is injective ("one-to-one") if the the nullspace of <mathjax>$\mathbf A$</mathjax> contains only the zero vector:</p>
 <p><mathjax>$$ N(\mathbf A) = \{ \vec{0} \} $$</mathjax></p>
 <p>which is true if the set of <mathjax>$\mathbf A$</mathjax>'s column vectors is linearly independent.</p>
 <p>This can also be stated as:</p>
 <p><mathjax>$$ \Rank(\mathbf A) = n $$</mathjax></p>
+<h3>是否可逆</h3>
 <h3>Determining if a transformation is invertible</h3>
 <p>A transformation is invertible if it is both injective and surjective.</p>
 <p>For a transformation to be surjective:</p>
@@ -1257,6 +1273,7 @@ $$</mathjax></p>
 <p>Therefore for a transformation to be invertible:</p>
 <p><mathjax>$$ \Rank(\mathbf A) = m = n $$</mathjax></p>
 <p>So the transformation matrix <mathjax>$\mathbf A$</mathjax> must be a square matrix.</p>
+<h3>线性变换的逆变换</h3>
 <h3>Inverse transformations of linear transformations</h3>
 <p>Inverse transformations are linear transformations if the original transformation is both linear and invertible. That is, if <mathjax>$T$</mathjax> is invertible and linear, <mathjax>$T^{-1}$</mathjax> is linear:</p>
 <p><mathjax>$$
@@ -1265,6 +1282,7 @@ T^{-1}(\vec{x}) &amp;= \mathbf A^{-1} \vec{x} \\
 (T^{-1} \circ T)(\vec{x}) &amp;= \mathbf A^{-1} \mathbf A \vec{x} = I_n \vec{x} = \mathbf A \mathbf A^{-1} \vec{x} = (T \circ T^{-1})(\vec{x})
 \end{aligned}
 $$</mathjax></p>
+<h2>特征值和特征向量</h2>
 <h2>Eigenvalues and Eigenvectors</h2>
 <p>Say we have a linear transformation <mathjax>$T: \mathbb R^n \to \mathbb R^n$</mathjax> :</p>
 <p><mathjax>$$ T(\vec{v}) = \mathbf A \vec{v} = \lambda\vec{v} $$</mathjax></p>
@@ -1300,6 +1318,7 @@ $$</mathjax></p>
 <p><mathjax>$$ \vec{0} = \mathbf B \vec{v} $$</mathjax></p>
 <p>which, by our definition of nullspace, indicates that <mathjax>$\vec{v}$</mathjax> is in the nullspace of <mathjax>$\mathbf B$</mathjax>. That is:</p>
 <p><mathjax>$$ \vec{v} \in N(\lambda \mathbf I_n - \mathbf A) $$</mathjax></p>
+<h3>特征值和特征向量的属性</h3>
 <h3>Properties of eigenvalues and eigenvectors</h3>
 <ul>
 <li>The trace of <mathjax>$A$</mathjax> is equal to the sum of its eigenvalues: <mathjax>$\Tr(A) = \sum^n_{i=1} \lambda_i$</mathjax>.</li>
@@ -1308,6 +1327,7 @@ $$</mathjax></p>
 <li>If <mathjax>$A$</mathjax> is non-singular, then <mathjax>$\frac{1}{\lambda_i}$</mathjax> is an eigenvalue of <mathjax>$A^{-1}$</mathjax> with associated eigenvector <mathjax>$x_i$</mathjax>, i.e. <mathjax>$A^{-1}x_i = (\frac{1}{\lambda_i})x_i$</mathjax>.</li>
 <li>The eigenvalues of a diagonal matrix <mathjax>$D = \Diag(d_1, \dots, d_n)$</mathjax> are just the diagonal entries <mathjax>$d_1, \dots, d_n$</mathjax>.</li>
 </ul>
+<h3>对角化的矩阵</h3>
 <h3>Diagonalizable matrices</h3>
 <p>All eigenvector equations can be written simultaneously as:</p>
 <p><mathjax>$$
@@ -1315,6 +1335,7 @@ AX = X\Lambda
 $$</mathjax></p>
 <p>where the columns of <mathjax>$X \in \mathbb R^{n \times n}$</mathjax> are the eigenvectors of <mathjax>$A$</mathjax> and <mathjax>$\Lambda$</mathjax> is a diagonal matrix whose entries are the eigenvalues of <mathjax>$A$</mathjax>, i.e. <mathjax>$\Lambda = \Diag(\lambda_1, \dots, \lambda_n)$</mathjax>.</p>
 <p>If the eigenvectors of <mathjax>$A$</mathjax> are linearly independent, then the matrix <mathjax>$X$</mathjax> will be invertible, so that <mathjax>$A = X \Lambda X^{-1}$</mathjax>. A matrix that can be written in this form is called <strong>diagonalizable</strong>.</p>
+<h3>对称矩阵的特征值和特征向量</h3>
 <h3>Eigenvalues &amp; eigenvectors of symmetric matrices</h3>
 <p>For a symmetric matrix <mathjax>$A \in \mathbb S^n$</mathjax>, the eigenvalues of <mathjax>$A$</mathjax> are all real and the eigenvectors of <mathjax>$A$</mathjax> are all orthonormal.</p>
 <p>If for all of <mathjax>$A$</mathjax>'s eigenvalues <mathjax>$\lambda_i$</mathjax>...</p>
@@ -1325,6 +1346,7 @@ $$</mathjax></p>
 <li><mathjax>$\lambda_i \leq 0$</mathjax>, then <mathjax>$A$</mathjax> is negative semidefinite.</li>
 <li>have both positive and negative values, then <mathjax>$A$</mathjax> is indefinite.</li>
 </ul>
+<h4>示例</h4>
 <h4>Example</h4>
 <p>Say we have a linear transformation <mathjax>$T(\vec{x}) = \mathbf A \vec{x}$</mathjax>. Here are some example values of <mathjax>$\vec{x}$</mathjax> being input and the output vectors they yield (it's not important here what <mathjax>$\mathbf A$</mathjax> actually looks like, its just to help distinguish what is and isn't an eigenvector.)</p>
 <ul>
@@ -1338,11 +1360,14 @@ simple example where the vector was scaled up by 2, so the eigenvalue here is 2.
 </ul>
 </li>
 </ul>
+<h3>特征空间</h3>
 <h3>Eigenspace</h3>
 <p>The eigenvectors that correspond to an eigenvalue <mathjax>$\lambda$</mathjax> form the <strong>eigenspace</strong> for that <mathjax>$\lambda$</mathjax>, notated <mathjax>$E_{\lambda}$</mathjax> :</p>
 <p><mathjax>$$ E_{\lambda} = N(\lambda \mathbf I_n - \mathbf A) $$</mathjax></p>
+<h3>特征基</h3>
 <h3>Eigenbasis</h3>
 <p>Say we have an <mathjax>$n \times n$</mathjax> matrix <mathjax>$\mathbf A$</mathjax>. An <strong>eigenbasis</strong> is a basis for <mathjax>$\mathbb R^n$</mathjax> consisting entirely of eigenvectors for <mathjax>$\mathbf A$</mathjax>.</p>
+<h2>张量</h2>
 <h2>Tensors</h2>
 <p><strong>Tensors</strong> are generalizations of scalars, vectors, and matrices. A tensor is distinguished by its <strong>rank</strong>, which is the number of indices it has. A scalar is a <mathjax>$0^{th}$</mathjax>-rank tensor (it has no indices), a vector is a <mathjax>$1^{th}$</mathjax>-rank tensor, i.e. its components are accessed by one index, e.g. <mathjax>$x_i$</mathjax>, and a matrix is a <mathjax>$2^{th}$</mathjax>-rank tensor, i.e. its components are accessed by two indices, e.g. <mathjax>$X_{i,j}$</mathjax>, and so on.</p>
 <p>Just as we have scalar and vector fields, we also have <strong>tensor fields</strong>.</p>
