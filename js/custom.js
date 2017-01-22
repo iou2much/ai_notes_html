@@ -58,6 +58,7 @@ $(document).ready(function() {
                     parr_lv = parr.attr('lv');
                 }
                 parr.append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
+                $('#tt_'+(title_idx.length)).attr('lv',lv);
             }
         }else {
             $(this).addClass('en')
