@@ -6,3 +6,8 @@
     font-size: 0.9em;
     color: #aaa;
 }
+.toc{
+    position: absolute;
+    top:0px;
+    left:0px;
+}
