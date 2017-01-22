@@ -63,7 +63,7 @@ $(document).ready(function() {
         }else {
             $(this).addClass('en')
         }
-        this.append('<a id="anchor_'+(title_idx.length)+'">.</a>')
+        this.after('<a id="anchor_'+(title_idx.length)+'">.</a>')
 
         title_idx.push(this);
 
