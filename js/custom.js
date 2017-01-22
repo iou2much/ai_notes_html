@@ -63,7 +63,7 @@ $(document).ready(function() {
         }else {
             $(this).addClass('en')
         }
-        $(this).before('<a id="anchor_'+(title_idx.length)+'">.</a>')
+        $(this).before('<a id="anchor_'+(title_idx.length)+'"></a>')
 
         title_idx.push(this);
 
