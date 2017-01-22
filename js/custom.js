@@ -18,16 +18,12 @@ $(document).ready(function() {
     var cur_node=$('#toc'),parr_node=$('#toc');
 
     $('h1,h2,h3,h4,h5,h6').each(function(){
-        console.log(this);
-
-
-
         if(title_idx.length%2==0){
             $(this).addClass('cn')
             var lv = this.localName[1];
 
             if(title_idx.length==0){
-                $('#toc').append('<li id="tt_'+title_idx.length+'">'+this.innerText+this.localName+'</li>');
+                $('#toc').append('<li id="tt_'+title_idx.length+'"><a href="#anchor_"'+(title_idx.length)+' >'+this.innerText+'</a></li>');
                 $('#tt_'+(title_idx.length)).attr('lv',lv);
                 title_idx.push(this);
                 return;
@@ -36,14 +32,14 @@ $(document).ready(function() {
 
 
             if(title_idx[title_idx.length-2].localName[1] == lv){
-                $('#tt_'+(title_idx.length-2)).parent().append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
+                $('#tt_'+(title_idx.length-2)).parent().append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+'</li>');
                 $('#tt_'+(title_idx.length)).attr('lv',lv);
             }else if(title_idx[title_idx.length-2].localName[1] < lv){
                 if($('#tt_'+(title_idx.length-2)+'>ul').length==0){
                     $('#tt_'+(title_idx.length-2)).append('<ul></ul>');
 
                 }
-                $('#tt_'+(title_idx.length-2)+'>ul').append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
+                $('#tt_'+(title_idx.length-2)+'>ul').append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+'</li>');
                 $('#tt_'+(title_idx.length)).attr('lv',lv);
 
             }else{
@@ -61,12 +57,13 @@ $(document).ready(function() {
                     parr = parr.parent().parent().parent();
                     parr_lv = parr.attr('lv');
                 }
-                parr.append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
+                parr.append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+'</li>');
                 $('#tt_'+(title_idx.length)).attr('lv',lv);
             }
         }else {
             $(this).addClass('en')
         }
+        this.append('<a id="anchor_'+(title_idx.length)+'">.</a>')
 
         title_idx.push(this);
 
