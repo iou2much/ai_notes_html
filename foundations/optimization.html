@@ -1,0 +1,341 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Optimization</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <p><mathjax>$$
+\def\argmax{\operatorname*{argmax}}
+\def\argmin{\operatorname*{argmin}}
+$$</mathjax></p>
+<h1>Optimization</h1>
+<p>Optimization is the task of finding the arguments to a function which yield its minimum or maximum value. An optimal argument is denoted with an asterisk, e.g. <mathjax>$x^{\*}$</mathjax>.</p>
+<p>In the context of machine learning, we are typically dealing with minimization. If necessary, a maximization problem can be reframed as minimization: to maximize a function <mathjax>$f(x)$</mathjax>, you can instead minimize <mathjax>$-f(x)$</mathjax>.</p>
+<p>The function we want to optimize is called the <strong>objective function</strong>. When the particular optimization is minimization, the function may also be referred to as a <strong>cost</strong>, <strong>loss</strong>, or <strong>error</strong> function.</p>
+<p>Optimization problems can be thought of a topology where you are looking for the global peak (if you are maximizing) or the globally lowest point (if you are minimizing). For simplicity, minimizing will be the assumed goal here, as you are often trying to minimize some error function.</p>
+<p>![Local vs global minima](../assets/local_global_minima.svg textwidth=0.6)</p>
+<p>Consider a very naive approach: a greedy random algorithm which starts at some position in this topology, then randomly tries moving to a new position and checks if it is better. If it is, it sets that as the current solution. It continues until it has some reason to stop, usually because it has found a minimum. This is a <strong>local minimum</strong>; that is, it is a minimum relative to its immediately surrounding points, but it is not necessarily the <strong>global minimum</strong>, which is the minimum of the entire function.</p>
+<p>This algorithm is <em>greedy</em> in that it will always prefer a better scoring position, even if it is only marginally better. Thus it can be easy to get stuck in local optima - since any step away from it seems worse, even if the global optimum is right around the corner, so to speak.</p>
+<p>Optimization may be accomplished <strong>numerically</strong> or <strong>analytically</strong>. The analytic approach involves computing derivatives and then identifying critical points (e.g. the second derivative test). These provide the exact optima.</p>
+<p>However, this analytic approach is infeasible for many functions. In such cases we resort to numerical optimization, which involves, in a sense, guessing your way to the optima. The methods covered here are all numerical optimization methods.</p>
+<p>Within optimization there are certain special cases:</p>
+<h3>Convex optimization</h3>
+<p>As far as optimization goes, convex optimization is easier to deal with - convex functions have only global minima (any local minimum is a global minimum) without any saddle points.</p>
+<h3>Constrained optimization</h3>
+<p>In optimization we are typically looking to find the optimum across <em>all</em> points. However, we may only be interested in finding the optimum across a subset <mathjax>$S$</mathjax> of these points - in this case, we have a <strong>constrained optimization</strong> problem. The points that are in <mathjax>$S$</mathjax> are called <strong>feasible</strong> points.</p>
+<p>One method for constrained optimization is the <strong>Karush-Kuhn-Tucker</strong> (KKT) method.</p>
+<p>It uses the <strong>generalized Lagrangian</strong> (sometimes called the generalized Lagrange function).</p>
+<p>We must describe <mathjax>$S$</mathjax> as equations and inequalities; in particular, with <mathjax>$m$</mathjax> functions <mathjax>$g_i$</mathjax>, called <em>equality constraints</em>, and <mathjax>$n$</mathjax> functions <mathjax>$h_j$</mathjax>, called <em>inequality constraints</em>, such that <mathjax>$S = \{\mathbf x | \forall i, g_i(\mathbf x) = 0 \text{and} \forall_j, h_j (\mathbf x) \leq 0 \}$</mathjax>.</p>
+<p>For each constraint we also have the variables <mathjax>$\lambda_i, \alpha_i$</mathjax>, called <em>KKT multipliers</em>.</p>
+<p>Then we can define the generalized Lagrangian as:</p>
+<p><mathjax>$$
+L(\mathbf x, \mathbf \lambda, \mathbf \alpha) = f(\mathbf x) + \sigma_i \lambda_i g_i(\mathbf x) + \sigma_j \alpha_j h_j(\mathbf x)
+$$</mathjax></p>
+<p>This reframes the constrained minimization problem as an unconstrained optimization of the generalized Lagrangian.</p>
+<p>That is, so long as at least one feasible point exists and <mathjax>$f(\mathbf x)$</mathjax> cannot be <mathjax>$\infty$</mathjax>, then</p>
+<p><mathjax>$$
+\min_{\mathbf x} \max_{\mathbf \lambda} \max_{\mathbf \alpha, \mathbf \alpha \geq 0} L(\mathbf x, \mathbf \lambda, \mathbf \alpha)
+$$</mathjax></p>
+<p>has the same objective function value and set of optimal points as <mathjax>$\min_{\mathbf x \in S} f(\mathbf x)$</mathjax>.</p>
+<p>So long as the constraints are satisfied,</p>
+<p><mathjax>$$
+\max_{\mathbf \lambda} \max_{\mathbf \alpha, \mathbf \alpha \geq 0} L(\mathbf x, \mathbf \lambda, \mathbf \alpha) = f(\mathbf x)
+$$</mathjax></p>
+<p>and if a constraint is violated, then</p>
+<p><mathjax>$$
+\max_{\mathbf \lambda} \max_{\mathbf \alpha, \mathbf \alpha \geq 0} L(\mathbf x, \mathbf \lambda, \mathbf \alpha) = \infty
+$$</mathjax></p>
+<h2>Gradient vs non-gradient methods</h2>
+<p>Broadly we can categorize optimization methods into those that use gradients and those that do not:</p>
+<p>Non-gradient methods include:</p>
+<ul>
+<li>hill climbing</li>
+<li>simplex/amoeba/Nelder Mead</li>
+<li>genetic algorithms</li>
+</ul>
+<p>Gradient methods include:</p>
+<ul>
+<li>gradient descent</li>
+<li>conjugate gradient</li>
+<li>quasi-newton</li>
+</ul>
+<p>Gradient methods tend to be more efficient, but are not always possible to use (you don't always have the gradient).</p>
+<h2>Gradient Descent</h2>
+<p>![Sphere function](../assets/spherefunc.svg textwidth=0.5)</p>
+<p><strong>Gradient descent</strong> (GD) is perhaps the common minimizing optimization (for maximizing, its equivalent is <em>gradient ascent</em>) in machine learning.</p>
+<p>Say we have a function <mathjax>$C(v)$</mathjax> which we want to minimize. For simplicity, we will use <mathjax>$v \in \mathbb R^2$</mathjax>. An example <mathjax>$C(v)$</mathjax> is visualized in the accompanying figure.</p>
+<p>In this example, the global minimum is visually obvious, but most of the time it is not (especially when dealing with far more dimensions). But we can apply the model of a ball rolling down a hill and expand it to any arbitrary <mathjax>$n$</mathjax> dimensions. The ball will "roll" down to a minimum, though not necessarily the global minimum.</p>
+<p>The position the ball is at is a potential solution; here it is some values for <mathjax>$v_1$</mathjax> and <mathjax>$v_2$</mathjax>. We want to move the ball such that <mathjax>$\Delta C$</mathjax>, the change in <mathjax>$C(v)$</mathjax> from the ball's previous position to the new position, is negative (i.e. the cost function's output is smaller, since we're minimizing).</p>
+<p>More formally, <mathjax>$\Delta C$</mathjax> is defined as:</p>
+<p><mathjax>$$
+\begin{aligned}
+  \Delta C \approx \frac{\partial C}{\partial v_1} \Delta v_1 +
+  \frac{\partial C}{\partial v_2} \Delta v_2
+\end{aligned}
+$$</mathjax></p>
+<p>We define the <em>gradient</em> of <mathjax>$C$</mathjax>, denoted <mathjax>$\nabla C$</mathjax>, to be the vector of partial derivatives (transposed to be a column vector):</p>
+<p><mathjax>$$
+\begin{aligned}
+  \nabla C \equiv \left( \frac{\partial C}{\partial v_1},
+  \frac{\partial C}{\partial v_2} \right)^T
+\end{aligned}
+$$</mathjax></p>
+<p>So we can rewrite <mathjax>$\Delta C$</mathjax> as:</p>
+<p><mathjax>$$
+\begin{aligned}
+  \Delta C \approx \nabla C \cdot \Delta v.
+\end{aligned}
+$$</mathjax></p>
+<p>We can choose <mathjax>$\Delta v$</mathjax> to make <mathjax>$\Delta C$</mathjax> negative:</p>
+<p><mathjax>$$
+\begin{aligned}
+  \Delta v = -\eta \nabla C,
+\end{aligned}
+$$</mathjax></p>
+<p>Where <mathjax>$\eta$</mathjax> is a small, positive parameter (the <strong>learning rate</strong>), which controls the step size.</p>
+<p>Finally we have:</p>
+<p><mathjax>$$
+\Delta C \approx
+-\eta \nabla C \cdot \nabla C = -\eta \|\nabla C\|^2
+$$</mathjax></p>
+<p>We can use this to compute a value for <mathjax>$\Delta v$</mathjax>, which is really the change in position for our "ball" to a new position <mathjax>$v'$</mathjax>:</p>
+<p><mathjax>$$
+\begin{aligned}
+  v \rightarrow v' = v -\eta \nabla C.
+\end{aligned}
+$$</mathjax></p>
+<p>And repeat until we hit a global (or local) minimum.</p>
+<p>This process is known in particular as <strong>batch gradient descent</strong> because each step is computed over the entire <em>batch</em> of data.</p>
+<h3>Stochastic gradient descent (SGD)</h3>
+<p>With batch gradient descent, the cost function is evaluated on all the training inputs for each step. This can be quite slow.</p>
+<p>With <strong>stochastic gradient descent</strong> (SGD), you randomly shuffle your examples and look at only one example for each iteration of gradient descent (sometimes this is called <em>online</em> gradient descent to contrast with minibatch gradient descent, described below). Ultimately it is less direct than batch gradient descent but gets you close to the global minimum - the main advantage is that you're not iterating over your entire training set for each step, so though its path is more wandering, it ends up taking less time on large datasets.</p>
+<p>The reason we randomly shuffle examples is to avoid "forgetting". For instance, say you have time series data where there are somewhat different patterns later in the data than earlier on. If that training data is presented in sequence, the algorithm will "forget" the patterns earlier on in favor of those it encounters later on (since the parameter updates learned from the later-on data will effectively erase the updates from the earlier-on data).</p>
+<p>In fact, stochastic gradient descent can help with finding the global minimum because instead of computing over a single error surface, you are working with many different error surfaces varying with the example you are current looking at. So it is possible that in one of these surfaces a local minima does not exist or is less pronounced than in others, which make it easier to surpass.</p>
+<p>There's another form of stochastic gradient descent called <strong>minibatch gradient descent</strong>. Here <mathjax>$b$</mathjax> random examples are used for each iteration, where <mathjax>$b$</mathjax> is your minibatch size. It is usually in the range of 2-100; a typical choice might be 10 (minibatch gradient descent where <mathjax>$b=1$</mathjax> is just regular SGD). Note that a minibatch size can be <em>too</em> large, resulting in greater time for convergence. But generally it is faster than SGD and has the benefit of aiding in local minima avoidance.</p>
+<p>Minibatches also need to be properly representative of the overall dataset (e.g. be balanced for classes).</p>
+<p>When the stochastic variant is used, a <mathjax>$\frac{1}{b}$</mathjax> term is sometimes included:</p>
+<p><mathjax>$$
+\begin{aligned}
+  v \rightarrow v' = v -\frac{\eta}{b} \nabla C.
+\end{aligned}
+$$</mathjax></p>
+<h3>Epochs vs iterations</h3>
+<p>An important point of clarification: an "epoch" and a training "iteration" are not necessarily the same thing.</p>
+<p>One training iteration is one step of your optimization algorithm (i.e. one update pass). In the case of something like minibatch gradient descent, one training iteration will only look at one batch of examples.</p>
+<p>An epoch, on the other hand, consists of enough training iterations to look at all your training examples.</p>
+<p>So if you have a total of 1000 training examples and a batch size of 100, one epoch will consist of 10 training iterations.</p>
+<h3>Learning rates</h3>
+<p>The learning rate <mathjax>$\eta$</mathjax> is typically held constant. It can be slowly decreased it over time if you want <mathjax>$\theta$</mathjax> to converge on the global minimum in stochastic gradient descent (otherwise, it just gets close). So for instance, you can divide it by the iteration number plus some constant, but this can be overkill.</p>
+<h3>Conditioning</h3>
+<p><strong>Conditioning</strong> describes how much the output of a function varies with small changes in input.</p>
+<p>In particular, if we have a function <mathjax>$f(x) = A^{-1}x, A \in R^{n \times n}$</mathjax>, where <mathjax>$A$</mathjax> has an eigenvalue decomposition, we can compute its <strong>condition number</strong> as follows:</p>
+<p><mathjax>$$
+\max_{i,j} |\frac{\lambda_i}{\lambda_j}|
+$$</mathjax></p>
+<p>Which is the ratio of the magnitude of the largest and smallest eigenvalue; when this is large, we say we have a <em>poorly conditioned</em> matrix since it is overly sensitive to small changes in input. This has the practical implications of slow convergence.</p>
+<p>In the context of gradient descent, if the Hessian is poorly conditioned, then gradient descent does not perform as well. This can be alleviated with <strong>Newton's method</strong>, where a Taylor series expansion is used to approximate <mathjax>$f(x)$</mathjax> near some point <mathjax>$x_0$</mathjax>, going up to only the second-order derivatives:</p>
+<p><mathjax>$$
+f(x) \approx f(x_0) + (x-x_0)^T \nabla x f(x_0) + \frac{1}{2}(x - x_0)^T H(f)(x_0)(x - x_0)
+$$</mathjax></p>
+<p>Solving for the critical point gives:</p>
+<p><mathjax>$$
+x^{\*} = x_0 - H(f)(x_0)^{-1}\nabla_x f(x_0)
+$$</mathjax></p>
+<p>(As a reminder, <mathjax>$H(f)$</mathjax> is the Hessian of <mathjax>$f$</mathjax>)</p>
+<p>Such methods which also use second-order derivatives (i.e. the Hessian) are known as <em>second-order optimization algorithms</em>; those that use only the gradient are called <em>first-order</em> optimization algorithms.</p>
+<h2>Simulated Annealing</h2>
+<p><strong>Simulated annealing</strong> is similar to the greedy random approach but it has some randomness which can "shake" it out of local optima.</p>
+<p>Annealing is a process in metal working where the metal starts at a very high temperature and gradually cools down. Simulated annealing uses a similar process to manage its randomness.</p>
+<p>A simulated annealing algorithm starts with a high "<em>temperature</em>" (or "energy") which "cools" down (becomes less extreme) as progress is made.<br />
+Like the greedy random approach, the algorithm tries a random move. If the move is better, it is accepted as the new position. If the move is worse, then there is a chance it still may be accepted; the probability of this is based on the current temperature, the current error, and the previous error:</p>
+<p><mathjax>$$
+P(e, e', T) = \exp(\frac{-(e'-e)}{T})
+$$</mathjax></p>
+<p>Each random move, whether accepted or not, is considered an iteration. After each iteration, the temperature is decreased according to a <em>cooling schedule</em>. An example cooling schedule is:</p>
+<p><mathjax>$$
+T(k) = T_{\text{init}} \frac{T_{\text{final}}}{T_{\text{init}}}^{\frac{k}{k_{\max}}}
+$$</mathjax></p>
+<p>where</p>
+<ul>
+<li><mathjax>$T_{\text{init}}$</mathjax> = the starting temperature</li>
+<li><mathjax>$T_{\text{final}}$</mathjax> = the minimum/ending temperature</li>
+<li><mathjax>$k$</mathjax> = the current iteration</li>
+<li><mathjax>$k_{\max}$</mathjax> = the maximum number of iterations</li>
+</ul>
+<p>For this particular schedule, you probably don't want to set <mathjax>$T_{\text{final}}$</mathjax> to 0 since otherwise it would rapidly decrease to 0. Set it something close to 0 instead.</p>
+<p>The algorithm terminates when the temperature is at its minimum.</p>
+<h2>Nelder-Mead (aka Simplex or Amoeba optimization)</h2>
+<p>For a problem of <mathjax>$n$</mathjax> dimensions, create a shape of <mathjax>$n+1$</mathjax> vertices. This shape is a <strong>simplex</strong>.</p>
+<p>One vertex of the simplex is initialized with your best educated guess of the solution vector. That guess could be the output of some other optimization approach, even a previous Nelder-Mead run. If you have nothing to start with, a random vector can be used.</p>
+<p>The other <mathjax>$n$</mathjax> vertices are created by moving in one of the <mathjax>$n$</mathjax> dimensions by some set amount.</p>
+<p>Then at each step of the algorithm, you want to (illustrations are for <mathjax>$n=2$</mathjax>, thus <mathjax>$3$</mathjax> vertices):</p>
+<ul>
+<li>Find the worst, second worst, and best scoring vertices</li>
+<li>Reflect the worst vertex to some point <mathjax>$p'$</mathjax> through the best side</li>
+<li>If <mathjax>$p'$</mathjax> is better, <em>expand</em> by setting the worst vertex to a new point <mathjax>$p''$</mathjax>, a bit further than <mathjax>$p'$</mathjax> but in the same direction</li>
+<li>If <mathjax>$p'$</mathjax> is worse, then <em>contract</em> by setting the worst vertex to a new point <mathjax>$p''$</mathjax>, in the same direction as <mathjax>$p'$</mathjax> but before crossing the best side</li>
+</ul>
+<figure><img alt="Nelder-Mead" src="../assets/nelder_mead.svg" /><figcaption>Nelder-Mead</figcaption>
+</figure>
+<p>The algorithm terminates when one of the following occurs:</p>
+<ul>
+<li>The maximum number of iterations is reached</li>
+<li>The score is "good enough"</li>
+<li>The vertices have become close enough together</li>
+</ul>
+<p>Then the best vertex is considered the solution.</p>
+<p>This optimization method is very sensitive to how it is initialized; whether or not a good solution is found depends a great deal on its starting points.</p>
+<h2>Particle Swarm Optimization</h2>
+<p><strong>Particle swarm optimization</strong> is similar to Nelder-Mead, but instead of three points, many more points are used. These points are called "particles".</p>
+<p>Each particle has a position (a potential solution) and a velocity which indicates where the particle moves to in the next iteration. Particles also keep track of their current error to the training examples and its best position so far.</p>
+<p>Globally, we also track the best position overall and the lowest error overall.</p>
+<p>The velocity for each particle is computed according to:</p>
+<ul>
+<li>it's inertia (i.e. the current direction it is moving in)</li>
+<li>it's historic best position (i.e. the best position it's found so far)</li>
+<li>the global best position</li>
+</ul>
+<p>The influence of these components are:</p>
+<ul>
+<li>inertia weight</li>
+<li>cognitive weight (for historic best position)</li>
+<li>social weight (for global best position)</li>
+</ul>
+<p>These weights are parameters that must be tuned, but this method is quite robust to them (that is, they are not sensitive to these changes so you don't have to worry too much about getting them just right).</p>
+<p>More particles are better, of course, but more intensive.</p>
+<p>You can specify the number of epochs to run.</p>
+<p>You can also incorporate a death-birth cycle in which low-performing particles (those that seem to be stuck, for instance) get destroyed and a new randomly-placed particle is initialized in its place.</p>
+<h2>Evolutionary Algorithms</h2>
+<p>Evolutionary algorithms are a type of algorithm which uses concepts from evolution - e.g. individuals, populations, fitness, reproduction, mutation - to search a solution space.</p>
+<h3>Genetic Algorithms</h3>
+<p>Genetic algorithms are the most common class of evolutionary algorithms.</p>
+<ul>
+<li>You have a <em>population</em> of "<strong>chromosomes</strong>" (e.g. possible solutions or parameters, which are also called "<em>object variables</em>"). These chromosomes are interchangeably referred to as "<em>individuals</em>"</li>
+<li>There may be some <strong>mutation</strong> in the chromosomes (e.g. with binary chromosomes, sometimes 0s become 1s and vice versa or with continuous values, changes happen according to some step size)</li>
+<li>Parents have children, in which their chromosomes <strong>crossover</strong> - the front part of one chromosome combines with the back part of another. This is also called <em>recombination</em>.</li>
+<li>The <strong>genotype</strong> (the chromosome composition) is expressed as some <strong>phenotype</strong> (i.e. some genetically-determined properties) in some individuals</li>
+<li>Then each of these individuals has some <strong>fitness</strong> value resulting from their phenotypes</li>
+<li>These fitnesses are turned into some probability of <strong>survival</strong> (this <em>selection pressure</em> is what pushes the system towards an optimal individual)</li>
+<li>Then the individuals are <em>selected</em> randomly based on their survival probabilities</li>
+<li>These individuals form the new chromosome population for the next <strong>generation</strong></li>
+</ul>
+<p>Each of these steps requires some decisions by the implementer.</p>
+<p>For instance, how do you translate a fitness score into a survival probability?</p>
+<p>Well, the simplest way is:</p>
+<p><mathjax>$$
+P_i = \frac{f_i}{\sum_i f_i}
+$$</mathjax></p>
+<p>Where <mathjax>$f_i$</mathjax> is the fitness of some individual <mathjax>$i$</mathjax>.</p>
+<p>However, depending on how you calculate fitness, this may not be appropriate.</p>
+<p>You could alternatively use a ranking method, in which you just look at the relative fitness rankings and not their actual values. So the most fit individual is most likely to survive, the second fit is a bit less likely, and so on.</p>
+<p>You pick a probability constant <mathjax>$P_C$</mathjax>, and the survival of the top-ranked individual is <mathjax>$P_C$</mathjax>, that of the second is <mathjax>$(1-P_C)P_C$</mathjax>, that of the third is, <mathjax>$(1-P_C)^2 P_C$</mathjax>, and so on. So <mathjax>$P_{n-1} = (1-P_C)^{n-2}P_C$</mathjax> and <mathjax>$P_n = (1-P_C)^{n-1}$</mathjax>.</p>
+<p>If you get stuck on local maxima you can try increasing the step size. When your populations start to get close to the desired value, you can decrease the step size so the changes are less sporadic (i.e. use simulated annealing).</p>
+<p>When selecting a new population, you can incorporate a diversity rank in addition to a fitness rank. This diversity ranking tries to maximize the diversity of the new population. You select one individual for the new population, and then as you select your next individual, you try and find one which is distinct from the already selected individuals.</p>
+<p>The general algorithm is as follows:</p>
+<ol>
+<li>randomly initialize a population of <mathjax>$\mu$</mathjax> individuals</li>
+<li>compute fitness scores for each individual</li>
+<li>randomly choose <mathjax>$\frac{\mu}{2}$</mathjax> pairs of parents, weighted by fitness (see above for an example), to reproduce</li>
+<li>with probability <mathjax>$P_c$</mathjax> (a hyperparameter, e.g. 0.8), perform crossover on the parents to form two children, which replaces the old population (you may also choose the keep some of the old population, rather than having two children per pair of parents, as per above - there is no universal genetic algorithm; you typically need to adjust it for a particular task)</li>
+<li>randomly apply mutation to some of the population with probability <mathjax>$P_m$</mathjax> (a hyperparameter, e.g. 0.01)</li>
+<li>repeat</li>
+</ol>
+<p>The specifics of how crossover and mutation work depend on your particular problem.</p>
+<h3>Evolution Strategies</h3>
+<p>With <em>evolution strategies</em>, each individual includes not only object variables but also "strategy" parameters which, which are variances and covariances (optional) of the object variables. These strategy parameters control mutation.</p>
+<p>From each population of size <mathjax>$\mu$</mathjax>, <mathjax>$\lambda$</mathjax> offspring are generated (e.g. <mathjax>$\lambda = 7\mu$</mathjax>).</p>
+<p>All of the object variables, as with genetic algorithms, are derived from the same parents, though each strategy parameter may be derived from a different pair of parents, selected at random (without any selection pressure). However, the best approach is to copy an object variable from one of the parents and set each strategy parameter to be the mean of its parents' corresponding strategy parameter.</p>
+<p>Then mutation mutates both the strategy parameters and the object variables, starting with the strategy parameters. The mutation of the strategy parameters is called <em>self-adaptation</em>. The object variables are mutated according to the probability distribution specified by the (mutated) strategy parameters.</p>
+<p>There are two approaches to selection for evolutionary strategy:</p>
+<ul>
+<li><em><mathjax>$(\mu, \lambda)$</mathjax> selection</em> just involves taking the best <mathjax>$\mu$</mathjax> individuals from the <mathjax>$\lambda$</mathjax> offspring.</li>
+<li><em><mathjax>$(\mu + \lambda)$</mathjax> selection</em> involves selecting the best <mathjax>$\mu$</mathjax> individuals from the union of the <mathjax>$\lambda$</mathjax> offspring and the <mathjax>$\mu$</mathjax> parents.</li>
+</ul>
+<p><mathjax>$(\mu, \lambda)$</mathjax> selection is recommended because <mathjax>$(\mu + \lambda)$</mathjax> selection can interfere with self-adaptation.</p>
+<h3>Evolutionary Programming</h3>
+<p><em>Evolutionary programming</em> does not include recombination; changes to individuals rely solely on mutation. Mutations are based on a Gaussian distribution, where the standard deviation is the square root of a linear transform (parametrized according to the user) of the parent's fitness score. Each of the <mathjax>$\mu$</mathjax> parents yields one offspring.</p>
+<p>Note that in <em>meta-evolutionary programming</em>, the variances are also part of the individual, i.e. subject to mutation (this is self-adaptation).</p>
+<p>The next generation is selected from the union of the parents and the offspring via a process called <em><mathjax>$q$</mathjax>-tournament selection</em>. Each candidate is paired with <mathjax>$q$</mathjax> (a hyperparameter) randomly selected opponents and receives a score which is the number of these <mathjax>$q$</mathjax> opponents that have a worse fitness score than the candidate. The top-scoring <mathjax>$\mu$</mathjax> candidates are kept as the new generation.</p>
+<p>Increasing <mathjax>$q$</mathjax> causes the selection pressure to be both higher and more deterministic.</p>
+<h2>Derivative-Free Optimization</h2>
+<p>Note that Nelder-Mead, Particle Swarm, and genetic algorithm optimization methods are sometimes known as "derivative-free" because they do not involve computing derivatives in order to optimize.</p>
+<h2>Hessian optimization</h2>
+<p>Also known as the "Hessian technique".</p>
+<p>Given a function <mathjax>$f(X)$</mathjax>, where <mathjax>$X = [x_1, x_2, \dots, x_n]$</mathjax>, we can approximate <mathjax>$f$</mathjax> near a point <mathjax>$X$</mathjax> using Taylor's theorem:</p>
+<p><mathjax>$$
+\begin{aligned}
+f(X + \Delta X) &amp;= f(X) + \sum_j \frac{\partial f}{\partial X_j} \Delta X_j + \frac{1}{2} \sum_{jk} \Delta X_j \frac{\partial^2 f}{\partial X_j \partial X_k} \Delta X_k + \dots \\
+&amp;= f(X) + \nabla f \cdot \Delta X + \frac{1}{2} \Delta X^T H \Delta X + \dots
+\end{aligned}
+$$</mathjax></p>
+<p>Where <mathjax>$H$</mathjax> is the Hessian matrix (the <mathjax>$jk$</mathjax>th entry is <mathjax>$\frac{\partial^2 f}{\partial X_j \partial X_k}$</mathjax>).</p>
+<p>We can approximate <mathjax>$f$</mathjax> by dropping the higher-order terms (the ellipsis, <mathjax>$\dots$</mathjax>, terms):</p>
+<p><mathjax>$$
+f(X + \Delta X) \approx f(X) + \nabla f \cdot \Delta X + \frac{1}{2} \Delta X^T H \Delta X
+$$</mathjax></p>
+<p>Assuming the Hessian matrix is positive definite, we can show using calculus that the right-hand expression can be minimized to:</p>
+<p><mathjax>$$
+\Delta X = -H^{-1} \nabla f
+$$</mathjax></p>
+<p>If <mathjax>$f$</mathjax> is a cost function <mathjax>$C$</mathjax> and <mathjax>$X$</mathjax> are the parameters <mathjax>$\theta$</mathjax> to the cost function, we can minimize the cost by updating <mathjax>$\theta$</mathjax> according to the following algorithm (where <mathjax>$\eta$</mathjax> is the <em>learning rate</em>):</p>
+<ul>
+<li>Initialize <mathjax>$\theta$</mathjax>.</li>
+<li>Update <mathjax>$\theta$</mathjax> to <mathjax>$\theta' = \theta -\eta H^{-1} \nabla C$</mathjax>, computing <mathjax>$H$</mathjax> and <mathjax>$\nabla C$</mathjax> at <mathjax>$\theta$</mathjax>.</li>
+<li>Update <mathjax>$\theta'$</mathjax> to <mathjax>$\theta'' = \theta - \eta H'^{-1} \nabla' C$</mathjax>, computing <mathjax>$H'$</mathjax> and <mathjax>$\nabla' C$</mathjax> at <mathjax>$\theta'$</mathjax>.</li>
+<li>And so on.</li>
+</ul>
+<p>The second derivatives in the Hessian tells us how the gradient is changing, which provides some advantages (such as convergence speed) over traditional gradient descent.</p>
+<p>The Hessian matrix has <mathjax>$n^2$</mathjax> elements, where <mathjax>$n$</mathjax> is the number of parameters, so it can be extremely large. In practice, computing the Hessian can be quite difficult.</p>
+<h2>Advanced optimization algorithms</h2>
+<p>There are other advanced optimization algorithms, such as:</p>
+<ul>
+<li>Conjugate gradient</li>
+<li>BFGS</li>
+<li>L-BFGS</li>
+</ul>
+<p>These shouldn't be implemented on your own since they require an advanced understanding of numerical computing, even just to understand what they're doing.</p>
+<p>They are more complex, but (in the context of machine learning) there's no need to manually pick a learning rate <mathjax>$\alpha$</mathjax> and they are often faster than gradient descent. So you can take advantage of them via some library which has them implemented (though some implementations are better than others).</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=bVDX_UwthZI">Swarm Intelligence Optimization using Python</a>. James McCaffrey. PyData 2015.</li>
+<li><a href="https://www.coursera.org/learn/machine-learning">Machine Learning</a>. 2014. Andrew Ng. Stanford University/Coursera.</li>
+<li><a href="http://neuralnetworksanddeeplearning.com">Neural Networks and Deep Learning</a>, Michael A Nielsen. Determination Press, 2015.</li>
+<li><a href="http://www-labs.iro.umontreal.ca/~bengioy/dlbook/">Deep Learning</a>. Yoshua Bengio, Ian Goodfellow, Aaron Courville.</li>
+<li><a href="http://www.wiley.com/legacy/wileychi/ecc/samples/sample10.pdf">Genetic and Evolutionary Algorithms</a>. Gareth Jones.</li>
+<li><a href="https://www.youtube.com/watch?v=KHZVXao4qXs&amp;index=7&amp;list=PL5X3mDkKaJrL42i_jhE4N-p6E2Ol62Ofa">Advanced Topics: Reinforcement Learning, Lecture 7</a>. David Silver.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

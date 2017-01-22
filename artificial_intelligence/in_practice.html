@@ -1,0 +1,69 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>In Practice</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>In Practice</h1>
+<p>In practice, there is no one-size-fits-all solution for AI problems. Generally, some combination of techniques is required.</p>
+<h2>Starcraft</h2>
+<p>Starcraft is hard for AI because:</p>
+<ul>
+<li>adversarial</li>
+<li>long horizon</li>
+<li>partially observable (fog-of-war)</li>
+<li>realtime (i.e. 24fps, one action per frame)</li>
+<li>huge branching factor</li>
+<li>concurrent (i.e. players move simultaneously)</li>
+<li>resource-rich</li>
+</ul>
+<p>There is no single algorithm (e.g. minimax) that will solve it off-the-shelf.</p>
+<p>The Berkeley Overmind won AIIDE 2010 (a Starcraft AI competition). It used:</p>
+<ul>
+<li>search: for path planning for troops</li>
+<li>CSPs: for base layout (i.e. buildings/facilities)</li>
+<li>minimax: for targeting of opponent's troops and facilities</li>
+<li>reinforcement learning (potential fields): for micro control (i.e. troop control)</li>
+<li>inference: for tracking opponent's units</li>
+<li>scheduling: for managing/prioritizing resources</li>
+<li>hierarchical control: high-level to low-level plans</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.edx.org/course/artificial-intelligence-uc-berkeleyx-cs188-1x">CS188: Artificial Intelligence</a>. Dan Klein, Pieter Abbeel. University of California, Berkeley (edX).</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

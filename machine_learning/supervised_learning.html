@@ -1,0 +1,1338 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Supervised Learning</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <p><mathjax>$$
+\def\argmax{\operatorname*{argmax}}
+\def\argmin{\operatorname*{argmin}}
+$$</mathjax></p>
+<h1>Supervised Learning</h1>
+<p>In supervised learning, the learning algorithm is provided some pre-labeled examples (a <em>training set</em>) to learn from.</p>
+<p>In <em>regression</em> problems, you try to predict some continuous valued output (i.e. a real number).</p>
+<p>In <em>classification</em> problems, you try to predict some discrete valued output (e.g. categories).</p>
+<p>Typical notation:</p>
+<ul>
+<li><mathjax>$m$</mathjax> = number training of examples</li>
+<li><mathjax>$x$</mathjax>'s = input variables or features</li>
+<li><mathjax>$y$</mathjax>'s = output variables or the "target" variable</li>
+<li><mathjax>$(x^{(i)}, y^{(i)})$</mathjax> = the <mathjax>$i$</mathjax>th training example</li>
+<li><mathjax>$h$</mathjax> = the hypothesis, that is, the function that the learning algorithm learns, taking <mathjax>$x$</mathjax>'s as input and outputting <mathjax>$y$</mathjax>'s</li>
+</ul>
+<p>The typical process is:</p>
+<ul>
+<li>Feed training set data into the learning algorithm</li>
+<li>The learning algorithm learns the hypothesis <mathjax>$h$</mathjax></li>
+<li>Input new data into <mathjax>$h$</mathjax></li>
+<li>Get output from <mathjax>$h$</mathjax></li>
+</ul>
+<p>The hypothesis can thought of as the model that you try to learn for a particular task. You then use this model on new inputs, e.g. to make predictions - <strong>generalization</strong> is how the model performs on new examples; this is most important in machine learning.</p>
+<h2>Basic concepts</h2>
+<ul>
+<li><strong>Capacity</strong>: the flexibility of a model - that is, the variety of functions it can fit.<ul>
+<li><strong>Representational capacity</strong> - the functions which the model <em>can</em> learn</li>
+<li><strong>Effective capacity</strong> - in practice, a learning algorithm is not likely to find the <em>best</em> function out of the possible functions it can learn, though it can learn one that performs exceptionally well - those functions that the learning algorithm is capable of finding defines the model's <em>effective</em> capacity.</li>
+</ul>
+</li>
+<li><strong>Hypothesis space</strong>: the set of functions the model is limited to learning. For instance, linear regression can be limited to linear functions as its hypothesis space, or it can be expanded to learn polynomials as well, e.g. by introducing an <mathjax>$x^2$</mathjax> term.</li>
+<li><strong>Hyperparameter</strong>: a parameter of a model that is not learned (that is, you specify it yourself)</li>
+<li><strong>Underfitting</strong>: when the model could achieve better generalization with more training or capacity. Characterized by a high training error.</li>
+<li><strong>Overfitting</strong>: when the model could achieve better generalization with more training or capacity; in particular, the model is too tuned to the idiosyncrasies of the training data (for instance, it may fit to sampling error, which we don't want). Too much capacity can lead to overfitting in that the model may be able to learn functions too specific to the data. Characterized by a large gap between the training error and the test error.</li>
+<li><strong>Model selection</strong>: the process of choosing the best hyperparameters on a validation set</li>
+</ul>
+<p>If the true function is in your hypothesis space <mathjax>$H$</mathjax>, we say it is <em>realizable</em> in <mathjax>$H$</mathjax>.</p>
+<p>In machine learning, there are generally two kinds of problems: <em>regression</em> and <em>classification</em> problems. Machine learning algorithms are typically designed for one or the other.</p>
+<h3>Regression</h3>
+<p><strong>Regression</strong> involves fitting a model to data. The goal is to understand the relationship between one set of variables - the <strong>dependent</strong> or <strong>response</strong> or <strong>target</strong> or <strong>outcome</strong> or <strong>explained</strong> variables (e.g. <mathjax>$y$</mathjax>) - and another set - the <strong>independent</strong> or <strong>explanatory</strong> or <strong>predictor</strong> or <strong>regressor</strong> variables (e.g. <mathjax>$X$</mathjax> or <mathjax>$x$</mathjax>). In cases of just one dependent and one explanatory variable, we have <strong>simple regression</strong>. In scenarios with more than one explanatory variable, we have <strong>multiple regression</strong>. In scenarios with more than one dependent variable, we have <strong>multivariate regression</strong>.</p>
+<p>With <strong>linear regression</strong> we expect that the dependent and explanatory variables have a linear relationship; that is, can be expressed as a <strong>linear combination</strong> of random variables, i.e.:</p>
+<p><mathjax>$$
+y = \beta_0 + \beta_1 x_1 + \dots + \beta_n x_n + \varepsilon
+$$</mathjax></p>
+<p>For some dependent variable <mathjax>$y$</mathjax> and explanatory variables <mathjax>$x_1, \dots, x_n$</mathjax>, where <mathjax>$\varepsilon$</mathjax> is the residual due to random variation or other noisy factors.</p>
+<p>Of course, we do not know the true values for these <mathjax>$\beta$</mathjax> parameters (also called <strong>regression coefficients</strong>) so they end up being point estimates as well. We can estimate them as follows.</p>
+<p>When given data, one technique we can use is <strong>ordinary least squares</strong>, sometimes just called <strong>least squares regression</strong>, which looks for parameters <mathjax>$\beta_0, \dots, \beta_n$</mathjax> such that the sum of the squared residuals (i.e. the SSE, i.e. <mathjax>$e_1^2 + \dots + e_n^2 = \sum_{i=1}^n (y_i - \hat y_i)^2$</mathjax>) is minimized (this minimization requirement is called the <strong>least squares criterion</strong>). The resulting line is called the <strong>least squares line</strong>.</p>
+<p>Note that <em>linear model</em> does not mean the model is necessarily a <em>straight</em> line. It can be polynomial as well - but you can think of the polynomial terms as additional explanatory variables; looking at it this way, the line (or curve, but for consistency, they are all called "lines") still follows the form above. And of course, in higher-dimensions (that is, for multiple regression) we are not dealing with lines but planes, hyperplanes, and so on. But again, for the sake of simplicity, they are all just referred to as "lines".</p>
+<p>For example, the line:</p>
+<p><mathjax>$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_1^2 + \varepsilon
+$$</mathjax></p>
+<p>Can be re-written:</p>
+<p><mathjax>$$
+\begin{aligned}
+x_2 &amp;= x_1^2 \\
+y &amp;= \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \varepsilon
+\end{aligned}
+$$</mathjax></p>
+<p>When we use a regression model to predict a dependent variable, e.g. <mathjax>$y$</mathjax>, we denote it as a estimate by putting a hat over it, e.g. <mathjax>$\hat y$</mathjax>.</p>
+<h3>Classification</h3>
+<p>Classification problems are where your target variables are discrete, so they represent categories or classes.</p>
+<p>For <em>binary classification</em>, there are only two classes (that is, <mathjax>$y \in \{0, 1\}$</mathjax>). We call the 0 class the <em>negative</em> class, and the 1 class the <em>positive</em> class.</p>
+<p>Otherwise, the classification problem is called a <em>multiclass</em> classification problem - there are more than two classes.</p>
+<h2>Optimization</h2>
+<p>Much of machine learning can be framed as optimization problems - there is some kind of <em>objective</em> (also called <em>loss</em> or <em>cost</em>) function which we want to optimize (e.g. minimize classification error on the training set). Typically you are trying to find some parameters for your model, <mathjax>$\theta$</mathjax>, which minimizes this objective or loss function.</p>
+<p>Generally this framework for machine learning is called <strong>empirical risk minimization</strong> and can be formulated:</p>
+<p><mathjax>$$
+\argmin_{\theta} \frac{1}{n} \sum_{i} l(f(x^{(i)}; \theta), y^{(i)}) + \lambda \Omega(\theta)
+$$</mathjax></p>
+<p>Where:</p>
+<ul>
+<li><mathjax>$f(x^{(i)}; \theta)$</mathjax> is your model, which outputs some predicted value for the input <mathjax>$x^{(i)}$</mathjax> and <mathjax>$\theta$</mathjax> are the parameters for the model</li>
+<li><mathjax>$y^{(i)}$</mathjax> is the training label (i.e. the ground-truth) for the input <mathjax>$x^{(i)}$</mathjax></li>
+<li><mathjax>$l$</mathjax> is the loss function</li>
+<li><mathjax>$\Omega(\theta)$</mathjax> is a <em>regularlizer</em> to penalize certain values of <mathjax>$\theta$</mathjax> and <mathjax>$\lambda$</mathjax> is the regularization parameter (see below on <em>regularlization</em>)</li>
+</ul>
+<p>Some optimization terminology:</p>
+<ul>
+<li><strong>Critical points</strong>: <mathjax>$\\{x \in \mathbb R^n | \nabla_x f(x) = 0 \\}$</mathjax></li>
+<li><strong>Curvature in direction <mathjax>$v$</mathjax></strong>: <mathjax>$v^T \nabla_x^2 f(x)v$</mathjax></li>
+<li>Types of critical points:<ul>
+<li>local minima: <mathjax>$v^T \nabla_x^2 f(x)v &gt; 0, \, \forall v$</mathjax>, that is <mathjax>$\nabla_x^2f(x)$</mathjax> is positive definite</li>
+<li>local maxima: <mathjax>$v^T \nabla_x^2 f(x)v &lt; 0, \, \forall v$</mathjax>, that is <mathjax>$\nabla_x^2f(x)$</mathjax> is negative definite</li>
+<li>saddle point: curvature is positive in some directions and negative in others</li>
+</ul>
+</li>
+</ul>
+<figure><img alt="A saddle point" src="../assets/saddlepoint.svg" /><figcaption>A saddle point</figcaption>
+</figure>
+<h3>Cost functions</h3>
+<p>So we have our training set <mathjax>$\{ (x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), \dots, (x^{(m)}, y^{(m)}) \}$</mathjax> where <mathjax>$y \in \{0, 1\}$</mathjax> and with the hypothesis function from before.</p>
+<p>Here is the cost function for <em>linear</em> regression:</p>
+<p><mathjax>$$ J(\theta) = \frac{1}{m} \sum^m_{i=1} \frac{1}{2} (h_{\theta}(x^{(i)}) - y^{(i)})^2 $$</mathjax></p>
+<p>Note that the <mathjax>$\frac{1}{2}$</mathjax> is introduced for convenience, so that the square exponent cancels out when we differentiate. Introducing an extra constant doesn't affect the result.</p>
+<p>Note that now the <mathjax>$\frac{1}{2m}$</mathjax> has been split into <mathjax>$\frac{1}{m}$</mathjax> and <mathjax>$\frac{1}{2}$</mathjax>.</p>
+<p>We can extract <mathjax>$\frac{1}{2} (h_{\theta}(x^{(i)}) - y^{(i)})^2$</mathjax> and call it <mathjax>$\text{Cost}(h_{\theta}(x), y)$</mathjax>.</p>
+<p>The cost function for logistic regression is different than that used for linear regression because the hypothesis function of logistic regression causes <mathjax>$J(\theta)$</mathjax> to be <em>non-convex</em>, that is, look something like the following with many local optima, making it hard to converge on the global minimum.</p>
+<figure><img alt="A non-convex function" src="../assets/nonconvex.svg" /><figcaption>A non-convex function</figcaption>
+</figure>
+<p>So we want to find a way to define <mathjax>$\text{Cost}(h_{\theta}(x), y)$</mathjax> such that it gives us a convex <mathjax>$J(\theta)$</mathjax>. We will use:</p>
+<p><mathjax>$$
+\text{Cost}(h_{\theta}(x), y) =
+\begin{cases}
+-log(h_{\theta}(x)) &amp; \text{if $y$ = 1} \\
+-log(1 - h_{\theta}(x)) &amp; \text{if $y$ = 0}
+\end{cases}
+$$</mathjax></p>
+<p>Some properties of this function is that if <mathjax>$y = h_{\theta}(x)$</mathjax> then <mathjax>$\text{Cost} = 0$</mathjax>, and as <mathjax>$h_{\theta}(x) \to 0$</mathjax>, <mathjax>$\text{Cost} \to \infty$</mathjax>.</p>
+<p>We can rewrite <mathjax>$\text{cost}$</mathjax> in a form more conducive to gradient descent:</p>
+<p><mathjax>$$
+\text{Cost}(h_{\theta}(x), y) = -y log(h_{\theta}(x)) - (1-y)log(1-h_{\theta}(x))
+$$</mathjax></p>
+<p>So our entire cost function is:</p>
+<p><mathjax>$$
+J(\theta) = -\frac{1}{m} [\sum^m_{i=1}y^{(i)}log(h_{\theta}(x^{(i)})) + (1-y^{(i)})log(1-h_{\theta}(x^{(i)}))]
+$$</mathjax></p>
+<p>You could use other cost functions for logistic regression, but this one is derived from the principle of maximum likelihood estimation and has the nice property of being convex, so this is the one that basically everyone uses for logistic regression.</p>
+<p>Then we can calculate <mathjax>$min_{\theta}J(\theta)$</mathjax> with gradient descent by repeating and simultaneously updating:</p>
+<p><mathjax>$$
+\begin{aligned}
+\theta_j &amp;:= \theta_j - \alpha \sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \cdot x_j^{(i)}
+\end{aligned}
+$$</mathjax></p>
+<p>This looks exactly the same as the linear regression gradient descent algorithm, but it is different because <mathjax>$h_{\theta}(x)$</mathjax> is now the nonlinear <mathjax>$h_{\theta}(x) = \frac{1}{1+e^{\theta^Tx}}$</mathjax>. Still, the previous methods for gradient descent (feature scaling and learning rate adjustment) apply here.</p>
+<h3>Gradient Descent</h3>
+<p><em>Gradient descent</em> is an optimization algorithm for finding parameter values which minimize a cost function.</p>
+<p>Gradient descent perhaps the most common optimization algorithm in machine learning.</p>
+<p>So we have some cost function <mathjax>$J(\theta_0, \theta_1, \dots, \theta_n)$</mathjax> and we want to minimize it.</p>
+<p>The general approach is:</p>
+<ul>
+<li>Start with some <mathjax>$\theta_0, \theta_1, \dots, \theta_n$</mathjax>.</li>
+<li>Changing <mathjax>$\theta_0, \theta_1, \dots, \theta_n$</mathjax> in some increment/step to reduce <mathjax>$J(\theta_0, \theta_1, \dots, \theta_n)$</mathjax> as much as possible.</li>
+<li>Repeat the previous step until convergence on a minimum (hopefully)</li>
+</ul>
+<h4>Gradient descent algorithm</h4>
+<p>Repeat the following until convergence:<br />
+(Note that := is the assignment operator.)</p>
+<p><mathjax>$$ \theta_j := \theta_j - \alpha\frac{\partial}{\partial\theta_j}J(\theta_0, \theta_1, \dots, \theta_n) $$</mathjax></p>
+<p>For each <mathjax>$j$</mathjax> in <mathjax>$n$</mathjax>.</p>
+<p>Every <mathjax>$\theta_j$</mathjax> is updated <em>simultaneously</em>. So technically, you'd calculate this value for each <mathjax>$j$</mathjax> in <mathjax>$n$</mathjax> and only after they are all updated would you actually update each <mathjax>$\theta_j$</mathjax>.</p>
+<p>For example, if the right-hand side of that equation was a function <code>func(j, t0, t1)</code>, you would implement it like so (example is <mathjax>$n=2$</mathjax>):</p>
+<pre><code>temp_0 = func(0, theta_0, theta_1)
+temp_1 = func(1, theta_0, theta_1)
+theta_0 = temp_0
+theta_1 = temp_1
+</code></pre>
+<p><mathjax>$\alpha$</mathjax> is the <em>learning rate</em> and tells how large a step/increment to change the parameters by.</p>
+<p>Learning rates which are too small cause the gradient descent to go slowly. Learning rates which are too large can cause the gradient descent to overshoot the minimum, and in those cases it can fail to converge or even diverge.</p>
+<p>The partial derivative on the right is just the rate of change from the current value.</p>
+<h3>Normal Equation</h3>
+<p>The normal equation is an approach which allows for the direct determination of an optimal <mathjax>$\theta$</mathjax> without the need for an iterative approach like gradient descent.</p>
+<p>With calculus, you find the optimum of a function by calculating where its derivatives equal 0 (the intuition is that derivatives are rates of change, when the rate of change is zero, the function is "turning around" and is at a peak or valley).</p>
+<p>So we can take the same cost function we've been using for linear regression and take the partial derivatives of the cost function <mathjax>$J$</mathjax> with respect to every parameter of <mathjax>$\theta$</mathjax> and then set each of these partial derivatives to 0:</p>
+<p><mathjax>$$ J(\theta_0, \theta_1, \dots, \theta_m) = \frac{1}{2m} \sum^m_{i=1} (h_{\theta}(x^{(i)}) - y^{(i)})^2 $$</mathjax></p>
+<p>And for each <mathjax>$j$</mathjax></p>
+<p><mathjax>$$ \frac{\partial}{\partial \theta_j} J(\theta) = \dots = 0 $$</mathjax></p>
+<p>Then solve for <mathjax>$\theta_0, \theta_1, \dots, \theta_m$</mathjax>.</p>
+<p>The fast way to do this is to construct a matrix out of your features, including a column for <mathjax>$x_0 = 1$</mathjax> (so it ends up being an <mathjax>$m \times (n+1)$</mathjax> dimensional matrix) and then construct a vector out of your target variables <mathjax>$y$</mathjax> (which is an <mathjax>$m$</mathjax>-dimensional vector):</p>
+<p>If you have <mathjax>$m$</mathjax> examples, <mathjax>$(x^{(1)}, y^{(1)}), \dots, (x^{(m)}, y^{(m)})$</mathjax>, and <mathjax>$n$</mathjax> features and then include <mathjax>$x_0 = 1$</mathjax>, you have the following feature vectors:</p>
+<p><mathjax>$$
+x^{(i)} =
+\begin{bmatrix}
+x^{(i)}_0 \\
+x^{(i)}_1 \\
+x^{(i)}_2 \\
+\vdots \\
+x^{(i)}_n
+\end{bmatrix}
+\in \mathbb R^{n+1}
+$$</mathjax></p>
+<p>From which we can construct <mathjax>$\mathbf X$</mathjax>, known as the <em>design matrix</em>:</p>
+<p><mathjax>$$
+\mathbf X =
+\begin{bmatrix}
+(x^{(1)})^T \\
+(x^{(2)})^T \\
+\vdots \\
+(x^{(m)})^T
+\end{bmatrix}
+$$</mathjax></p>
+<p>That is, the design matrix is composed of the transposes of the feature vectors for all the training examples. Thus a column in the design matrix corresponds to a feature, and each row corresponds to an example.</p>
+<p>Typically, all examples have the same length, but this may not necessarily be the case. You may have, for instance, images of different dimensions you wish to classify. This kind of data is <em>heterogeneous</em>.</p>
+<p>And then the vector <mathjax>$y$</mathjax> is the just all of the labels from your training data:</p>
+<p><mathjax>$$
+y =
+\begin{bmatrix}
+y^{(1)} \\
+y^{(2)} \\
+\vdots \\
+y^{(m)}
+\end{bmatrix}
+$$</mathjax></p>
+<p>Then you can calculate the <mathjax>$\theta$</mathjax> vector which minimizes your cost function like so:</p>
+<p><mathjax>$$ \theta = (X^T X)^{-1} X^T y $$</mathjax></p>
+<p>With this method, feature scaling isn't necessary.</p>
+<p>Note that it's possible that <mathjax>$X^TX$</mathjax> is not invertible (that is, it is <em>singular</em>, also called <em>degenerate</em>), but this is usually due to redundant features (e.g. having a feature in feet and in meters; they communicate the same information) or having too many features (e.g. <mathjax>$m \leq n$</mathjax>), in which case you should delete some features or use <em>regularization</em>.</p>
+<p>Programs which calculate the inverse of a matrix often have a method which allows it to calculate the optimal <mathjax>$\theta$</mathjax> vector even if <mathjax>$X^T X$</mathjax> is not invertible.</p>
+<h3>Deciding between Gradient Descent and the Normal Equation</h3>
+<ul>
+<li>Gradient Descent<ul>
+<li>requires that you choose <mathjax>$\alpha$</mathjax></li>
+<li>needs many iterations</li>
+<li>works well when <mathjax>$n$</mathjax> is large</li>
+</ul>
+</li>
+<li>Normal Equation<ul>
+<li>don't need to choose <mathjax>$\alpha$</mathjax></li>
+<li>don't need to iterate</li>
+<li>slow if <mathjax>$n$</mathjax> is very large (computing <mathjax>$(X^TX)^{-1}$</mathjax> has a complexity of <mathjax>$O(n^3)$</mathjax>), but is usually ok up until around <mathjax>$n = 10000$</mathjax></li>
+</ul>
+</li>
+</ul>
+<p>Also note that for some learning algorithms, the normal equation is not applicable, whereas gradient descent still works.</p>
+<h3>Advanced optimization algorithms</h3>
+<p>There are other advanced optimization algorithms, such as:</p>
+<ul>
+<li>Conjugate gradient</li>
+<li>BFGS</li>
+<li>L-BFGS</li>
+</ul>
+<p>These shouldn't be implemented on your own since they require an advanced understanding of numerical computing, even just to understand what they're doing.</p>
+<p>They are more complex, but (in the context of machine learning) there's no need to manually pick a learning rate <mathjax>$\alpha$</mathjax> and they are often faster than gradient descent. So you can take advantage of them via some library which has them implemented (though some implementations are better than others).</p>
+<h2>Preprocessing</h2>
+<p>Prior to applying a machine learning algorithm, data almost always must be <em>preprocessed</em>, i.e. prepared in a way that helps the algorithm perform well (or in a way necessary for the algorithm to work at all).</p>
+<figure><img alt="Preprocessing" src="../assets/preprocessing.svg" /><figcaption>Preprocessing</figcaption>
+</figure>
+<h3>Feature selection</h3>
+<p>Good features:</p>
+<ul>
+<li>lead to data compression</li>
+<li>retain relevant information</li>
+<li>are based on expert domain knowledge</li>
+</ul>
+<p>Common mistakes:</p>
+<ul>
+<li>trying to automate feature selection</li>
+<li>not paying attention to data-specific quirks</li>
+<li>throwing away information unnecessarily</li>
+</ul>
+<p>The model where you include all available features is called the <strong>full model</strong>. But sometimes including all features can hurt prediction accuracy.</p>
+<p>There are a few feature selection strategies that can be used.</p>
+<p>One class of selection strategies is called <strong>stepwise</strong> selection because they iteratively remove or add one feature at a time, measuring the goodness of fit for each. The two approaches here are the <strong>backward-elimination</strong> strategy which begins with the full model and removes one feature at a time, and the <strong>forward-selection</strong> strategy which is the reverse of backward-elimination, starting with one feature and adding the rest one at a time. These two strategies don't necessarily lead to the same model.</p>
+<h3>Feature engineering</h3>
+<p>Your data may have features explicitly present, e.g. a column in a database. But you can also design or <em>engineer</em> new features by combining these explicit features or through observing patterns on your own in the data that haven't yet been explicitly encoded. We're doing a form of this in polynomial regression above by encoding the polynomials as new features.</p>
+<h4>Representation</h4>
+<p>A very important choice in machine learning is how you represent the data. What are its salient features, and in what form is it best presented? Each field in the data (e.g. column in the table) is a <strong>feature</strong> and a great deal of time is spent getting this representation right. The best machine learning algorithms can't do much if the data isn't represented in a way suited to the task at hand.</p>
+<p>Sometimes it's not clear how to represent data. For instance, in identifying an image of a car, you may want to use a wheel as a feature. But how do you define a wheel in terms of pixel values?</p>
+<p><strong>Representation learning</strong> is a kind of machine learning in which representations themselves can be learned.</p>
+<p>An example representation learning algorithm is the <strong>autoencoder</strong>. It's a combination of an <em>encoder</em> function that converts input data into a different representation and a <em>decoder</em> function which converts the new representation back into its original format.</p>
+<p>Successful representations separate the <em>factors of variations</em> (that is, the contributors to variability) in the observed data. These may not be explicit in the data, "they may exist either as unobserved objects or forces in the physical world that affect the observable quantities, or they are constructs in the human mind that provide useful simplifying explanations or inferred causes of the observed data." (<a href="http://www.iro.umontreal.ca/~bengioy/dlbook"><em>Deep Learning</em></a>).</p>
+<h4>Deep Learning</h4>
+<p>Deep learning builds upon representation learning. It involves having the program learn some hierarchy of concepts, such that simpler concepts are used to construct more complicated ones. This hierarchy of concepts forms a deep (many-layered) graph, hence "deep learning".</p>
+<p>With deep learning we can have simpler representations aggregate into more complex abstractions.</p>
+<p>A basic example of a deep learning model is the multilayer perceptron (MLP), which is essentially a function composed of simpler functions (layers); each function (i.e. layer) can be thought of as taking the input and outputting a new representation of it.</p>
+<p>For example, if we trained a MLP for image recognition, the first layer may end up learning representations of edges, the next may see corners and contours, the next may identify higher level features like faces, etc.</p>
+<h3>Scaling (normalization)</h3>
+<p>If you design your features such that they are on a similar scale, gradient descent can converge more quickly.</p>
+<p>For example, say you are developing a model for predicting the price of a house. Your first feature may be the area, ranging from 0-2000 sqft, and your second feature may be the number of bedrooms, ranging from 1-5.</p>
+<p>These two ranges are very disparate, causing the contours of the cost function to be such that the gradient descent algorithm jumps around a lot trying to find an optimum.</p>
+<p>If you <em>scale</em> these features such that they share the same (or at least a similar) range, you avoid this problem.</p>
+<p>More formally, with feature scaling you want to get every feature into approximately a <mathjax>$-1 \leq x_i \leq 1$</mathjax> range (it doesn't necessarily have to be between -1 and 1, just so long as there is a consistent range across your features).</p>
+<p>With feature scaling, you could also apply <em>mean normalization</em>, where you replace <mathjax>$x_i$</mathjax> with <mathjax>$x_i - \mu_i$</mathjax> (that is, replace the value of the <mathjax>$i$</mathjax>th feature with its value minus the mean value for that feature) such that the mean of that feature is shifted to be about zero (note that you wouldn't apply this to <mathjax>$x_0 = 1$</mathjax>).</p>
+<h3>Mean subtraction</h3>
+<p>Mean subtraction centers the data around the origin (i.e. it "zero-centers" it), simply by subtracting each feature's mean from itself.</p>
+<h3>Dimensionality Reduction</h3>
+<p>Sometimes some of your features may be redundant. You can combine these features in such a way that you project your higher dimension representation into a lower dimension representation while minimizing information loss. With the reduction in dimensionality, your algorithms will run faster.</p>
+<p>The most common technique for dimensionality reduction is <em>principal component analysis</em> (PCA), although other techniques, such as non-negative matrix factorization (NMF) can be used.</p>
+<h4>Principal Component Analysis (PCA)</h4>
+<p>Say you have some data. This data has two dimensions, but you could more or less capture it in one dimension:</p>
+<figure><img alt="Reducing data dimensionality with PCA" src="../assets/pca_example.svg" /><figcaption>Reducing data dimensionality with PCA</figcaption>
+</figure>
+<p>Most of the variability of the data happens along that axis.</p>
+<p>This is basically what PCA does.</p>
+<p>PCA is the most commonly used algorithm for dimensionality reduction. PCA tries to identify a lower-dimensional surface to project the data onto such that the square <em>projection error</em> is minimized.</p>
+<figure><img alt="PCA example" src="../assets/pca.svg" /><figcaption>PCA example</figcaption>
+</figure>
+<p>PCA might project the data points onto the green line on the left. The projection error are the blue lines. Compare to the line on the right - PCA would not project the data onto that line since the projection error is much larger for that line.</p>
+<p>This example is going from 2D to 1D, but you can use PCA to project from any <mathjax>$n$</mathjax>-dimension to a lower <mathjax>$k$</mathjax>-dimension. Using PCA, we find some <mathjax>$k$</mathjax> vectors and project our data onto the linear subspace spanned by this set of <mathjax>$k$</mathjax> vectors.</p>
+<p>Note that this is different than linear regression, though the example might look otherwise. In PCA, the projection error is orthogonal to the line in question. In linear regression, it is vertical to the line. Linear regression also favors the target variable <mathjax>$y$</mathjax> whereas PCA makes no such distinction.</p>
+<p>Prior to PCA you should perform mean normalization (i.e. ensure every feature has zero mean) on your features and scale them.</p>
+<p>First you compute the <em>covariance matrix</em>, which is denoted <mathjax>$\Sigma$</mathjax> (same as summation, unfortunately):</p>
+<p><mathjax>$$
+\Sigma = \frac{1}{m} \sum^n_{i=1}(x^{(i)})(x^{(i)})^T
+$$</mathjax></p>
+<p>Then, you compute the <em>eigenvectors</em> of the matrix <mathjax>$\Sigma$</mathjax> using <em>singular value decomposition</em>:</p>
+<p><mathjax>$$
+[U, S, V] = \text{svd}(\Sigma)
+$$</mathjax></p>
+<p>The resulting <mathjax>$U$</mathjax> matrix will be an <mathjax>$n \times n$</mathjax> orthogonal matrix which provides the projected vectors you're looking for, so take the first <mathjax>$k$</mathjax> column vectors of <mathjax>$U$</mathjax>. This <mathjax>$n \times k$</mathjax> matrix can be called <mathjax>$U_{\text{reduce}}$</mathjax>, which you then transpose to get these vectors as rows, resulting in a <mathjax>$k \times n$</mathjax> matrix which you then multiply by your feature matrix.</p>
+<p>So how do you choose <mathjax>$k$</mathjax>, the number of principal components?</p>
+<p>One way to choose <mathjax>$k$</mathjax> is so that most of the variance is retained.</p>
+<p>If the average squared projection error (which is what PCA tries to minimize) is:</p>
+<p><mathjax>$$
+\frac{1}{m}\sum^m_{i=1} ||x^{(i)} - x^{(i)}_\text{approx}||^2
+$$</mathjax></p>
+<p>And the total variation in the data is given by:</p>
+<p><mathjax>$$
+\frac{1}{m} \sum^m_{i=1} ||x^{(i)}||^2
+$$</mathjax></p>
+<p>Then you would choose the smallest value of <mathjax>$k$</mathjax> such that:</p>
+<p><mathjax>$$
+\frac{\frac{1}{m}\sum^m_{i=1} ||x^{(i)} - x^{(i)}_\text{approx}||^2}{\frac{1}{m} \sum^m_{i=1} ||x^{(i)}||^2} \leq 0.01
+$$</mathjax></p>
+<p>That is, so that 99% of variance is retained.</p>
+<p>This procedure for selecting <mathjax>$k$</mathjax> is made much simpler if you use the <mathjax>$S$</mathjax> matrix from the <mathjax>$\text{svd}(\Sigma)$</mathjax> function.</p>
+<p>The <mathjax>$S$</mathjax> matrix's only non-zero values are along its diagonal, <mathjax>$S_{11}, S_{22}, \dots, S_{nn}$</mathjax>. Using this you can instead just calculate:</p>
+<p><mathjax>$$
+1 - \frac{\sum^k_{i=1} S_{ii}}{\sum^n_{i=1} S_{ii}} \leq 0.01
+$$</mathjax></p>
+<p>Or, to put it another way:</p>
+<p><mathjax>$$
+\frac{\sum^k_{i=1} S_{ii}}{\sum^n_{i=1} S_{ii}} \geq 0.99
+$$</mathjax></p>
+<p>In practice, you can reduce the dimensionality quite drastically, such as by 5 or 10 times, such as from 10,000 features to 1,000, and retain variance.</p>
+<p>But you should not use PCA prematurely - first try an approach without it, then later you can see if it helps.</p>
+<p>The process of using principal component analysis (PCA) to reduce dimensionality of data is called <em>factor analysis</em>.</p>
+<p>In factor analysis, the retained principal components are called <em>common factors</em> and their correlations with the input variables are called <em>factor loadings</em>.</p>
+<p>PCA becomes more reliable the more data you have. The number of examples must be larger than the number of variables in the input matrix. The assumptions of linear correlation must hold as well (i.e. that the variables must be linearly related).</p>
+<h4>PCA Whitening</h4>
+<p>You can go a step further with the resulting <mathjax>$U$</mathjax> matrix (with only the <mathjax>$k$</mathjax> chosen components) with <em>PCA whitening</em>, which can improve the training process.</p>
+<p>PCA whitening is used to decorrelate features and equalize the variance of the features.</p>
+<p>Thus the first step is to decorrelate the original data <mathjax>$X$</mathjax>, which is accomplished by rotating it:</p>
+<p><mathjax>$$
+X_{\text{rotated}} = U \cdot X
+$$</mathjax></p>
+<p>Then the data is normalized to have a variance of 1 for all of its components. To do so we just divide each component by the square root of its eigenvalue. An epsilon value is included to prevent division by zero:</p>
+<p><mathjax>$$
+X_{\text{whitened}} = \frac{X_{\text{rotated}}}{\sqrt(S + \epsilon)}
+$$</mathjax></p>
+<h3>Bagging ("Bootstrap aggregating")</h3>
+<p>Basic idea: Generate more data from your existing data by resampling</p>
+<blockquote>
+<p>Bagging (stands for Bootstrap Aggregation) is the way decrease the variance of your prediction by generating additional data for training from your original dataset using combinations with repetitions to produce multisets of the same cardinality/size as your original data. By increasing the size of your training set you can't improve the model predictive force, but just decrease the variance, narrowly tuning the prediction to expected outcome. - <a href="http://stats.stackexchange.com/a/19053/55910">http://stats.stackexchange.com/a/19053/55910</a></p>
+</blockquote>
+<h2>Linear Regression</h2>
+<h3>Univariate (simple) Linear Regression</h3>
+<p><em>Univariate linear regression</em> or <em>simple linear regression</em> (SLR) is linear regression with a single variable.</p>
+<p>In univariate linear regression, we have one input variable <mathjax>$x$</mathjax>.</p>
+<p>The hypothesis takes the form:</p>
+<p><mathjax>$$ h_{\theta}(x) = \theta_0 + \theta_1 x $$</mathjax></p>
+<p>Where the <mathjax>$\theta_i$</mathjax>s are the <em>parameters</em> that the learning algorithm learns.</p>
+<p>This should look familiar: it's just a line.</p>
+<h3>How are the parameters determined?</h3>
+<p>The general idea is that you want to choose your parameters so that <mathjax>$h_{\theta}(x)$</mathjax> is close to <mathjax>$y$</mathjax> for your training examples <mathjax>$(x,y)$</mathjax>. This can be written:</p>
+<p><mathjax>$$ \sum^m_{i=1} (h_{\theta}(x^{(i)}) - y^{(i)})^2 $$</mathjax></p>
+<p>To the math easier, you multiply everything by <mathjax>$\frac{1}{2m}$</mathjax> (this won't affect the resulting parameters):</p>
+<p><mathjax>$$ \frac{1}{2m} \sum^m_{i=1} (h_{\theta}(x^{(i)}) - y^{(i)})^2 $$</mathjax></p>
+<p>This is the <em>cost function</em> (or <em>objective function</em>). In this case, we call it <mathjax>$J$</mathjax>, which looks like:</p>
+<p><mathjax>$$ J(\theta_0, \theta_1) = \frac{1}{2m} \sum^m_{i=1} (h_{\theta}(x^{(i)}) - y^{(i)})^2 $$</mathjax></p>
+<p>Here it is the <em>squared error function</em> - it is probably the most commonly used cost function for regression problems.</p>
+<p>The squared error loss function is not the only loss function available. There are a variety you can use, and you can even come up with your own if needed. Perhaps, for instance, you want to weigh positive errors more than negative errors.</p>
+<figure><img alt="An example cost function with two parameters" src="../assets/costfunc.svg" /><figcaption>An example cost function with two parameters</figcaption>
+</figure>
+<figure><img alt="The same cost function, visualized as a contour plot" src="../assets/costfunccontour.svg" /><figcaption>The same cost function, visualized as a contour plot</figcaption>
+</figure>
+<p>We want to find <mathjax>$(\theta_0, \theta_1)$</mathjax> to <em>minimize</em> <mathjax>$J(\theta_0, \theta_1)$</mathjax>.</p>
+<h4>Gradient Descent for Univariate Linear Regression</h4>
+<p>For univariate linear regression, the derivatives are:</p>
+<p><mathjax>$$
+\begin{aligned}
+\frac{\partial}{\partial\theta_0}J(\theta_0, \theta_1) &amp;= \frac{1}{m}\sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \\
+\frac{\partial}{\partial\theta_1}J(\theta_0, \theta_1) &amp;= \frac{1}{m}\sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \cdot x^{(i)}
+\end{aligned}
+$$</mathjax></p>
+<p>so overall, the algorithm involves repeatedly updating:</p>
+<p><mathjax>$$
+\begin{aligned}
+\theta_0 &amp;:= \theta_0 - \alpha \frac{1}{m}\sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \\
+\theta_1 &amp;:= \theta_1 - \alpha \frac{1}{m}\sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \cdot x^{(i)}
+\end{aligned}
+$$</mathjax></p>
+<p>Remember that the <mathjax>$\theta$</mathjax> parameters are updated <em>simultaneously</em>.</p>
+<p>Note that because we are summing over <em>all</em> training examples for each step, this particular type of gradient descent is known as <em>batch gradient descent</em>. There are other approaches which only sum over a subset of the training examples for each step.</p>
+<p>Univariate linear regression's cost function is always convex ("bowl-shaped"), which has only one optimum, so gradient descent int his case will always find the global optimum.</p>
+<figure><img alt="A convex function" src="../assets/convex.svg" /><figcaption>A convex function</figcaption>
+</figure>
+<h3>Multivariate linear regression</h3>
+<p><em>Multivariate</em> linear regression is simply linear regression with multiple variables. This technique is for using multiple features with linear regression.</p>
+<p>Say we have:</p>
+<ul>
+<li><mathjax>$n$</mathjax> = number of features</li>
+<li><mathjax>$x^{(i)}$</mathjax> = the input features of the <mathjax>$i$</mathjax>th training example</li>
+<li><mathjax>$x_j^{(i)}$</mathjax> = the value of feature <mathjax>$j$</mathjax> in the <mathjax>$i$</mathjax>th training example</li>
+</ul>
+<p>Instead of the simple linear regression model we can use a <strong>generalized linear model</strong> (GLM). That is, the hypothesis <mathjax>$h$</mathjax> will take the form of:</p>
+<p><mathjax>$$ h_{\theta}(x) = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \dots + \theta_n x_n $$</mathjax></p>
+<p>For convenience of notation, you can define <mathjax>$x_0 = 1$</mathjax> and notate your features and parameters as zero-indexed <mathjax>$n + 1$</mathjax>-dimensional vectors:</p>
+<p><mathjax>$$
+x =
+\begin{bmatrix}
+x_0 \\ x_1 \\ x_2 \\ \vdots \\ x_n
+\end{bmatrix}
+,
+\theta =
+\begin{bmatrix}
+\theta_0 \\ \theta_1 \\ \theta_2 \\ \vdots \\ \theta_n
+\end{bmatrix}
+$$</mathjax></p>
+<p>And the hypothesis can be re-written as:</p>
+<p><mathjax>$$ h_{\theta}x = \theta^Tx $$</mathjax></p>
+<p>Sometimes in multiple regression you may have predictor variables which are correlated with one another; we say that these predictors are <strong>collinear</strong>.</p>
+<h4>Gradient descent with Multivariate Linear Regression</h4>
+<p>The previous gradient descent algorithm for univariate linear regression is just generalized (this is still repeated and simultaneously updated):</p>
+<p><mathjax>$$
+\begin{aligned}
+\theta_j &amp;:= \theta_j - \alpha \frac{1}{m}\sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \cdot x_j^{(i)}
+\end{aligned}
+$$</mathjax></p>
+<h3>Example implementation of linear regression with gradient descent</h3>
+<pre><code>"""
+- X = feature vectors
+- y = labels/target variable
+- theta = parameters
+- hyp = hypothesis (actually, the vector computed from the hypothesis function)
+"""
+import numpy as np
+
+def cost_function(X, y, theta):
+    """
+    This isn't used, but shown for clarity
+    """
+    m = y.size
+    hyp = np.dot(X, theta)
+    sq_err = sum(pow(hyp - y, 2))
+    return (0.5/m) * sq_err
+
+def gradient_descent(X, y, theta, alpha=0.01, iterations=10000):
+    m = y.size
+    for i in range(iterations):
+        hyp = np.dot(X, theta)
+        for i, p in enumerate(theta):
+            temp = X[:,i]
+            err = (hyp - y) * temp
+            cost_function_derivative = (1.0/m) * err.sum()
+            theta[i] = theta[i] - alpha * cost_function_derivative
+    return theta
+
+if __name__ == '__main__':
+    def true_function(X):
+        # Create random parameters for X's dimensions, plus one for x0.
+        true_theta = np.random.rand(X.shape[1] + 1)
+        return true_theta[0] + np.dot(true_theta[1:], X.T), true_theta
+
+    # Create some random data
+    n_samples = 20
+    n_dimensions = 5
+    X = np.random.rand(n_samples, n_dimensions)
+    y, true_theta = true_function(X)
+
+    # Add a column of 1s for x0
+    ones = np.ones((n_samples, 1))
+    X = np.hstack([ones, X])
+
+    # Initialize parameters
+    theta = np.zeros((n_dimensions+1))
+
+    # Split data
+    X_train, y_train = X[:-1], y[:-1]
+    X_test, y_test = X[-1:], y[-1:]
+
+    # Estimate parameters
+    theta = gradient_descent(X_train, y_train, theta, alpha=0.01, iterations=10000)
+
+    # Predict
+    print('true', y_test)
+    print('pred', np.dot(X_test, theta))
+
+    print('true theta', true_theta)
+    print('pred theta', theta)
+</code></pre>
+<h3>Outliers</h3>
+<p>Outliers can pose a problem for fitting a regression line. Outliers that fall horizontally away from the rest of the data points can influence the line more, so they are called points with <strong>high leverage</strong>. Any such point that actually does influence the line's slope is called an <strong>influential point</strong>. You can examine this effect by removing the point and then fitting the line again and seeing how it changes.</p>
+<p>Outliers should only be removed with good reason - they can still be useful and informative and a good model will be able to capture them in some way.</p>
+<h3>Polynomial Regression</h3>
+<p>Your data may not fit a straight line and might be better described by a polynomial function, e.g. <mathjax>$\theta_0 + \theta_1 x + \theta_2 x^2$</mathjax> or <mathjax>$\theta_0 + \theta_1 x + \theta_2 x^2 + \theta_3 x^3$</mathjax>.</p>
+<p>A trick to this is that you can write this in the form of plain old multivariate linear regression. You would, for example, just treat <mathjax>$x$</mathjax> as a feature <mathjax>$x_1$</mathjax>, <mathjax>$x^2$</mathjax> as another feature <mathjax>$x_2$</mathjax>, <mathjax>$x^3$</mathjax> as another feature <mathjax>$x_3$</mathjax>, and so on:</p>
+<p><mathjax>$$ \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \theta_3 x_3 + \dots + \theta_n x_n $$</mathjax></p>
+<p>Note that in situations like this, feature scaling is very important because these features' ranges differ by a lot due to the exponents.</p>
+<h2>Logistic Regression</h2>
+<p>Logistic regression is a common approach to classification. The name "regression" may be a bit confusing - it is a classification algorithm, though it returns a continuous value. In particular, it returns the probability of the positive class; if that probability is <mathjax>$\geq 0.5$</mathjax>, then the positive label is returned.</p>
+<p>Logistic regression outputs a value between zero and one (that is, <mathjax>$0 \leq h_{\theta}(x) \leq 1$</mathjax>).</p>
+<p>Say we have our hypothesis function</p>
+<p><mathjax>$$ h_{\theta}(x) = \theta^T x $$</mathjax></p>
+<p>With logistic regression, we apply an additional function <mathjax>$g$</mathjax> :</p>
+<p><mathjax>$$ h_{\theta}(x) = g(\theta^T x) $$</mathjax></p>
+<p>where</p>
+<p><mathjax>$$ g(z) = \frac{1}{1+e^{-z}} $$</mathjax></p>
+<p>This function is known as the <em>sigmoid</em> function, also known as the <em>logistic</em> function, with the form:</p>
+<figure><img alt="The sigmoid or logistic function" src="../assets/sigmoid.svg" /><figcaption>The sigmoid or logistic function</figcaption>
+</figure>
+<p>So in logistic regression, the hypothesis ends up being:</p>
+<p><mathjax>$$ h_{\theta}(x) = \frac{1}{1+e^{\theta^Tx}} $$</mathjax></p>
+<p>The output of the hypothesis is interpreted as the probability of the given input belonging to the positive class. that is:</p>
+<p><mathjax>$$ h_{\theta}(x) = P(y=1 | x; \theta) $$</mathjax></p>
+<p>Which is read: "the probability that <mathjax>$y=1$</mathjax> given <mathjax>$x$</mathjax> as parameterized by <mathjax>$\theta$</mathjax>".</p>
+<p>Since we are classifying input, we want to output a label, not a continuous value. So we might say <mathjax>$y = 1$</mathjax> if <mathjax>$h_{\theta}(x) \geq 0.5$</mathjax> and <mathjax>$y = 0$</mathjax> if <mathjax>$h_{\theta}(x) &lt; 0.5$</mathjax>. The line that forms this divide is an example of a <em>decision boundary</em>. Note that decision boundaries can be non-linear as well (e.g. they could be a circle or something).</p>
+<h4>more on Logistic Regression</h4>
+<p>Logistic regression is also a GLM - you're fitting a line which models the probability of being in the positive class. We can use the Bernoulli distribution since it models events with two possible outcomes and is parameterized by only the probability of the positive outcome, <mathjax>$p$</mathjax>. Thus our line would look something like:</p>
+<p><mathjax>$$
+p_i = \beta_0 + \beta_1 x_1 + \dots + \beta_n x_n + \epsilon
+$$</mathjax></p>
+<p>But to represent a probability, <mathjax>$y$</mathjax> values must be bound to <mathjax>$[0, 1]$</mathjax>. Currently, our model can be linear or polynomial and thus can output any continuous value. So we have to apply a transformation to constrain <mathjax>$y$</mathjax>; we do so by applying a <strong>logit transformation</strong>:</p>
+<p><mathjax>$$
+logit(p) = \log(\frac{p}{1-p}) = x
+$$</mathjax></p>
+<p>The <mathjax>$\frac{p}{1-p}$</mathjax> term constraints the output to be positive.<br />
+The <mathjax>$\log$</mathjax> operation constrains the values to <mathjax>$[0, 1]$</mathjax>.</p>
+<p>The inverse of the logit transformation is:</p>
+<p><mathjax>$$
+p = \frac{1}{1+\exp(-x)}
+$$</mathjax></p>
+<p>So the model is now:</p>
+<p><mathjax>$$
+logit(p) = \beta_0 + \beta_1 x_1 + \dots + \beta_n x_n \epsilon
+$$</mathjax></p>
+<p>So the likelihood here is:</p>
+<p><mathjax>$$
+L(y|p) = \prod^n_{i=1} p_i^{y_i}(1-p_i)^{1-y_i}
+$$</mathjax></p>
+<p>And the log likelihood then is:</p>
+<p><mathjax>$$
+l(y|p) = \sum^n_{i=1} y_i \log(p_i) + (1-y_i) \log(1-p_i)
+$$</mathjax></p>
+<h4>even more on Logistic Regression</h4>
+<p>Linear regression is good for explaining continuous dependent variables. But for discrete variables, linear regression gives ambiguous results - what does a fractional result mean? It can't be interpreted as a probability because linear regression models are not bound to <mathjax>$[0, 1]$</mathjax> as probability functions must be.</p>
+<p>When dealing with boolean/binary dependent variables you can use <strong>logistic regression</strong>. When dealing with non-binary discrete dependent variables, you can use <strong>Poisson regression</strong> (which is a GLM that uses the log link function).</p>
+<p>So we expect the logistic regression function to output a probability. In linear regression, the model can output any value, not bound to <mathjax>$[0, 1]$</mathjax>. So for logistic regression we apply a transformation, most commonly the <strong>logit transformation</strong>, so that our resulting values can be interpreted as probability:</p>
+<p><mathjax>$$
+\begin{aligned}
+\text{transformation}(p) &amp;= \beta_0 + \beta_1 x_1 + \dots + \beta_n x_n \\
+\text{logit}(p) &amp;= \log_e (\frac{p}{1 - p})
+\end{aligned}
+$$</mathjax></p>
+<p>So if we solve the original regression equation for <mathjax>$p$</mathjax>, we end up with:</p>
+<p><mathjax>$$
+p = \frac{e^{\beta_0 + \beta_1 x_1 + \dots + \beta_n x_n}}{1 + e^{\beta_0 + \beta_1 x_1 + \dots + \beta_n x_n}}
+$$</mathjax></p>
+<p>Logistic regression does not have a closed form solution - that is, it can't be solved in a finite number of operations, so we must estimate its parameters using other methods, more specifically, we use iterative methods. Generally the goal is to find the <strong>maximum likelihood estimate</strong> (MLE), which is the set of parameters that maximizes the likelihood of the data. So we might start with random guesses for the parameters, the compute the likelihood of our data (that is, we can compute the probability of each data point; the likelihood of the data is the product of these individual probabilities) based on these parameters. We iterate until we find the parameters which maximize this likelihood.</p>
+<h3>One-vs-All</h3>
+<p>The technique of <em>one-vs-all</em> (or <em>one-vs-rest</em>) involves dividing your training set into multiple binary classification problems, rather than as a single multiclass classification problem.</p>
+<p>For example, say you have three classes 1,2,3. Your first binary classifier will distinguish between class 1 and classes 2 and 3,, your second binary classifier will distinguish between class 2 and classes 1 and 3, and your final binary classifier will distinguish between class 3 and classes 1 and 2.</p>
+<p>Then to make the prediction, you pick the class <mathjax>$i$</mathjax> which maximizes <mathjax>$max_i h_{\theta}^{(i)}(x)$</mathjax>.</p>
+<h2>Softmax regression</h2>
+<p>Softmax regression generalizes logistic regression to beyond binary classification (i.e. multinomial classification; that is, there are more than just two possible classes). Logistic regression is the reduced form of softmax regression where <mathjax>$k=2$</mathjax> (thus logistic regression is sometimes caled a "binary Softmax classifier"). As is with logistic regression, softmax regression outputs probabilities for each class. As a generalization of logistic regression, softmax regression can also be expressed as a generalized linear model. It generally uses a cross-entropy loss function.</p>
+<h3>Hierarchical Softmax</h3>
+<p>In the case of many, many classes, the <em>hierarchical</em> variant of softmax may be preferred. In hierarchical softmax, the labels are structured as a hierarchy (a tree). A Softmax classifier is trained for each node of the tree, to distinguish the left and right branches.</p>
+<h2>Generalized linear models (GLMs)</h2>
+<p>There is a class of machine learning models known as <em>generalized linear models</em> (GLMs) because they are expressed as a linear combination of parameters, i.e.</p>
+<p><mathjax>$$
+\hat y = \theta_0 + \theta_1 x_1 + \dots + \theta_n x_n
+$$</mathjax></p>
+<p>We can use linear models for non-regression situations, as we do with logistic regression - that is, when the output variable is not an unbounded continuous value directly computed from the inputs (that is, the output variable is not a linear function of the inputs), such as with binary or other kinds of classification. In such cases, the linear models we used are called <em>generalized linear models</em>. Like any linear function, we get some value from our inputs, but we then also apply a <em>link function</em> which transforms the resulting value into something we can use. Another way of putting it is that these link functions allow us to <em>generalize</em> linear models to other situations.</p>
+<p>Linear regression also assumes <em>homoscedasticity</em>; that is, that the variance of the error is uniform along the line. GLMs do not need to make this assumption; the link function transforms the data to satisfy this assumption.</p>
+<p>For example, say you want to predict whether or not someone will buy something - this is a binary classification and we want either a 0 or a 1. We might come up with some linear function based on income and number of items purchased in the last month, but this won't give us a 0/no or a 1/yes, it will give us some continuous value. So then we apply some link function of our choosing which turns the resulting value to give us the probability of a 1/yes.</p>
+<p>Linear regression is also a GLM, where the link function is the identity function.</p>
+<p>Logistic regression uses the logit link function.</p>
+<p>Logistic regression is a type of models called <strong>generalized linear models</strong> (GLM), which involves two steps:</p>
+<ol>
+<li>Model the response variable with a probability distribution.</li>
+<li>Model the distribution's parameters using the predictor variables and a special form of multiple regression.</li>
+</ol>
+<p>This probability distribution is taken from the exponential family of probability distributions, which includes the normal, Bernoulli, beta, gamma, Dirichlet, and Poisson distributions (among others). A distribution is in the exponential family if it can be written in the form:</p>
+<p><mathjax>$$
+P(y|n) = b(y) \exp(\eta^T T(y) - a(\eta))
+$$</mathjax></p>
+<p><mathjax>$\eta$</mathjax> is known as the <strong>natural parameter</strong> or the <strong>canonical parameter</strong> of the distribution, <mathjax>$T(y)$</mathjax> is the <strong>sufficient statistics</strong>, which is often just <mathjax>$T(y) = y$</mathjax>. <mathjax>$a(\eta)$</mathjax> is the <strong>log partition function</strong>.</p>
+<p>We can set <mathjax>$T, a, b$</mathjax> to define a family of distributions; this family is parameterized by <mathjax>$\eta$</mathjax>, with different values giving different distributions within the family.</p>
+<p>For instance, the Bernoulli distribution is in the exponential family, where</p>
+<p><mathjax>$$
+\begin{aligned}
+\eta &amp;= \log(\frac{p}(1-p)) \\
+T(y) &amp;= y \\
+a(\eta) &amp;= -\log(1-p) \\
+b(y) &amp;= 1
+\end{aligned}
+$$</mathjax></p>
+<p>Same goes for the Gaussian distribution, where</p>
+<p><mathjax>$$
+\begin{aligned}
+\eta &amp;= \mu \\
+T(y) &amp;= y \\
+a(\eta) &amp;= \frac{\mu^2}{2} \\
+b(y) &amp;= \frac{1}{\sqrt(2\pi)}\exp(\frac{-y^2}{2})
+\end{aligned}
+$$</mathjax></p>
+<p>Note that with linear models, you should avoid <strong>extrapolation</strong>, that is, estimating values which are outside the original data's range. For example, if you have data in some range <mathjax>$[x_1, x_n]$</mathjax>, you have no guarantee that your model behaves correctly at <mathjax>$x &lt; x_1$</mathjax> and <mathjax>$x &gt; x_n$</mathjax>.</p>
+<h3>Linear Mixed Models (Mixed Models/Hierarchical Linear Models)</h3>
+<p>In a linear model there may be <em>mixed effects</em>, which includes <em>fixed</em> and <em>random</em> effects. Fixed effects are variables in your model where their coefficients are fixed (non-random). Random effects are variables in your model where their coefficients are random.</p>
+<p>For example, say you want to create a model for crop yields given a farm and amount of rainfall. We have data from several years and the same farms are represented multiple times throughout. We could consider that some farms may be better at producing greater crop yields given the same amount of rainfall as another farm. So we expect that samples from different farms will have different variances - e.g. if we look at just farm A's crop yields, that sample would have different variance than if we just looked at farm B's crop yields. In this regard, we might expect that models for farm A and farm B will be somewhat different.</p>
+<p>The naive approach would be to just ignore differences between farms and consider only rainfall as a fixed effect (i.e. with a fixed/constant coefficient). This is sometimes called "pooling" because we've lumped everything (in our case, all the farms) together.</p>
+<p>We could create individual models for each farm ("no pooling") but perhaps for some farms we only have one or two samples. For those farms, we'd be building very dubious models since their sample sizes are so small. The information from the other farms are still useful for giving us more data to work with in these cases, so no pooling isn't necessarily a good approach either.</p>
+<p>We can use a mixed model ("partial pooling") to capture this and make it so that the rainfall coefficient random, varying by farm.</p>
+<h4>more...from another source</h4>
+<p>We may run into situations like the following:</p>
+<figure><img alt="A situation where an HLM might be better" src="../assets/hlm_01.svg" /><figcaption>A situation where an HLM might be better</figcaption>
+</figure>
+<p>Where our data seems to encompass multiple models (the red, green, blue, and black ones going up from left to right), but if we try to model them all simultaneously, we get a complete incorrectly model (the dark grey line going down from left to right).</p>
+<p>Each of the true lines (red, green, blue, black) may come from distinct <em>units</em>, i.e. each could represent a different part of the day or a different US state, etc. When there are different effects for each unit, we say that there is <em>unit heterogeneity</em> in the data.</p>
+<p>In the example above, each line has a different intercept. But the slopes could be different, or both the intercepts and slopes could be different:</p>
+<figure><img alt="Varying slopes and intercepts" src="../assets/hlm_02.svg" /><figcaption>Varying slopes and intercepts</figcaption>
+</figure>
+<p>In this case, we use a random-effects model because some of the coefficients are random.</p>
+<p>For instance, in the first example above, the intercepts varied, in which case the intercept coefficient would be replaced with a random variable <mathjax>$\alpha^i$</mathjax> drawn from the normal distribution:</p>
+<p><mathjax>$$
+y = \alpha^i + \beta^i x + \epsilon
+$$</mathjax></p>
+<p>Or in the case of the slopes varying, we'd say that <mathjax>$\beta^i$</mathjax> is a random variable drawn from the normal distribution. In each case, <mathjax>$\alpha$</mathjax> is the mean intercept and <mathjax>$\beta$</mathjax> is the mean slope.</p>
+<p>When both slope and intercept vary, we draw them together from a multivariate normal distribution since they may have some relation, i.e.</p>
+<p><mathjax>$$
+\begin{bmatrix}
+\alpha_i \\
+\beta_i
+\end{bmatrix}
+\sim \Phi(\begin{bmatrix} \alpha \\ \beta \end{bmatrix}, \Sigma)
+$$</mathjax></p>
+<p>Now consider when there are multiple levels of these effects that we want to model. For instance, perhaps there are differences across US states but also differences across US regions.</p>
+<p>In this case, we will have a hierarchy of effects. Let's say only the intercept is affected - if we wanted to model the effects of US regions and US states on separate levels, then the <mathjax>$\alpha_i$</mathjax> will be drawn from a distribution according to the US region, <mathjax>$\alpha_i \sim \Phi(\mu_{\text{region}}, \sigma^2_\alpha)$</mathjax>, and then the regional mean which parameterizes <mathjax>$\alpha_i$</mathjax>'s distribution is drawn from a distribution of regional means, <mathjax>$\mu_{\text{region}} \sim \Phi(\mu, \sigma_r^2)$</mathjax>.</p>
+<h2>Support Vector Machines</h2>
+<p>SVMs can be powerful for learning non-linear functions and are widely-used.</p>
+<p>With SVMs, the optimization objective is:</p>
+<p><mathjax>$$
+min_{\theta} \sum^m_{i=1} [y^{(i)}\text{cost}_1(\theta^T x^{(i)}) + (1-y^{(i)}) \text{cost}_0(\theta^T x^{(i)})] + \frac{\lambda}{2} \sum^n_{j=1} \theta_j^2
+$$</mathjax></p>
+<p>Where the term at the end is the regularization term. Note that this is quite similar to the objective function for logistic regression; we have just removed the <mathjax>$\frac{1}{m}$</mathjax> term (removing it does not make a difference to our result because it is a constant) and substituted the log hypothesis terms for two new cost functions.</p>
+<p>If we break up the logistic regression objective function into terms (that is, the first sum and the regularization term), we might write it as <mathjax>$A + \lambda B$</mathjax>.</p>
+<p>The SVM objective is often instead notated by convention as <mathjax>$CA + B$</mathjax>. You can think of <mathjax>$C$</mathjax> as <mathjax>$\frac{1}{\lambda}$</mathjax>. That is, where increasing <mathjax>$\lambda$</mathjax> brings your parameters closer to zero, the regularization parameter <mathjax>$C$</mathjax> has the opposite effect - as it grows, so do your parameters, and vice versa.</p>
+<p>With that representation in mind, we can rewrite the objective by replacing the <mathjax>$\lambda$</mathjax> with <mathjax>$C$</mathjax> on the first term:</p>
+<p><mathjax>$$
+min_{\theta} C \sum^m_{i=1} [y^{(i)}\text{cost}_1(\theta^T x^{(i)}) + (1-y^{(i)}) \text{cost}_0(\theta^T x^{(i)})] + \frac{1}{2} \sum^n_{j=1} \theta_j^2
+$$</mathjax></p>
+<p>The SVM hypothesis is:</p>
+<p><mathjax>$$
+h_{\theta}(x) =
+\begin{cases}
+1 &amp; \text{if $\theta^T x \geq 0$} \\
+0 &amp; \text{otherwise}
+\end{cases}
+$$</mathjax></p>
+<p>SVMs are sometimes called <em>large margin</em> classifiers.</p>
+<p>Take the following data:</p>
+<figure><img alt="SVM and margins" src="../assets/svm.svg" /><figcaption>SVM and margins</figcaption>
+</figure>
+<p>On the left, a few different lines separating the data are drawn. The optimal one found by SVM is the one in orange. It is the optimal one because it has the largest margins, illustrated by the red lines on the right (technically, the margin is orthogonal from the decision boundary <em>to</em> those red lines). When <mathjax>$C$</mathjax> is very large, SVM tries to maximize these margins.</p>
+<p>However, outliers can throw SVM off if your regularization parameter <mathjax>$C$</mathjax> is too large, so in those cases, you may want to try a smaller value for <mathjax>$C$</mathjax>.</p>
+<h3>Kernels</h3>
+<p><em>Kernels</em> are the main technique for adapting SVMs to do complex non-linear classification.</p>
+<p>A note on notation. Say your hypothesis looks something like:</p>
+<p><mathjax>$$
+\theta_0 + \theta_1 x_1 + \theta_2 x_2 + \theta_3 x_1 x_2 + \theta_4 x_1^2 + \dots
+$$</mathjax></p>
+<p>We can instead notate each non-parameter term as a feature <mathjax>$f$</mathjax>, like so:</p>
+<p><mathjax>$$
+\theta_0 + \theta_1 f_1 + \theta_2 f_2 + \theta_3 f_3 + \theta_4 f_4 + \dots
+$$</mathjax></p>
+<p>For SVMs, how do we choose these features?</p>
+<p>What we can do is compute features based on <mathjax>$x$</mathjax>'s proximity to landmarks <mathjax>$l^{(1)}, l^{(2)}, l^{(3)}, \dots$</mathjax>. For each landmark, we get a feature:</p>
+<p><mathjax>$$
+f_i = \text{similarity}(x, l^{(i)}) = exp(-\frac{||x-l^{(i)}||^2}{2 \sigma^2})
+$$</mathjax></p>
+<p>Here, the <mathjax>$\text{similarity}(x, l^{(i)})$</mathjax> function is the <em>kernel</em>, sometimes just notated <mathjax>$k(x, l^{(i)})$</mathjax>.</p>
+<p>We have a choice in what kernel function we use; here we are using <em>Gaussian kernels</em>. In the Gaussian kernel we have a parameter <mathjax>$\sigma$</mathjax>.</p>
+<p>If <mathjax>$x$</mathjax> is close to <mathjax>$l^{(i)}$</mathjax>, then we expect <mathjax>$f_i \approx 1$</mathjax>. Conversely, if <mathjax>$x$</mathjax> is far from <mathjax>$l^{(i)}$</mathjax>, then we expect <mathjax>$f_i \approx 0$</mathjax>.</p>
+<p>With this approach, classification becomes based on distances to the landmarks - points that are far away from certain landmarks will be classified 0, points that are close to certain landmarks will be classified 1. And thus we can get some complex decision boundaries like so:</p>
+<figure><img alt="An example SVM decision boundary" src="../assets/svm_boundary.svg" /><figcaption>An example SVM decision boundary</figcaption>
+</figure>
+<p>So how do you choose the landmarks?</p>
+<p>You can take each training example and place a landmark there. So if you have <mathjax>$m$</mathjax> training examples, you will have <mathjax>$m$</mathjax> landmarks.</p>
+<p>So given <mathjax>$(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), \dots, (x^{(m)}, y^{(m)})$</mathjax>, choose <mathjax>$l^{(1)} = x^{(1)}, l^{(2)} = x^{(2)}, \dots, l^{(m)} = x^{(m)}$</mathjax>.</p>
+<p>Then given a training example <mathjax>$(x^{(i)}, y^{(i)})$</mathjax>, we can compute a feature vector <mathjax>$f$</mathjax>, where <mathjax>$f_0 = 1$</mathjax>, like so:</p>
+<p><mathjax>$$
+f =
+\begin{bmatrix}
+f_0 = 1 \\
+f_1^{(i)} = sim(x^{(i)}, l^{(1)}) \\
+f_2^{(i)} = sim(x^{(i)}, l^{(2)}) \\
+\vdots \\
+f_i^{(i)} = sim(x^{(i)}, l^{(i)}) \\
+\vdots \\
+f_m^{(i)} = sim(x^{(i)}, l^{(m)})
+\end{bmatrix}
+$$</mathjax></p>
+<p>Then instead of <mathjax>$x$</mathjax> we use our feature vector <mathjax>$f$</mathjax>. So our objective function becomes:</p>
+<p><mathjax>$$
+min_{\theta} C \sum^m_{i=1} [y^{(i)}\text{cost}_1(\theta^T f^{(i)}) + (1-y^{(i)}) \text{cost}_0(\theta^T f^{(i)})] + \frac{1}{2} \sum^n_{j=1} \theta_j^2
+$$</mathjax></p>
+<p>Note that here <mathjax>$n = m$</mathjax> because we have a feature for each of our <mathjax>$m$</mathjax> training examples.</p>
+<p>Of course, using a landmark for each of your training examples makes SVM difficult on large datasets. There are some implementation tricks to make it more efficient, though.</p>
+<p>When choosing the regularization parameter <mathjax>$C$</mathjax>, note that:</p>
+<ul>
+<li>A large <mathjax>$C$</mathjax> means lower bias, high variance</li>
+<li>A small <mathjax>$C$</mathjax> means higher bias, low variance</li>
+</ul>
+<p>For the Gaussian kernel, we also have to choose the parameter <mathjax>$\sigma^2$</mathjax>.</p>
+<ul>
+<li>A large <mathjax>$\sigma^2$</mathjax> means that features <mathjax>$f_i$</mathjax> vary more smoothly. Higher bias, lower variance.</li>
+<li>A small <mathjax>$\sigma^2$</mathjax> means that features <mathjax>$f_i$</mathjax> vary less smoothly. Lower bias, higher variance.</li>
+</ul>
+<p>When using SVM, you also need to choose a kernel, which could be the Gaussian kernel, or it could be no kernel (i.e. a linear kernel), or it could be one of many others. The Gaussian and linear kernels are by far the most commonly used.</p>
+<p>You may want to use a linear kernel if <mathjax>$n$</mathjax> is very large, but you don't have many training examples (<mathjax>$m$</mathjax> is small). Something more complicated may overfit if you only have a little data.</p>
+<p>The Gaussian kernel is appropriate if <mathjax>$n$</mathjax> is small and/or <mathjax>$m$</mathjax> is large. Note that you should perform feature scaling before using the Gaussian kernel.</p>
+<p>Not all similarity functions make valid kernels - they must satisfy a condition called Mercer's Theorem which allows the optimizations that most SVM implementations provide and also so they don't diverge.</p>
+<p>Other off-the-shelf kernels include:</p>
+<ul>
+<li>Polynomial kernel: <mathjax>$k(x,l) = (x^T l)^2$</mathjax>, or <mathjax>$k(x,l) = (X^T l)^3$</mathjax>, or <mathjax>$k(x,l + 1)^3$</mathjax>, etc (there are many variations), the general form is <mathjax>$(x^Tl + \text{constant})^{\text{degree}}$</mathjax>. It usually performs worse than the Gaussian kernel.</li>
+<li>More esoteric ones: String kernel, chi-square kernel, histogram intersection kernel, ...</li>
+</ul>
+<p>But these are seldom, if ever, used.</p>
+<p>Some SVM packages have a built-in multi-class classification functionality. Otherwise, you can use the one-vs-all method. That is, train <mathjax>$K$</mathjax> SVMs, one to distinguish <mathjax>$y=i$</mathjax> from the rest, for <mathjax>$i=1,2,\dots,K$</mathjax>, then get <mathjax>$\theta^{(1)}, \theta^{(2)}, \dots, \theta^{(K)}$</mathjax>, and pick classs <mathjax>$i$</mathjax> with the largest <mathjax>$(\theta^{(i)})^Tx$</mathjax>.</p>
+<p>If <mathjax>$n$</mathjax> is large relative to <mathjax>$m$</mathjax>, e.g. <mathjax>$n=10000, m \in [10, 1000]$</mathjax>, then it may be better to use logistic regression, or SVM without a kernel (linear kernel).</p>
+<p>If <mathjax>$n$</mathjax> is small (1-1000) and <mathjax>$m$</mathjax> is intermediate (10-50000), then you can try SVM with the Gaussian kernel.</p>
+<p>If <mathjax>$n$</mathjax> is small (1-1000) but <mathjax>$m$</mathjax> is large (50000+), then you can create more features and then use logistic regression or SVM without a kernel, since otherwise SVMs struggle at large training sizes.</p>
+<p>SVM without a kernel works out to be similar to logistic regression for the most part.</p>
+<p>Neural networks are likely to work well for most of these situations, but may be slower to train.</p>
+<p>The SVM's optimization problem turns out to be convex, so good SVM packages will find global minimum or something close to it (so no need to worry about local optima).</p>
+<p>Other rules of thumb:</p>
+<ul>
+<li>Use linear kernel when number of features is larger than number of observations.</li>
+<li>Use gaussian kernel when number of observations is larger than number of features.</li>
+<li>If number of observations is larger than 50,000 speed could be an issue when using gaussian kernel; hence, one might want to use linear kernel.<br />
+<a href="http://stats.stackexchange.com/a/73116/55910">Source</a></li>
+</ul>
+<p>Also:</p>
+<blockquote>
+<p>Usually, the decision is whether to use linear or an RBF (aka Gaussian) kernel. There are two main factors to consider:</p>
+<blockquote>
+<p>Solving the optimisation problem for a linear kernel is much faster, see e.g. LIBLINEAR.<br />
+Typically, the best possible predictive performance is better for a nonlinear kernel (or at least as good as the linear one).</p>
+</blockquote>
+<p>It's been shown that the linear kernel is a degenerate version of RBF, hence the linear kernel is never more accurate than a properly tuned RBF kernel. Quoting the abstract from the paper I linked:</p>
+<blockquote>
+<p>The analysis also indicates that if complete model selection using the Gaussian kernel has been conducted, there is no need to consider linear SVM.</p>
+</blockquote>
+<p>A basic rule of thumb is briefly covered in NTU's practical guide to support vector classification (Appendix C).</p>
+<blockquote>
+<p>If the number of features is large, one may not need to map data to a higher dimensional space. That is, the nonlinear mapping does not improve the performance. Using the linear kernel is good enough, and one only searches for the parameter C.</p>
+</blockquote>
+<p>Your conclusion is more or less right but you have the argument backwards. In practice, the linear kernel tends to perform very well when the number of features is large (e.g. there is no need to map to an even higher dimensional feature space). A typical example of this is document classification, with thousands of dimensions in input space.</p>
+<p>In those cases, nonlinear kernels are not necessarily significantly more accurate than the linear one. This basically means nonlinear kernels lose their appeal: they require way more resources to train with little to no gain in predictive performance, so why bother.</p>
+<p><strong>TL;DR</strong></p>
+<p>Always try linear first since it is way faster to train (AND test). If the accuracy suffices, pat yourself on the back for a job well done and move on to the next problem. If not, try a nonlinear kernel.<br />
+<a href="http://stats.stackexchange.com/a/73156/55910">Source</a></p>
+</blockquote>
+<h3>more on support vector machines</h3>
+<p><em>Support vector machines</em> is another way of coming up with decision boundaries to divide a space.</p>
+<p>Here the decision boundary is positioned so that its <em>margins</em> are as wide as possible.</p>
+<figure><img alt="Support Vector Machines" src="../assets/svm_02.svg" /><figcaption>Support Vector Machines</figcaption>
+</figure>
+<p>We can consider some vector <mathjax>$\vec w$</mathjax> which is perpendicular to the decision boundary and has an unknown length.</p>
+<p>Then we can consider an unknown vector <mathjax>$\vec u$</mathjax> that we want to classify.</p>
+<p>We can compute their dot product, <mathjax>$\vec w \cdot \vec u$</mathjax>, and see if it is greater than or equal to some constant <mathjax>$c$</mathjax>.</p>
+<p>To make things easier to work with mathematically, we set <mathjax>$b = -c$</mathjax> and rewrite this as:</p>
+<p><mathjax>$$
+\vec w \cdot \vec u + b \geq 0
+$$</mathjax></p>
+<p>This is our decision rule: if this inequality is true, we have a positive example.</p>
+<p>Now we will define a few things about this system:</p>
+<p><mathjax>$$
+\begin{aligned}
+\vec w \cdot \vec x_+ + b &amp;\geq 1 \\
+\vec w \cdot \vec x_- + b &amp;\leq -1
+\end{aligned}
+$$</mathjax></p>
+<p>Where <mathjax>$\vec x_+$</mathjax> is a positive training example and <mathjax>$\vec x_-$</mathjax> is a negative training example. So we will insist that these inequalities hold.</p>
+<p>For mathematical convenience, we will define another variable <mathjax>$y_i$</mathjax> like so:</p>
+<p><mathjax>$$
+y_i =
+\begin{cases}
+y_i = +1 &amp; \text{if positive example} \\
+y_i = -1 &amp; \text{if negative example}
+\end{cases}
+$$</mathjax></p>
+<p>So we can rewrite our constraints as:</p>
+<p><mathjax>$$
+\begin{aligned}
+y_i(\vec w \cdot \vec x_+ + b) &amp;\geq 1 \\
+y_i(\vec w \cdot \vec x_- + b) &amp;\geq 1
+\end{aligned}
+$$</mathjax></p>
+<p>Which ends up just collapsing into:</p>
+<p><mathjax>$$
+y_i(\vec w \cdot \vec x + b) \geq 1
+$$</mathjax></p>
+<p>Or:</p>
+<p><mathjax>$$
+y_i(\vec w \cdot \vec x + b) - 1 \geq 0
+$$</mathjax></p>
+<p>We then add an additional constraint for an <mathjax>$x_i$</mathjax> in the gutter (that is, within the margin of the decision boundary):</p>
+<p><mathjax>$$
+y_i(\vec w \cdot \vec x + b) - 1 = 0
+$$</mathjax></p>
+<p>So how do you compute the total width of the margins?</p>
+<figure><img alt="Support Vector Machines" src="../assets/svm_03.svg" /><figcaption>Support Vector Machines</figcaption>
+</figure>
+<p>You can take a negative example <mathjax>$\vec x_-$</mathjax> and a positive example <mathjax>$\vec x_+$</mathjax> and compute their difference <mathjax>$\vec x_+ - \vec x_-$</mathjax>. This resulting vector is not orthogonal to the decision boundary, so we can project it onto the unit vector <mathjax>$\hat w$</mathjax> (the unit vector of the <mathjax>$\vec w$</mathjax>, which is orthogonal to the decision boundary):</p>
+<p><mathjax>$$
+\text{width} = (\vec x_+ - \vec x_-) \cdot \frac{\vec w}{||\vec w||}
+$$</mathjax></p>
+<p>Using our previous constraints we get <mathjax>$\vec x_+ = 1 - b$</mathjax> and <mathjax>$- \vec x_- = 1 + b$</mathjax>, so the end result is:</p>
+<p><mathjax>$$
+\text{width} = \frac{2}{||\vec w||}
+$$</mathjax></p>
+<p>We want to maximize the margins, that is, we want to maximize the width, and we can divide by <mathjax>$\frac{1}{2}$</mathjax> because we still have a meaningful maximum, and that in turn can be interpreted as the minimum of the length of <mathjax>$\vec w$</mathjax>, which we can rewrite in a more mathematically convenient form (and still have the same meaningful minimum):</p>
+<p><mathjax>$$
+max(\frac{2}{||\vec w||}) \to max(\frac{1}{||\vec w||}) \to min(||\vec w||) \to min(\frac{1}{2}||\vec w||^2)
+$$</mathjax></p>
+<p>Let's turn this into something we can maximize, incorporating our constraints. We have to use Lagrange multipliers which provide us with this new function we can maximize without needing to think about our constraints anymore:</p>
+<p><mathjax>$$
+L = \frac{1}{2} ||\vec w||^2 - \sum_i \alpha_i [y_i (\vec w \cdot \vec x_i + b) - 1]
+$$</mathjax></p>
+<p>(Note that the Lagrangian is an objective function which includes equality constraints).</p>
+<p>Where <mathjax>$L$</mathjax> is the function we want to maximize, and the sum is the sum of the constraints, each with a multiplier <mathjax>$\alpha_i$</mathjax>.</p>
+<p>So then to get the maximum, we just compute the partial derivatives and look for zeros:</p>
+<p><mathjax>$$
+\begin{aligned}
+\frac{\partial L}{\partial {\vec w}} &amp;= \vec w - \sum_i \alpha_i y_i \vec x_i = 0 \to \vec w = \sum_i \alpha_i y_i \vec x_i \\
+\frac{\partial L}{\partial b} &amp;= -\sum_i \alpha_i y_i = 0 \to \sum_i \alpha_i y_i = 0
+\end{aligned}
+$$</mathjax></p>
+<p>Let's take these partial derivatives and re-use them in the original Lagrangian:</p>
+<p><mathjax>$$
+L = \frac{1}{2}(\sum_i \alpha_i y_i \vec x_i) \cdot (\sum_j \alpha_j y_j \vec x_j) - \sum_i \alpha_i y_i \vec x_i \cdot (\sum_j \alpha_j y_j \vec x_j) - \sum \alpha_i y_i b + \sum \alpha_i
+$$</mathjax></p>
+<p>Which simplifies to:</p>
+<p><mathjax>$$
+L = \sum \alpha_i - \frac{1}{2} \sum_i \sum_j \alpha_i \alpha_j y_i y_j \vec x_i \cdot \vec x_j
+$$</mathjax></p>
+<p>We see that this depends on <mathjax>$\vec x_i \cdot \vec x_j$</mathjax>.</p>
+<p>Similarly, we can rewrite our decision rule, substituting for <mathjax>$\vec w$</mathjax>.</p>
+<p><mathjax>$$
+\begin{aligned}
+\vec w &amp;= \sum_i \alpha_i y_i \vec x_i \\
+\vec w \cdot \vec u + b &amp;\geq 0 \\
+\sum_i \alpha_i y_i \vec x_i \cdot \vec u + b &amp;\geq 0
+\end{aligned}
+$$</mathjax></p>
+<p>And similarly we see that this depends on <mathjax>$\vec x_i \cdot \vec u$</mathjax>.</p>
+<p>The nice thing here is that this works in a convex space (proof not shown) which means that it cannot get stuck on a local maximum.</p>
+<p>Sometimes you may have some training data <mathjax>$\vec x$</mathjax> which is not linearly separable. What you need is a transformation, <mathjax>$\phi(\vec x)$</mathjax> to take the data from its current space to a space where it <em>is</em> linearly separable.</p>
+<p>Since the maximization and the decision rule depend only on the dot products of vectors, we can just substitute the transformation, so that:</p>
+<ul>
+<li>we want to maximize <mathjax>$\phi(\vec x_i) \cdot \phi(\vec x_j)$</mathjax></li>
+<li>for the decision rule, we have <mathjax>$\phi(\vec x_i) \cdot \phi(\vec u)$</mathjax></li>
+</ul>
+<p>Since these are just dot products between the transformed vectors, we really only need a function which gives us that dot product:</p>
+<p><mathjax>$$
+K(\vec x_i, \vec x_j) = \phi(\vec x_i) \cdot \phi(\vec x_j)
+$$</mathjax></p>
+<p>This function <mathjax>$K$</mathjax> is called the <em>kernel</em> function.</p>
+<p>So if you have the kernel function, you don't even need to know the specific transformation - you just need the kernel function.</p>
+<p>Some popular kernels:</p>
+<ul>
+<li>linear kernel: <mathjax>$K(\vec u, \vec v) = (\vec u \cdot \vec v + 1)^n$</mathjax></li>
+<li>radial basis kernel: <mathjax>$e^{-\frac{||\vec x_i - \vec x_j||}{\sigma}}$</mathjax></li>
+</ul>
+<h4>More on kernels: The Kernel Trick</h4>
+<p>Many machine learning algorithms can be written in the form:</p>
+<p><mathjax>$$
+w^T x + b = b + \sum_{i=1}^m \alpha_i x^T x^{(i)}
+$$</mathjax></p>
+<p>Where <mathjax>$\alpha$</mathjax> is a vector of coefficients.</p>
+<p>We can substitute <mathjax>$x$</mathjax> with the output of a feature function <mathjax>$\phi(x)$</mathjax> and the dot product <mathjax>$x^T x^{(i)}$</mathjax> with a function <mathjax>$k(x, x^{(i)}) = \phi(x)^T \phi(x^{(i})$</mathjax>. This function <mathjax>$k$</mathjax> is called a <strong>kernel</strong>.</p>
+<p>Thus we are left with:</p>
+<p><mathjax>$$
+f(x) = b + \sum_{i=1}^m \alpha_i k(x, x^{(i)})
+$$</mathjax></p>
+<p><mathjax>$\phi$</mathjax> maps <mathjax>$x$</mathjax> to a linear space, so this final function <mathjax>$f$</mathjax> is linear; as such, <mathjax>$x$</mathjax> can be non-linear.</p>
+<p>Machine learning algorithms which use this trick are called <strong>kernel methods</strong> or <strong>kernel machines</strong>.</p>
+<h2>Decision Trees</h2>
+<p>Basic algorithm:</p>
+<ol>
+<li>Start with data all in one group</li>
+<li>Find some criteria which best splits the outcomes</li>
+<li>Divide the data into two groups (which become the leaves) on that split (which becomes a node)</li>
+<li>Within each split, repeat</li>
+<li>Repeat until the groups are too small or are sufficiently "pure" (homogeneous)</li>
+</ol>
+<p>Classification trees are non-linear models:</p>
+<ul>
+<li>They use interactions b/w variables</li>
+<li>Data transformations may be less important (monotone transformations probably won't affect how data is split)</li>
+<li>Trees can be used for regression problems (continuous outcome)</li>
+</ul>
+<h3>Measures of impurity</h3>
+<p><mathjax>$$
+\hat p_{mk} = \frac{1}{N_m} \sum_{x_i \in \text{Leaf}_m} \mathbb 1(y_i = k)
+$$</mathjax></p>
+<p>That is, within the <mathjax>$m$</mathjax> leaf you have <mathjax>$N_m$</mathjax> objects to consider and you count the number of a particular class <mathjax>$k$</mathjax> in that set of objects and divide it by <mathjax>$N_m$</mathjax> to get the probability <mathjax>$\hat p_{mk}$</mathjax>.</p>
+<ul>
+<li><strong>misclassification error</strong>: <mathjax>$1 - \hat p_{mk(m)} ; k(m) = \text{most; common; k}$</mathjax><ul>
+<li>0 = perfect purity</li>
+<li>0.5 = no purity</li>
+</ul>
+</li>
+<li><strong>Gini index</strong>: <mathjax>$\sum_{k \neq k'} \hat p_{mk} \times \hat p_{mk'} = \sum_{k=1}^K \hat p_{mk} (1 - \hat p_{mk}) = 1 - \sum_{k=1}^K p^2_{mk}$</mathjax><ul>
+<li>0 = perfect purity</li>
+<li>0.5 = no purity</li>
+</ul>
+</li>
+<li><strong>Deviance/information gain</strong>: <mathjax>$- \sum^K_{k=1} \hat p_{mk} \log_2 \hat p_{mk}$</mathjax><ul>
+<li>0 = perfect purity</li>
+<li>1 = no purity</li>
+</ul>
+</li>
+</ul>
+<h3>Random forests</h3>
+<p>Random forests are the ensemble model version of decision trees.</p>
+<p>Basic idea:</p>
+<ol>
+<li>Bootstrap samples (i.e. resample)</li>
+<li>At each split in the tree, bootstrap the variables (i.e. only a subset of the variables is considered at each split)</li>
+<li>Grow multiple trees</li>
+<li>Each tree votes on a classification</li>
+</ol>
+<p>This can be very accurate but slow, prone to overfitting (cross-validation helps though), and not easy to interpret. However, they generally perform very well.</p>
+<h3>Classification loss functions</h3>
+<h4>Hinge Loss (aka Max-Margin Loss)</h4>
+<p>The hinge loss function takes the form <mathjax>$\ell(y) = \max(0, 1-t \cdot y)$</mathjax> and is typically used for SVMs (sometimes squared hinge loss is used, which is just the previous equation squared).</p>
+<h4>Cross-entropy loss</h4>
+<p><mathjax>$$
+L(y, \hat y) = -\frac{1}{N} \sum_{n \in N} \sum_{i \in C} y_{n,i} \log \hat y_{n,i}
+$$</mathjax></p>
+<p>where</p>
+<ul>
+<li><mathjax>$N$</mathjax> = number of samples</li>
+<li><mathjax>$C$</mathjax> = number of classes</li>
+</ul>
+<p>Typically used for Softmax classifiers.</p>
+<p><mathjax>$$
+L_i = -\log\left(\frac{e^{f_{y_i}}}{ \sum_j e^{f_j} }\right)
+$$</mathjax></p>
+<h2>Ensemble models</h2>
+<h3>Boosting</h3>
+<p>Basically, taking many models and combining their outputs as a weighted average.</p>
+<p>Basic idea:</p>
+<ol>
+<li>Take lots of (possibly) weak predictors <mathjax>$h_1, \dots, h_k$</mathjax>, e.g. a bunch of different trees or regression models or different cutoffs.</li>
+<li>Weight them and combine them by creating a classifier which combine the predictors: <mathjax>$f(x) = \text{sign}(\sum^T_{t=1} \alpha_t h_t(x))$</mathjax><ul>
+<li>Goal is to minimize error on training set</li>
+<li>Iteratively select a classifier <mathjax>$h$</mathjax> at each step</li>
+<li>Calculate weights based on errors</li>
+<li>Increase the weight of missed classifications and select the next classifier</li>
+<li>The sign of the result tells you the class</li>
+</ul>
+</li>
+</ol>
+<p><em>Adaboost</em> is a popular boosting algorithm.</p>
+<p>One class of boosting is <em>gradient boosting</em>.</p>
+<p>Boosting typically does very well.</p>
+<h4>more on boosting</h4>
+<p>Here we focus on binary classification.</p>
+<p>Say we have a classifier <mathjax>$h$</mathjax> which produces <mathjax>$+1$</mathjax> or <mathjax>$-1$</mathjax>.</p>
+<p>We have some error rate, which ranges from 0 to 1. A weak classifier is one where the error is just less than 0.5 (that is, it works slightly better than chance). A stronger classifier has an error rate closer to 0.</p>
+<p>Let's say we have several weak classifiers, <mathjax>$h_1, \dots, h_n$</mathjax>.</p>
+<p>We can combine them into a bigger classifier, <mathjax>$H(x)$</mathjax>, where <mathjax>$x$</mathjax> is some input, which is the sum of the individual weak classifiers, and take the sign of the result. In this sense, the weak classifiers <em>vote</em> on the classification:</p>
+<p><mathjax>$$
+H(x) = \text{sign}(\sum_i h_i(x))
+$$</mathjax></p>
+<p>How do we generate these weak classifiers?</p>
+<ul>
+<li>We can create one by taking the data, training classifiers on it, and selecting with the smallest error rate (this will be classifier <mathjax>$h_1$</mathjax>.)</li>
+<li>We can create another by taking the data and giving it some exaggeration of <mathjax>$h_1$</mathjax>'s errors (e.g. pay more attention to the samples that <mathjax>$h_1$</mathjax> has trouble one). Training a new classifier on this gives us <mathjax>$h_2$</mathjax>.</li>
+<li>We can create another by taking the data and giving it some exaggeration to the samples where the results of <mathjax>$h_1 \neq h_2$</mathjax>. Training a new classifier on this gives us <mathjax>$h_3$</mathjax>.</li>
+</ul>
+<p>This process can be recursive. That is, <mathjax>$h_1$</mathjax> could be made up of three individual classifiers as well, and so could <mathjax>$h_2$</mathjax> and <mathjax>$h_3$</mathjax>.</p>
+<p>For our classifiers we could use <em>decision tree stumps</em>, which is just a single test to divide the data into groups (i.e. just a part of a fuller decision tree). Note that boosting doesn't have to use decision tree (stumps), it can be used with any classifier.</p>
+<p>We can assign a weight to each training example, <mathjax>$w_i$</mathjax>, where to start, all weights are uniform. These weights can be adjusted to exaggerate certain examples. For convenience, we keep it so that all weights sum to 1, <mathjax>$\sum w_i = 1$</mathjax>, thus enforcing a distribution.</p>
+<p>We can compute the error <mathjax>$\epsilon$</mathjax> of a given classifier as the sum of the weights of the examples it got wrong.</p>
+<p>For our aggregate classifier, we may want to weight the classifiers with the weights <mathjax>$\alpha_1, \dots, \alpha_n$</mathjax>.</p>
+<p><mathjax>$$
+H(x) = \text{sign}(\sum_i \alpha_i h_i(x))
+$$</mathjax></p>
+<p>The general algorithm is:</p>
+<ul>
+<li>We can set the starting weights <mathjax>$w^t_i$</mathjax> for our training examples to be <mathjax>$\frac{1}{N}$</mathjax> where <mathjax>$N$</mathjax> is the number of examples and <mathjax>$t=1$</mathjax>, representing the time (or the iteration).</li>
+<li>Then we pick a classifier <mathjax>$h^t$</mathjax> which minimizes the error rate.</li>
+<li>Then we can pick <mathjax>$\alpha^t$</mathjax>.</li>
+<li>And we can calculate <mathjax>$w^{t+1}$</mathjax>.</li>
+<li>Then repeat.</li>
+</ul>
+<p>Now suppose <mathjax>$w^{t+1}_i = \frac{w^t_i}{Z}e^{-\alpha^t h^t(x) y(x)}$</mathjax>, where <mathjax>$y(x)$</mathjax> gives you the right classification (the right sign) for a given Training example. So if <mathjax>$h^t(x)$</mathjax> correctly classifies a sample, then it and <mathjax>$y(x)$</mathjax> will be the same sign, so it will be a positive exponent. Otherwise, if <mathjax>$h^t(x)$</mathjax> gives the incorrect sign, it will be a negative exponent. <mathjax>$Z$</mathjax> is some normalizing value so that we get a distribution.</p>
+<p>We want to minimize the error bound for <mathjax>$H(x)$</mathjax> if <mathjax>$\alpha^t = \frac{1}{2}ln\frac{1 - \epsilon^t}{\epsilon^t}$</mathjax>.</p>
+<h3>Stacking</h3>
+<p>Stacking is similar to boosting, except that you also learn the weights for the weighted average by wrapping the ensemble of models into another model.</p>
+<h2>Overfitting</h2>
+<p><em>Overfitting</em> is a problem where your hypothesis describes the training data <em>too</em> well, to the point where it cannot generalize to new examples. It is a <em>high variance</em> problem. In contrast, <em>underfitting</em> is a <em>high bias</em> problem.</p>
+<p>To clarify, if your model has no bias, it means that it makes no errors on your training data (i.e. it does not underfit). If your model has no variance, it means your model generalizes well on your test data (i.e. it does not overfit). It is possible to have bias and variance problems simultaneously.</p>
+<p>Another way to think of this is that:</p>
+<ul>
+<li>variance = how much does the model vary if the training data changes? I.e. what space of possible models does this cover? High variance implies that the model is too sensitive to the particular training examples it looked at, and thus will not adapt well to other examples.</li>
+<li>bias = is the average model close to the "true" solution/model? High bias means that the model is systematically incorrect.</li>
+</ul>
+<figure><img alt="Bias and Variance" src="../assets/biasvariance.png" /><figcaption>Bias and Variance</figcaption>
+</figure>
+<p>There is a <em>bias-variance trade-off</em>, in which improvement of one is typically at the detriment of the other.</p>
+<p>You can think of generalization error as the sum of bias and variance. You want to keep both low, if possible.</p>
+<p>Overfitting can happen if your hypothesis is too complex, which can happen if you have too many features. So you will want to through a <em>feature selection</em> phase and pick out features which seem to provide the most value.</p>
+<p>Alternatively, you can use the technique of <em>regularization</em>, in which you keep all your features, but reduce the magnitudes/values of parameters <mathjax>$\theta_j$</mathjax>. This is a good option all of your features are informative and you don't want to get rid of any.</p>
+<h2>Regularization</h2>
+<p><strong>Regularization</strong> can be defined as any method which aims to reduce the generalization error of a model though it may not have the same effect on the training error. Since good generalization error is the main goal of machine learning, regularization is essential to success.</p>
+<p>Perhaps the most common form of regularization aims to favor smaller parameters. The intuition is that, if you have small values for your parameters <mathjax>$\theta_0, \theta_1, \dots, \theta_n$</mathjax>, then you have a "simpler" hypothesis which is less prone to overfitting.</p>
+<p>In practice, there may be many combination of parameters which fit your data well. However, some may overfit/not generalize well. We want to introduce some means of valuing these simpler hypotheses over more complex ones (i.e. with larger parameters). We can do so with regularization.</p>
+<p>So generally regularization is about shrinking your parameters to make them smaller; for this reason it is sometimes called <em>weight decay</em>. For linear regression, you accomplish this by modifying the cost function to include the term <mathjax>$\lambda \sum^n_{i=1} \theta_j^2$</mathjax> at the end:</p>
+<p><mathjax>$$
+J(\theta) = \frac{1}{2m} \sum^m_{i=1} (h_{\theta}(x^{(i)}) - y^{(i)})^2 + \lambda \sum^n_{i=1} \theta_j^2
+$$</mathjax></p>
+<p>Note that we are not shrinking <mathjax>$\theta_0$</mathjax>. In practice, it does not make much of a difference if you include it or not; standard practice is to leave it out.</p>
+<p><mathjax>$\lambda$</mathjax> here is called the <em>regularization parameter</em>. It tunes the balance between fitting the data and keeping the parameters small (i.e. each half of the cost function). If you make <mathjax>$\lambda$</mathjax> <em>too</em> large for your problem, you may make your parameters too close to 0 for them to be meaningful - large values of lambda can lead to underfitting problems (since the parameters get close to 0).</p>
+<p>The additional <mathjax>$\lambda \sum^n_{i=1} \theta_j^2$</mathjax> term is called the <em>regularization loss</em>, and the rest of the loss function is called the <em>data loss</em>.</p>
+<h3>Ridge regression</h3>
+<p>A regularization method used in linear regression; the L2 norm of the parameters is constrained so that it less than or equal to some specified value (that is, this is L2 regularization):</p>
+<p><mathjax>$$
+\hat \beta = \argmin_{\beta} (\sum_{i=1}^N(y_i - \beta_0 - \sum_{j=1}^p x_{ij} \beta_j)^2 + \lambda \sum_{j=1}^p \beta^2_j)
+$$</mathjax></p>
+<p>Where:</p>
+<ul>
+<li><mathjax>$\lambda \geq 0$</mathjax> is a hyperparameter controlling the amount of shrinkage.</li>
+<li><mathjax>$N$</mathjax> is the number of data points</li>
+<li><mathjax>$p$</mathjax> is the number of dimensions</li>
+</ul>
+<h3>LASSO</h3>
+<p><strong>LASSO</strong> (Least Absolute Shrinkage and Selection Operator) is a regularization method which constrains the L1 norm of the parameters such that it is less than or equal to some specified value:</p>
+<p><mathjax>$$
+\hat \beta = \argmin_{\beta} (\frac{1}{2} \sum_{i=1}^N(y_i - \beta_0 - \sum_{j=1}^p x_{ij} \beta_j)^2 + \lambda \sum_{j=1}^p |\beta_j|)
+$$</mathjax></p>
+<p>(These two regularization methods are sometimes called <em>shrinkage</em> methods)</p>
+<h3>Regularized Linear Regression</h3>
+<p>We can update gradient descent to work with our regularization term:</p>
+<p><mathjax>$$
+\begin{aligned}
+\theta_0 &amp;:= \theta_0 - \alpha \frac{1}{m}\sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \cdot x_0^{(i)} \\
+\theta_j &amp;:= \theta_j - \alpha \frac{1}{m}\sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \cdot x_j^{(i)} + \frac{\lambda}{m}\theta_j \\
+j &amp;= (1,2,3, \dots, n)
+\end{aligned}
+$$</mathjax></p>
+<p>The <mathjax>$\theta_j$</mathjax> part can be re-written as:</p>
+<p><mathjax>$$
+\theta_j := \theta_j(1 - \alpha \frac{\lambda}{m}) - \alpha \frac{1}{m} \sum^m_{i=1} (h_{\theta}(x^{(i)}) - y^{(i)}) \cdot x_j^{(i)}
+$$</mathjax></p>
+<p>If we are using the normal equation, we can update it to a regularized form as well:</p>
+<p><mathjax>$$
+\theta = (X^T X + \lambda M)^{-1} X^T y
+$$</mathjax></p>
+<p>Where <mathjax>$M$</mathjax> is an <mathjax>$n+1 \times n+1$</mathjax> matrix, where the diagonal is all ones, except for the element at <mathjax>$(0,0)$</mathjax> which is 0, and every other element is also 0.</p>
+<h3>Regularized Logistic Regression</h3>
+<p>We can also update the logistic regression cost function with the regularization term:</p>
+<p><mathjax>$$
+J(\theta) = -\frac{1}{m} [\sum^m_{i=1}y^{(i)}log(h_{\theta}(x^{(i)})) + (1-y^{(i)})log(1-h_{\theta}(x^{(i)}))] + \frac{\lambda}{2m} \sum^n_{i=1} \theta_j^2
+$$</mathjax></p>
+<p>Then we can update gradient descent with the new derivative of this cost function for the parameters <mathjax>$\theta_j$</mathjax> where <mathjax>$j \neq 0$</mathjax></p>
+<p><mathjax>$$
+\begin{aligned}
+\theta_0 &amp;:= \theta_0 - \alpha \frac{1}{m}\sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \cdot x_0^{(i)} \\
+\theta_j &amp;:= \theta_j - \alpha \frac{1}{m}\sum^m_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)}) \cdot x_j^{(i)} + \frac{\lambda}{m}\theta_j \\
+j &amp;= (1,2,3, \dots, n)
+\end{aligned}
+$$</mathjax></p>
+<p>It looks the same as the one for linear regression, but again, the actual hypothesis function <mathjax>$h_{\theta}$</mathjax> is different.</p>
+<h2>Probabilistic modeling</h2>
+<p>Fundamentally, machine learning is all about data:</p>
+<ul>
+<li>Stochastic, chaotic, and/or complex generative processes</li>
+<li>Noisily observed</li>
+<li>Partially observed</li>
+</ul>
+<p>So there is a lot of uncertainty - we can use probability theory to express this uncertainty in the form of <em>probabilistic models</em>. Generally, learning probabilistic models is known as <em>probablistic machine learning</em>; here we are primarily concerned with non-Bayesian machine learning.</p>
+<p>We have some data <mathjax>$x_1, x_2, \dots, x_n$</mathjax> and some latent variables <mathjax>$y_1, y_2, \dots, y_n$</mathjax> we want to uncover, which correspond to each of our data points.</p>
+<p>We have a parameter <mathjax>$\theta$</mathjax>.</p>
+<p>A probabilistic model is just a parameterized joint distribution over all the variables:</p>
+<p><mathjax>$$
+P(x_1, \dots, x_n, y_1, \dots, y_n | \theta)
+$$</mathjax></p>
+<p>We usually interpret such models as a <em>generative</em> model - how was our observed data <em>generated</em> by the world?</p>
+<p>So the problem of inference is about learning about our latent variables given the observed data, which we can get via the posterior distribution:</p>
+<p><mathjax>$$
+P(y_1, \dots, y_n | x_1, \dots, x_n, \theta) = \frac{P(x_1, \dots, x_n, y_1, \dots, y_n | \theta)}{P(x_1, \dots, x_n|\theta)}
+$$</mathjax></p>
+<p>Learning is typically posed as a <em>maximum likelihood</em> problem; that is, we try to find <mathjax>$\theta$</mathjax> which maximizes the probability of our observed data:</p>
+<p><mathjax>$$
+\theta^{ML} = \argmax_{\theta} P(x_1, \dots, x_n | \theta)
+$$</mathjax></p>
+<p>Then, to make a prediction we want to compute the conditional distribution of some future data:</p>
+<p><mathjax>$$
+P(x_{n+1}, y_{n+1}|x_1, \dots, x_n, \theta)
+$$</mathjax></p>
+<p>Or, for classification, if we some classes, each parameterizing a joint distribution, we want to pick the class which maximizes the probability of the observed data:</p>
+<p><mathjax>$$
+\argmax_{c}P(x_{n+1}|\theta^c)
+$$</mathjax></p>
+<h3>Discriminative vs Generative learning algorithms</h3>
+<p><em>Discriminative</em> learning algorithms include algorithms like logistic regression, decision trees, kNN, and SVM. Discriminative approaches try to find some way of separating data (<em>discriminating</em> them), such as in logistic regression which tries to find a dividing line and then sees where new data lies in relation to that line. They are unconcerned with <em>how</em> the data was generated.</p>
+<p>Say our input features are <mathjax>$x$</mathjax> and <mathjax>$y$</mathjax> is the class.</p>
+<p>Discriminative learning algorithms learn <mathjax>$P(y|x)$</mathjax> directly, that is it tries to learn the probability of <mathjax>$y$</mathjax> directly as a function of <mathjax>$x$</mathjax>. To put it another way, what is the probability this new data is of class <mathjax>$y$</mathjax> given the features <mathjax>$x$</mathjax>?</p>
+<p><em>Generative</em> learning algorithms instead tries to develop a model for each class and sees which model new data conforms to.</p>
+<p>Generative learning algorithms learn <mathjax>$P(x|y)$</mathjax> and <mathjax>$P(y)$</mathjax> instead (that is, it models the joint distribution <mathjax>$P(x,y)$</mathjax>). So instead they ask, if this were class <mathjax>$y$</mathjax>, what is the probability of seeing these new features <mathjax>$x$</mathjax>? You're basically trying to figure out what class is most likely to have <em>generated</em> the given features <mathjax>$x$</mathjax>.</p>
+<p><mathjax>$P(y)$</mathjax> is the class prior/the prior probability of seeing the class <mathjax>$y$</mathjax>, that is the probability of class <mathjax>$y$</mathjax> if you don't have any other information.</p>
+<p>It is easier to estimate the conditional distribution <mathjax>$P(y|x)$</mathjax> than it is the joint distribution <mathjax>$P(x,y)$</mathjax>, though generative models can be much stronger. With <mathjax>$P(x,y)$</mathjax>, it is easy to calculate the same conditional (<mathjax>$P(y|x) = \frac{P(x,y)}{P(x)}$</mathjax>).</p>
+<p>For both discriminative and generative approaches, you will have parameters and latent variables <mathjax>$\theta$</mathjax> which govern these distributions. We treat <mathjax>$\theta$</mathjax> as a random variable.</p>
+<h3>Maximum Likelihood Estimation (MLE)</h3>
+<p>Say we have some observed values <mathjax>$x_1, x_2, \dots, x_n$</mathjax>, generated by some latent model parameterized by <mathjax>$\theta$</mathjax>, i.e. <mathjax>$f(x_1, x_2, \dots, x_n ; \theta)$</mathjax>, where <mathjax>$\theta$</mathjax> represents a single unknown parameter or a vector of unknown parameters.<br />
+If we flip this we get the <strong>likelihood</strong> of <mathjax>$\theta$</mathjax>, <mathjax>$L(\theta; x_1, x_2, \dots, x_n)$</mathjax>, which is the probability of <mathjax>$\theta$</mathjax>, given the observed data.</p>
+<p><em>Likelihood</em> is just the name for the probability of observed data as a function of the parameters.</p>
+<p>The <strong>maximum likelihood estimation</strong> is the <mathjax>$\theta$</mathjax> (parameter) which maximizes this likelihood. That is, the value of <mathjax>$\theta$</mathjax> which generates the observed values with the highest probability. MLE can be done by computing the derivative of the likelihood and solving for zero. It is a very common way of estimating parameters.</p>
+<p>(The Expectation-Maximization (EM) algorithm is a way of computing a maximum likelihood estimate for situations where some variables may be hidden.)</p>
+<p>If the random variables associated with the values, i.e. <mathjax>$X_1, X_2, \dots, X_n$</mathjax>, are iid, then the likelihood is just:</p>
+<p><mathjax>$$
+L(\theta; x_1, x_2, \dots, x_n) = \prod_{i=1}^n f(x_i|\theta)
+$$</mathjax></p>
+<p>Sometimes this is just notated <mathjax>$L(\theta)$</mathjax>.</p>
+<p>So we are looking to estimate the <mathjax>$\theta$</mathjax> which maximizes this likelihood (this estimate is often notated <mathjax>$\hat \theta$</mathjax>, the hat typically indicates an estimator):</p>
+<p><mathjax>$$
+\hat \theta = \argmax_{\theta} L(\theta;x_1, x_2, \dots, x_n)
+$$</mathjax></p>
+<p>Logarithms are used, however, for convenience (i.e. dealing with sums rather than products), so instead we are often maximizing the <strong>log likelihood</strong> (which has its maximum at the same value (i.e. the same argmax) as the regular likelihood, though the actual maximum value may be different):</p>
+<p><mathjax>$$
+\ell(\theta) = \sum_{i=1}^n \log(f(x_i|\theta))
+$$</mathjax></p>
+<p>Another way of explaining MLE:</p>
+<p>We have some data <mathjax>$X = \{x^{(1)}, x^{(2)}, \dots, x^{(m)} \}$</mathjax> and a parametric probability distribution <mathjax>$p(x;\theta)$</mathjax>. The maximum likelihood estimate for <mathjax>$\theta$</mathjax> is:</p>
+<p><mathjax>$$
+\begin{aligned}
+\theta_{\text{ML}} &amp;= \argmax_{\theta} p(X;\theta) \\
+&amp;= \argmax_{\theta} \prod_{i=1}^m p(x^{(i)};\theta)
+\end{aligned}
+$$</mathjax></p>
+<p>(Notation note: <mathjax>$p(X;\theta)$</mathjax> is read "the probability density of <mathjax>$X$</mathjax> as parameterized by <mathjax>$\theta$</mathjax>")</p>
+<p>Though the logarithm version mentioned above is typically preferred to avoid underflow.</p>
+<p>Typically, we are more interested in the conditional probability <mathjax>$P(y|x;\theta)$</mathjax> (i.e. the probability of <mathjax>$y$</mathjax> given <mathjax>$x$</mathjax>, parameterized by <mathjax>$\theta$</mathjax>), in which case, given all our inputs <mathjax>$X$</mathjax> and all our targets <mathjax>$Y$</mathjax>, we have the conditional maximum likelihood estimator:</p>
+<p><mathjax>$$
+\theta_{\text{ML}} = \argmax_{\theta} P(Y|X;\theta)
+$$</mathjax></p>
+<p>Assuming the examples are iid, this is:</p>
+<p><mathjax>$$
+\theta_{\text{ML}} = \argmax_{\theta} \sum_{i=1}^m \log P(y^{(i)}|x^{(i)};\theta)
+$$</mathjax></p>
+<h4>Example</h4>
+<p>Say we have a coin which may be unfair. We flip it ten times and get <code>HHHHTTTTTT</code> (we'll call this observed data <mathjax>$X$</mathjax>). We are interested in the probability of heads, <mathjax>$\pi$</mathjax>, for this coin, so we can determine if it's unfair or not.</p>
+<p>Here we just have a binomial distribution so the parameters here are <mathjax>$n$</mathjax> and <mathjax>$p$</mathjax> (or <mathjax>$\pi$</mathjax> as we are referring to it here). We know <mathjax>$n$</mathjax> as it is the sample size, so that parameter is easy to "estimate" (i.e. we already know it). All that's left is the parameter <mathjax>$p$</mathjax> to estimate. So we can just use MLE to make this estimation; for binomial distributions it is rather trivial Because <mathjax>$p$</mathjax> is the probability of a successful trial, and it's intuitive that the most likely <mathjax>$p$</mathjax> just reflects the number of observed successes over the total number of observed trials:</p>
+<p><mathjax>$$
+\begin{aligned}
+\tilde \pi_{MLE} &amp;= \argmax_{\pi} P(X|\pi) \\
+P(y|X) &amp;\approx P(y|\tilde \pi_{MLE})
+\end{aligned}
+$$</mathjax></p>
+<p>Where <mathjax>$y$</mathjax> is the outcome of the next coin flip.</p>
+<p>For this case our MLE would be <mathjax>$\tilde \pi_{MLE} = 0.4$</mathjax> because that is most likely to have generated our observed data (we saw <mathjax>$\frac{4}{10}$</mathjax> heads).</p>
+<p>Also formulated as:</p>
+<p><mathjax>$$
+\hat \theta = \argmax_{\theta} p(x^{(1)}, \dots, x^{(n)})
+$$</mathjax></p>
+<p>For a Gaussian distribution, the sample mean is the MLE.</p>
+<h3>Expectation Maximization</h3>
+<p>The <strong>expectation maximization</strong> (EM) algorithm is a two-staged iterative algorithm.</p>
+<p>Say you have a dataset which is missing some values. How can you complete your data?</p>
+<p>The EM algorithm allows you to do so.</p>
+<p>The two stages work as such:</p>
+<ol>
+<li>Begin with initial parameters <mathjax>$\hat \theta^{(t)}, t=0$</mathjax>.</li>
+<li>The "E-step"<ol>
+<li>Using the current parameters <mathjax>$\hat \theta^{(t)}$</mathjax>, compute probabilities for each possible completion of the missing data.</li>
+<li>Use these probabilities to create a weighted training set of these possible completions.</li>
+</ol>
+</li>
+<li>The "M-step"<ol>
+<li>Use a modified version of MLE (one which can deal with weighted samples) to derive new parameter estimates, <mathjax>$\hat \theta^{(t+1)}$</mathjax>.</li>
+</ol>
+</li>
+<li>Repeat the E and M steps until convergence.</li>
+</ol>
+<p>Intuitively, what EM does is tries to find the parameters <mathjax>$\hat \theta$</mathjax> which maximizes the log probability <mathjax>$\log P(x|\theta)$</mathjax> of the observed data <mathjax>$x$</mathjax>, much like MLE, except does so under the conditions of incomplete data. EM will converge on a local optimum (maximum) for this log probability.</p>
+<h4>Example</h4>
+<p>Say we have two coins <mathjax>$A,B$</mathjax>, which may not be fair coins.</p>
+<p>We conduct 5 experiments in which we randomly choose one of the coins (with equal probability) and flip it 10 times.</p>
+<p>We have the following results:</p>
+<pre><code>1. HTTTHHTHTH
+2. HHHHTHHHHH
+3. HTHHHHHTHH
+4. HTHTTTHHTT
+5. THHHTHHHTH
+</code></pre>
+<p>We are still interested in learning a parameter for each coin, <mathjax>$\hat \theta_A, \hat \theta_B$</mathjax>, describing the probability of heads for each.</p>
+<p>If we knew which coin we flipped during each experiment, this would be a simple MLE problem. Say we did know which coin was picked for each experiment:</p>
+<pre><code>1. B: HTTTHHTHTH
+2. A: HHHHTHHHHH
+3. A: HTHHHHHTHH
+4. B: HTHTTTHHTT
+5. A: THHHTHHHTH
+</code></pre>
+<p>Then we just use MLE and get:</p>
+<p><mathjax>$$
+\begin{aligned}
+\hat \theta_A &amp;= \frac{24}{24+6} = 0.8 \\
+\hat \theta_B &amp;= \frac{9}{9+11} = 0.45
+\end{aligned}
+$$</mathjax></p>
+<p>That is, for each coin we just compute <mathjax>$\frac{\text{num heads}}{\text{total trials}}$</mathjax>.</p>
+<p>But, alas, we are missing the data of which coin we picked for each experiment. We can instead apply the EM algorithm.</p>
+<p>Say we initially guess that <mathjax>$\hat \theta_A^{(0)} = 0.60, \hat \theta_B^{(0)} = 0.50$</mathjax>. For each experiment, we'll compute the probability that coin <mathjax>$A$</mathjax> produced those results and the same probability for coin <mathjax>$B$</mathjax>. Here we'll just show the computation for the first experiment.</p>
+<p>We're dealing with a binomial distribution here, so we are using:</p>
+<p><mathjax>$$
+P(x) = {n \choose x}p(1-p)^{n-x}, \, p = \hat \theta
+$$</mathjax></p>
+<p>The binomial coefficient is the same for both coins (the <mathjax>${n \choose x}$</mathjax> term) and cancels out in normalization, so we only care about the remaining factors. So we will instead just use:</p>
+<p><mathjax>$$
+P(x) = p(1-p)^{n-x}, \, p = \hat \theta
+$$</mathjax></p>
+<p>For the first experiment we have 5 heads (and <mathjax>$n=10$</mathjax>). Using our current estimates for <mathjax>$\hat \theta_A, \hat \theta_B$</mathjax>, we compute:</p>
+<p><mathjax>$$
+\begin{aligned}
+\theta_A^5 (1-\theta_A)^{10-5} &amp;\approx 0.0008 \\
+\theta_B^5 (1-\theta_B)^{10-5} &amp;\approx 0.0010 \\
+\frac{0.0008}{0.0008+0.0010} &amp;\approx 0.44 \\
+\frac{0.0010}{0.0008+0.0010} &amp;\approx 0.56
+\end{aligned}
+$$</mathjax></p>
+<p>So for this first iteration and for the first experiment, we estimate that the chance of the picked coin being coin <mathjax>$A$</mathjax> is about <mathjax>$0.44$</mathjax>, and about <mathjax>$0.56$</mathjax> for coin <mathjax>$B$</mathjax>.</p>
+<p>Then we generate the weighted set of these possible completions by computing how much each of these coins, as weighted by the probabilities we just computed, contributed to the results for this experiment (<mathjax>$(5H, 5T)$</mathjax>):</p>
+<p><mathjax>$$
+\begin{aligned}
+0.44(5H, 5T) &amp;= (2.2H, 2.2T), \, \text{(coin A)} \\
+0.56(5H, 5T) &amp;= (2.8H, 2.8T), \, \text{(coin B)}
+\end{aligned}
+$$</mathjax></p>
+<p>Then we repeat this for the rest of the experiments, getting the following weighted values for each coin for each experiment:</p>
+<p><mathjax>$$
+\begin{array}{l|l}
+\text{coin A} &amp; \text{coin B} \\
+\hline
+2.2H, 2.2T &amp; 2.8H, 2.8T \\
+7.2H, 0.8T &amp; 1.8H, 0.2T \\
+5.9H, 1.5T &amp; 2.1H, 0.5T \\
+1.4H, 2.1T &amp; 2.6H, 3.9T \\
+4.5H, 1.9T &amp; 2.5H, 1.1T
+\end{array}
+$$</mathjax></p>
+<p>and sum up the weighted values for each coin:</p>
+<p><mathjax>$$
+\begin{array}{l|l}
+\text{coin A} &amp; \text{coin B} \\
+\hline
+21.3H, 8.6T &amp; 11.7H, 8.4T
+\end{array}
+$$</mathjax></p>
+<p>Then we use these weighted values and MLE to update <mathjax>$\hat \theta_A, \hat \theta_B$</mathjax>, i.e.:</p>
+<p><mathjax>$$
+\begin{aligned}
+\hat \theta_A^{(1)} &amp;\approx \frac{21.3}{21.3+8.6} \approx 0.71 \\
+\hat \theta_B^{(1)} &amp;\approx \frac{11.7}{117.+8.4} \approx 0.58
+\end{aligned}
+$$</mathjax></p>
+<p>And repeat until convergence.</p>
+<h4>Expectation Maximization as a Generalization of K-Means</h4>
+<p>In K-Means we make hard assignments of datapoints to clusters (that is, they belong to only one cluster at a time, and that assignment is binary).</p>
+<p>EM is similar to K-Means, but we use soft assignments instead - datapoints can belong to multiple clusters in varying strengths (the "strengths" are probabilities of assignment to each cluster). When the centroids are updated, they are updated against <em>all</em> points, weighted by assignment strength (whereas in K-Means, centroids are updated only against their members).</p>
+<p>EM converges to approximately the same clusters as K-Means, except datapoints still have some membership to other clusters (though they may be very weak memberships).</p>
+<p>In EM, we consider that each datapoint is generated from a mixture of classes.</p>
+<p>For each <mathjax>$K$</mathjax> classes, we have the prior probability of that class <mathjax>$P(C=i)$</mathjax> and the probability of the datapoint given that class <mathjax>$P(x|C=i)$</mathjax>.</p>
+<p><mathjax>$$
+P(x) = \sum^K_{i=1} P(C=i) P(x|C=i)
+$$</mathjax></p>
+<p>These terms may be notated:</p>
+<p><mathjax>$$
+\begin{aligned}
+\pi &amp;= P(C=i) \\
+\mu_i \sum_i &amp;= P(x|C=i)
+\end{aligned}
+$$</mathjax></p>
+<p>What this is modeling here is that each centroid is the center of a Gaussian distribution, and we try to fit these centroids and their distributions to the data.</p>
+<h2>References</h2>
+<ul>
+<li>Review of fundamentals, IFT725. Hugo Larochelle. 2012.</li>
+<li><a href="https://sux13.github.io/DataScienceSpCourseNotes/4_EXDATA/Exploratory_Data_Analysis_Course_Notes.pdf">Exploratory Data Analysis Course Notes</a>. Xing Su.</li>
+<li><a href="https://www.coursera.org/course/mmds">Mining Massive Datasets</a> (Coursera &amp; Stanford, 2014). Jure Leskovec, Anand Rajaraman, Jeff Ullman.</li>
+<li><a href="https://www.coursera.org/learn/machine-learning">Machine Learning</a>. 2014. Andrew Ng. Stanford University/Coursera.</li>
+<li><a href="https://www.edx.org/course/artificial-intelligence-uc-berkeleyx-cs188-1x">CS188: Artificial Intelligence</a>. Dan Klein, Pieter Abbeel. University of California, Berkeley (edX).</li>
+<li><em>Evaluating Machine Learning Models</em>. Alice Zheng. 2015.</li>
+<li><a href="https://www.youtube.com/watch?v=heFaYLKVZY4">Computational Statistics II</a> (<a href="https://github.com/fonnesbeck/scipy2015_tutorial">code</a>). Chris Fonnesbeck. SciPy 2015.</li>
+<li><a href="https://www.udacity.com/course/intro-to-artificial-intelligence--cs271">Intro to Artificial Intelligence</a>. CS271. Peter Norvig, Sebastian Thrun. Udacity.</li>
+<li><a href="http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-034-artificial-intelligence-fall-2010/">MIT 6.034 (Fall 2010): Artificial Intelligence</a>. Patrick H. Winston. MIT.</li>
+<li><a href="http://www-labs.iro.umontreal.ca/~bengioy/dlbook/">Deep Learning</a>. Yoshua Bengio, Ian Goodfellow, Aaron Courville.</li>
+<li><a href="https://cs231n.github.io/neural-networks-1/">CS231n Convolutional Neural Networks for Visual Recognition, Module 1: Neural Networks Part 2: Setting up the Data and the Loss</a>. Andrej Karpathy.</li>
+<li><a href="https://www.youtube.com/watch?v=g_4z6o7XZbQ">POLS 509: Hierarchical Linear Models</a>. Justin Esarey.</li>
+<li><a href="http://www.isi.edu/natural-language/people/bayes-with-tears.pdf">Bayesian Inference with Tears</a>. Kevin Knight, September 2009.</li>
+<li><a href="https://chronicles.mfglabs.com/learning-to-learn-or-the-advent-of-augmented-data-scientists-20873282e181">Learning to learn, or the advent of augmented data scientists</a>. Simon Benhamou.</li>
+<li><a href="http://arxiv.org/abs/1206.2944">Practical Bayesian Optimization of Machine Learning Algorithms</a>. Jasper Snoek, Hugo Larochelle, Ryan P. Adams.</li>
+<li><a href="http://www.nature.com/nbt/journal/v26/n8/full/nbt1406.html">What is the expectation maximization algorithm?</a>. Chuong B Do &amp; Serafim Batzoglou.</li>
+<li><a href="https://www.umiacs.umd.edu/~resnik/pubs/LAMP-TR-153.pdf">Gibbs Sampling for the Uninitiated</a>. Philip Resnik, Eric Hardisty. June 2010.</li>
+<li><a href="https://onlinecourses.science.psu.edu/stat414/node/191">Maximum Likelihood Estimation</a>. Penn State Eberly College of Science.</li>
+<li><a href="https://www.coursera.org/specializations/jhu-data-science">Data Science Specialization</a>. Johns Hopkins (Coursera). 2015.</li>
+<li><a href="https://www.coursera.org/learn/practical-machine-learning">Practical Machine Learning</a>. Johns Hopkins (Coursera). 2015.</li>
+<li><a href="http://statweb.stanford.edu/~tibs/ElemStatLearn/">Elements of Statistical Learning</a>. 10th Edition. Trevor Hastie, Robert Tibshirani, Jerome Friedman.</li>
+<li><a href="https://cs231n.github.io/linear-classify/">CS231n Convolutional Neural Networks for Visual Recognition, Linear Classification</a>. Andrej Karpathy.</li>
+<li><a href="https://math.stackexchange.com/questions/25111/how-does-expectation-maximization-work">How does expectation maximization work?</a>. joriki.</li>
+<li><a href="https://math.stackexchange.com/questions/81004/how-does-expectation-maximization-work-in-coin-flipping-problem&gt;">How does expectation maximization work in coin flipping problem</a>. joriki.</li>
+<li><a href="https://chrisjmccormick.wordpress.com/2014/06/03/deep-learning-tutorial-pca-and-whitening/">Deep Learning Tutorial - PCA and Whitening</a>. Chris McCormick.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

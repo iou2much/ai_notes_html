@@ -1,0 +1,132 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Graphs</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Graphs</h1>
+<p>A <strong>graph</strong> consists of <strong>vertices</strong> (nodes) connected by <strong>edges</strong> (arcs).</p>
+<p>The two main categories of graphs are <strong>undirected</strong> graphs, in which edges don't have any particular direction, and <strong>directed graphs</strong>, where edges have direction - for example, there may be an edge from node A to node B, but no edge from node B to node A.</p>
+<figure><img alt="A directed graph" src="../assets/directed.svg" /><figcaption>A directed graph</figcaption>
+</figure>
+<figure><img alt="An undirected graph" src="../assets/undirected.svg" /><figcaption>An undirected graph</figcaption>
+</figure>
+<p>Generally, we use the following notation for a graph <mathjax>$G$</mathjax>: <mathjax>$n$</mathjax> is the number of vertices, i.e. <mathjax>$|V|$</mathjax>, <mathjax>$m$</mathjax> is the number of edges, i.e. <mathjax>$|E|$</mathjax>.</p>
+<p>Within undirected graphs there are other distinctions:</p>
+<ul>
+<li>a <em>simple</em> graph is a graph in which there are no loops and only single edges are allowed</li>
+<li>a <em>regular</em> graph is one in which each vertex has the same number of neighbors (i.e. the same degree)</li>
+<li>a <em>complete</em> graph is a simple graph where every pair of vertices is connected by an edge</li>
+<li>a <em>connected</em> graph is a graph where there exists a path between every pair of vertices</li>
+</ul>
+<p>For a connected graph with no parallel edges (i.e. each pair of vertices has only zero or one edge between it), <mathjax>$m$</mathjax> is somewhere between <mathjax>$\Omega(n)$</mathjax> and <mathjax>$O(n^2)$</mathjax>.</p>
+<p>Generally, a graph is said to be <strong>sparse</strong> if <mathjax>$m$</mathjax> is <mathjax>$O(n)$</mathjax> or close to it (that is, it has the lower end of number of edges). If <mathjax>$m$</mathjax> is closer to <mathjax>$O(n^2)$</mathjax>, this is generally said to be a <strong>dense</strong> graph.</p>
+<p>An adjacency matrix requires <mathjax>$\Theta(n^2)$</mathjax> space. If the graph is sparse, this is a waste of space, and an adjacency list is more appropriate - you have an array of vertices and an array of edges. Each edge points to its endpoints, and each vertex points to edges incident on it. This requires <mathjax>$\Theta(m+n)$</mathjax> space (because the array of vertices takes <mathjax>$\Theta(n)$</mathjax> space and the arrays of edges, edge-to-endpoints, and vertex-to-edges each take <mathjax>$\Theta(m)$</mathjax>, for <mathjax>$\Theta(n+3m) = \Theta(m+n)$</mathjax>), so it is better for sparse graphs.</p>
+<p>Consider the accompanying example graph.</p>
+<figure><img alt="Example graph" src="../assets/graph_example.svg" /><figcaption>Example graph</figcaption>
+</figure>
+<p>A <strong>path</strong> <mathjax>$A \to B$</mathjax> is the sequence of nodes connecting <mathjax>$A$</mathjax> to <mathjax>$B$</mathjax>, including <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax>.</p>
+<p>Here the path <mathjax>$A \to B$</mathjax> is <mathjax>$A,C,E,B$</mathjax>.</p>
+<p><mathjax>$A,C,E$</mathjax> are the <strong>ancestors</strong> of <mathjax>$B$</mathjax>.<br />
+<mathjax>$C,E,B$</mathjax> are the <strong>descendants</strong> of <mathjax>$A$</mathjax>.</p>
+<figure><img alt="Example of a cyclic graph" src="../assets/graph_cycle_example.svg" /><figcaption>Example of a cyclic graph</figcaption>
+</figure>
+<p>A <strong>cycle</strong> is a directed path which ends where it starts. Here, <mathjax>$A,D,C,B$</mathjax> form a cycle.</p>
+<p>A <strong>loop</strong> is any path (directed or not) which ends where it starts.</p>
+<p>A graph with no cycles is said to be <strong>acyclic</strong>.</p>
+<p>A <strong>chord</strong> is any edge which connects two non-adjacent nodes in a loop.</p>
+<p><strong>Directed acyclic graphs</strong> (DAGs) are used often. In a DAG, <strong>parents</strong> are the nodes which point to a given node; the nodes that a given node points to are its <strong>children</strong>. A <strong>family</strong> of a node is the node and its parents.</p>
+<p>The <strong>Markov blanket</strong> of a node is its parents, children, and the parents of its children (including itself).</p>
+<p>For an undirected graph, a node's <strong>neighbors</strong> are noes directly connected to it.</p>
+<p>In an undirected graph, a <strong>clique</strong> is a fully-connected subset of nodes. All members of a clique are neighbors.</p>
+<p>A <strong>maximal clique</strong> is a clique which is not a subset of another clique.</p>
+<figure><img alt="A graph demonstrating cliques" src="../assets/clique_example.svg" /><figcaption>A graph demonstrating cliques</figcaption>
+</figure>
+<p>In this graph:</p>
+<ul>
+<li><mathjax>$\{A,B,C,D\}$</mathjax> is a maximal clique</li>
+<li><mathjax>$\{B,C,E\}$</mathjax> is a maximal clique</li>
+<li><mathjax>$\{A,B,C\}$</mathjax> is a non-maximal clique, contained in <mathjax>$\{A,B,C,D\}$</mathjax></li>
+</ul>
+<p>An undirected graph is <strong>connected</strong> if there is a path between every pair of nodes. That is, there is no isolated subgraph.</p>
+<p>For a non-connected graph, its <strong>connected components</strong> are its subgraphs which are connected.</p>
+<p>A <strong>singly connected graph</strong> is the connected graph (directed or not) where there is only one path between each pair of nodes. This is equivalent to a <strong>tree</strong>.</p>
+<p>A non-singly connected graph is said to be <strong>multiply connected</strong>.</p>
+<p>A <strong>spanning tree</strong> of an undirected graph is one where the sum of all edge weights is at least as large as any other spanning trees'.</p>
+<figure><img alt="Spanning tree example. The graph on the right is a spanning tree of the graph on the left." src="../assets/spanning_tree.svg" /><figcaption>Spanning tree example. The graph on the right is a spanning tree of the graph on the left.</figcaption>
+</figure>
+<p>Graphs can be represented as an <strong>adjacency matrix</strong>:</p>
+<p><mathjax>$$
+A =
+\begin{bmatrix}
+0 &amp; 1 &amp; 1 &amp; 0 \\
+1 &amp; 0 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 0 &amp; 1 \\
+0 &amp; 1 &amp; 1 &amp; 0
+\end{bmatrix}
+$$</mathjax></p>
+<p>Where a non-zero value at <mathjax>$A_{ij}$</mathjax> indicates that node <mathjax>$i$</mathjax> is connected to node <mathjax>$j$</mathjax>.</p>
+<p>A <strong>clique matrix</strong> represents the maximal cliques in a graph.</p>
+<p>For example, this clique matrix describes the following maximal clique:</p>
+<p><mathjax>$$
+C =
+\begin{bmatrix}
+1 &amp; 0 \\
+1 &amp; 1 \\
+1 &amp; 1 \\
+0 &amp; 1
+\end{bmatrix}
+$$</mathjax></p>
+<figure><img alt="A maximal clique" src="../assets/maximal_clique.svg" /><figcaption>A maximal clique</figcaption>
+</figure>
+<p>A clique matrix containing only 2-node cliques is an <strong>incidence matrix</strong>:</p>
+<p><mathjax>$$
+C =
+\begin{bmatrix}
+1 &amp; 1 &amp; 0 &amp; 0 &amp; 0 \\
+1 &amp; 0 &amp; 1 &amp; 1 &amp; 0 \\
+0 &amp; 1 &amp; 1 &amp; 0 &amp; 1 \\
+0 &amp; 0 &amp; 0 &amp; 1 &amp; 1
+\end{bmatrix}
+$$</mathjax></p>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.coursera.org/course/algo">Algorithms: Design and Analysis, Part 1</a>. Tim Roughgarden. Stanford/Coursera.</li>
+<li><em>Bayesian Reasoning and Machine Learning</em>. David Barber.</li>
+<li><a href="https://www.coursera.org/course/pgm">Probabilistic Graphical Models</a>. Daphne Koller. Stanford University/Coursera.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

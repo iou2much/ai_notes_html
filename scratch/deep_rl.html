@@ -1,0 +1,81 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>deep_rl</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <p>notes from John Schulman's Deep Reinforcement Learning lectures for MLSS 2016 in Cadiz.</p>
+<p><a href="https://www.youtube.com/watch?v=aUrX-rP_ss4">Lecture 1</a><br />
+<a href="https://www.youtube.com/watch?v=oPGVsoBonLM">Lecture 2</a><br />
+<a href="https://www.youtube.com/watch?v=rO7Dx8pSJQw">Lecture 3</a><br />
+<a href="https://www.youtube.com/watch?v=gb5Q2XL5c8A">Lecture 4</a></p>
+<hr />
+<p>Broadly, two approaches to RL:</p>
+<ul>
+<li>policy optimization: the policy is parameterized and you try to optimize expected reward<ul>
+<li>includes policy gradients, derivative-free optimization (DFO)/evolutionary algorithms (though DFO doesn't work well for large numbers of parameter)</li>
+</ul>
+</li>
+<li>dynamic programming: you can exactly solve some simple control problems (i.e. MDPs) with dynamic programming<ul>
+<li>includes policy iteration, value iteration</li>
+<li>for more useful/realistic problems we have to use approximate versions of these algorithms (e.g. Q-learning)</li>
+</ul>
+</li>
+</ul>
+<p>There are also actor-critic methods which are policy gradient methods that use value functions.</p>
+<p><em>Deep reinforcement learning</em> is just reinforcement learning with nonlinear function approximators, usually updating parameters with stochastic gradient descent.</p>
+<hr />
+<p>Policies:</p>
+<ul>
+<li>deterministic policies: <mathjax>$a = \pi(s)$</mathjax></li>
+<li>stochastic policies: <mathjax>$a \sim \pi(a|s)$</mathjax></li>
+</ul>
+<p>Policies may be parameterized, i.e. <mathjax>$\pi_{\theta}$</mathjax></p>
+<hr />
+<p>Cross-entropy method (a DFO/evolutionary algorithm, for parameterized policies/policy optimization):</p>
+<ul>
+<li>initialize <mathjax>$\mu \in \mathbb R^d, \sigma \in \mathbb R^d$</mathjax></li>
+<li>for each iteration<ul>
+<li>collection <mathjax>$n$</mathjax> samples of <mathjax>$\theta_i \sim N(\mu, \diag(\theta))$</mathjax> (i.e. sample a population of parameter vectors)</li>
+<li>perform a noisy evaluation <mathjax>$R_i \sim \theta_i$</mathjax> (i.e. for each parameter vector, evaluate its reward)</li>
+<li>select the top <mathjax>$p$</mathjax> percent of samples (e.g. <mathjax>$p=20$</mathjax>); this is the <em>elite set</em> (the high-fitness individuals)</li>
+<li>fit a Gaussian distribution, with diagonal covariance, to the elite set, obtaining a new <mathjax>$\mu, \sigma$</mathjax></li>
+</ul>
+</li>
+<li>return the final <mathjax>$\mu$</mathjax></li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

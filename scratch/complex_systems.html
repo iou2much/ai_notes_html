@@ -1,0 +1,333 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>complex_systems</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <p>Notes for <em>Introduction to the Modeling and Analysis of Complex Systems</em> (Hiroki Sayama).</p>
+<p><em>Emergence</em> describes properties that are not present in the components of a system but occur at the level (scale) of the system as a result of the interaction between components.("the whole is greater than the sum of its parts"). You can't examine an individual component and see the emergent property there, and they can't be explained purely in terms of the component's properties - their interactions and relationships must be taken into account.</p>
+<p><em>Scale</em> plays an important part in that the phenomena/emergent properties at each scale can be very different.</p>
+<p><em>Self-organization</em> can also occur where coherent macroscopic structures and/or behaviors form over time.</p>
+<p>Complex systems exhibit emergence (across scales) as a result of nonlinear interaction amongst their components and exhibit self-organization (across time).</p>
+<p>"Nonlinear" refers to that the outputs (e.g. the next state of the system) cannot be expressed as a linear combination of inputs (e.g. the current state of the system). Note that linear equations are analytically solvable, whereas nonlinear equations generally are not.</p>
+<p>An <em>analytical solution</em> is a solution written in the form <mathjax>$x_t = f(t)$</mathjax> without using state variables on the right-hand side, also called a <em>closed-form</em> solution because the right-hand side is "closed".</p>
+<p>A <em>model</em> is just some (simplified) representation of a system (any kind of representation).</p>
+<p>When modeling a complex system, you should consider:</p>
+<ul>
+<li>what are your goals? what questions do you want to answer?</li>
+<li>what is the structure of the system?</li>
+<li>what are the possible states?</li>
+<li>what are the dynamics of the system?</li>
+</ul>
+<p>We prefer models that are simple, valid against empirical evidence, and robust to minor changes in modeling assumptions or parameters. There is often a trade-off between simplicity and validity (i.e. a more complex model can better conform to real-world observations, which introduces an overfitting problem).</p>
+<p>Discrete-time dynamical systems are expressed as a <em>difference equation</em> (also called a <em>recurrency equation</em>):</p>
+<p><mathjax>$$
+x_t = F(x_{t-1}, t)
+$$</mathjax></p>
+<p>or equivalently: <mathjax>$x_{t+1} = F(x_t, t)$</mathjax></p>
+<p>If there is no <mathjax>$t$</mathjax> on the right, this is called an <em>iterative map</em>.</p>
+<p>These are called difference equations because they can be translated easily into "difference" form:</p>
+<p><mathjax>$$
+\Delta x = x_t - x_{t-1} = F(x_{t-1}, t) - x_{t-1}
+$$</mathjax></p>
+<p>Continuous-time dynamical systems are expressed as a <em>differential equation</em>:</p>
+<p><mathjax>$$
+\frac{dx}{dt} = F(x,t)
+$$</mathjax></p>
+<p>In each case, <mathjax>$F$</mathjax> is a function that determines the rules by which the system changes its state over time.</p>
+<p>A <em>phase space</em> is a space in which each state of the system is mapped to a unique spatial location. The number of state variables needed to uniquely specify the system's state (i.e. the dimensions of the space) is the <em>degrees of freedom</em> in the system.</p>
+<p>We can use phase space to visualize trajectories of the system through its various states. We may encounter attractors, etc (see other notes on complex systems) in phase space.</p>
+<p>A <em>first-order system</em> is one that involves only state variables of the immediate past (at time <mathjax>$t-1$</mathjax>). Any other system is a <em>higher-order system</em>.</p>
+<p>An <em>autonomous system</em> is a dynamical equation whose rules don't explicitly include time <mathjax>$t$</mathjax> or any other external variables. A <em>non-autonomous system</em> is a dynamical equation whose rules <em>do</em> include time <mathjax>$t$</mathjax> or other external variables explicitly.</p>
+<p>Non-autonomous, higher-order difference equations can be converted into autonomous, first-order forms by introducing additional state variables.</p>
+<p>For instance, consider the Fibonacci sequence, which is second-order:</p>
+<p><mathjax>$$
+x_t = x_{t-1} + x_{t-2}
+$$</mathjax></p>
+<p>We can introduce a "memory" variable <mathjax>$y$</mathjax> such that <mathjax>$y_t = x_{t-1}$</mathjax>. Then re-write it as a first-order difference equation:</p>
+<p><mathjax>$$
+x_t = x_{t-1} + y_{t-1}
+$$</mathjax></p>
+<p>We can do something similar for converting non-autonomous equations into autonomous equations:</p>
+<p><mathjax>$$
+\begin{aligned}
+x_t &amp;= x_{t-1} + t \\
+z_t &amp;= z_{t-1} + 1, z_0 = 1 \\
+x_t &amp;= x_{t-1} + z_{t-1}
+\end{aligned}
+$$</mathjax></p>
+<p>Linear dynamical systems can only show the following behaviors:</p>
+<ul>
+<li>exponential growth/decay</li>
+<li>periodic oscillations</li>
+<li>stationary states</li>
+<li>or some combination of the above</li>
+<li>when their coefficient matrices are non-diagonalizable, they can also show behaviors that are polynomials (or products of polynomials and exponentials) of time</li>
+</ul>
+<p>These behaviors are indicative of linear systems.</p>
+<p>The <em>asymptotic behavior</em> of a system is what happens when time is taken to infinity.</p>
+<h2>Discrete time</h2>
+<h3>Linear dynamical systems</h3>
+<p>We can describe the dynamics of a discrete-time linear dynamical system as:</p>
+<p><mathjax>$$
+x_t = Ax_{t-1}
+$$</mathjax></p>
+<p>where <mathjax>$x$</mathjax> is the state vector and <mathjax>$A$</mathjax> is the coefficient matrix.</p>
+<p>This has the closed-form solution:</p>
+<p><mathjax>$$
+x_t = A^t x_0
+$$</mathjax></p>
+<p>The asymptotic behavior of such a system is described by having <mathjax>$t \to \infty$</mathjax>. We can turn <mathjax>$A^t$</mathjax> into a more workable form using eigenvalues and eigenvectors.</p>
+<p>Remember that eigenvalues <mathjax>$\lambda_i$</mathjax> and eigenvectors <mathjax>$v_i$</mathjax> of a matrix A are the scalars and vectors that satisfy:</p>
+<p><mathjax>$$
+A v_i = \lambda_i v_i
+$$</mathjax></p>
+<p>We can apply this to <mathjax>$A^t$</mathjax>:</p>
+<p><mathjax>$$
+A^t v_i = A^{t-1}\lambda_i v_i = A^{t-2}\lambda_i^2 v_i = \dots = \lambda_i^t v_i
+$$</mathjax></p>
+<p>Then we need to represent the initial state <mathjax>$x_o$</mathjax> by using <mathjax>$A$</mathjax>'s eigenvectors as the basis vectors:</p>
+<p><mathjax>$$
+x_0 = b_1 v_1 + b_2 v_2 + \dots + b_n v_n
+$$</mathjax></p>
+<p>Where <mathjax>$n$</mathjax> is the dimension of the state space (i.e. <mathjax>$A$</mathjax> is an <mathjax>$n \times n$</mathjax> matrix). We can assume that <mathjax>$A$</mathjax> is diagonalizable so that we have <mathjax>$n$</mathjax> linearly independent eigenvectors, thus we can use them as the basis vectors for <mathjax>$x_0$</mathjax>.</p>
+<p>Now we have:</p>
+<p><mathjax>$$
+\begin{aligned}
+x_t &amp;= A^t (b_1 v_1 + b_2 v_2 + \dots + b_n v_n) \\
+&amp;= b_1 A^t v_1 + b_2 A^t v_2 + \dots + b_n A^t v_n) \\
+&amp;= b_1 \lambda_1^t v_1 + b_2 \lambda_2^t v_2 + \dots + b_n \lambda_n^t v_n)
+\end{aligned}
+$$</mathjax></p>
+<p>So the largest (by absolute value) eigenvalue (called the <em>dominant</em> eigenvalue)  will come to dominate this equation as <mathjax>$t$</mathjax> increases. Thus we can say that as <mathjax>$t \to \infty$</mathjax>, <mathjax>$x_t \approx \lambda_i^t b_i v_i$</mathjax>, where <mathjax>$i$</mathjax> is the index of the dominant eigenvalue. The dominant eigenvalue's corresponding dominant eigenvector will determine the direction the system's state goes in asymptotically. This asymptotic behavior occurs regardless of the system's initial state!</p>
+<p>For these discrete-time models, the absolute value of the eigenvalues can tell us a lot about the system:</p>
+<table>
+<thead>
+<tr>
+<th>- if $</th>
+<th>\lambda_i</th>
+<th>&gt; 1<mathjax>$, the component $</mathjax>v_i$ is growing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- if $</td>
+<td>\lambda_i</td>
+<td>= 1<mathjax>$, the component $</mathjax>v_i$ is conserved</td>
+</tr>
+</tbody>
+</table>
+<p>We learn more from the dominant eigenvalue <mathjax>$\lambda_d$</mathjax> as well:</p>
+<table>
+<thead>
+<tr>
+<th>- if $</th>
+<th>\lambda_d</th>
+<th>&gt; 1$, the system is unstable, diverging to infinity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- if $</td>
+<td>\lambda_d</td>
+<td>= 1$, the system is stable, but may converge to a non-zero equilibrium point</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="" src="../assets/discrete_time_eigens.png" /><br />
+(from the textbook, figure 5.13)</p>
+<p>The dynamics of a linear system are <em>decomposable</em> into multiple independent one-dimensional exponential dynamics, each along the direction given by an eigenvector.</p>
+<p>If the eigenvalues of the coefficient matrix are complex conjugate rather than real (i.e. because the matrix is asymmetric), it means that there is rotation happening in the phase space. In this case, the eigenvalues are still informative:</p>
+<table>
+<thead>
+<tr>
+<th>- if $</th>
+<th>\lambda_i</th>
+<th>&gt; 1<mathjax>$, the component $</mathjax>v_i$ is rotating with expanding amplitude (i.e. spiraling out)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- if $</td>
+<td>\lambda_i</td>
+<td>= 1<mathjax>$, the component $</mathjax>v_i$ is rotating with sustained amplitude</td>
+</tr>
+</tbody>
+</table>
+<p>Also note that the list of eigenvalues for a system is called the (eigenvalue) <em>spectrum</em> of the system.</p>
+<h3>Nonlinear dynamical systems</h3>
+<p>Unfortunately this methodology of eigenvalues and eigenvectors cannot be applied to the asymptotic analysis of nonlinear dynamical systems.</p>
+<p>Eigenvalues and eigenvectors can, however, be used to conduct <em>linear stability analysis</em> of nonlinear systems, which describes the stability of the system at or near its equilibrium point by approximating the dynamics around that point as linear.</p>
+<p>The general idea behind this is that we take the equilibrium point and perturb it slightly (by an infinitesimally small amount).</p>
+<p>Say we have the nonlinear difference equation:</p>
+<p><mathjax>$$
+x_t = F(x_{t-1})
+$$</mathjax></p>
+<p>At the equilibrium point <mathjax>$x_{eq}$</mathjax>, by definition:</p>
+<p><mathjax>$$
+x_{eq} = F(x_{eq})
+$$</mathjax></p>
+<p>Then we slightly perturb it:</p>
+<p><mathjax>$$
+x_{eq} + \Delta x_t = F(x_{eq} + \Delta x_t)
+$$</mathjax></p>
+<p>Assuming <mathjax>$x_t$</mathjax> is scalar, we scan approximate the right-hand side with the Taylor expansion:</p>
+<p><mathjax>$$
+\begin{aligned}
+F(x_{eq} + \Delta x_t) &amp;= F(x_{eq}) + F'(x_{eq}) \Delta x_{t-1} + \frac{F''(x_{eq})}{2!}\Delta x_{t-1}^2 + \dots \\
+&amp;\approx F(x_{eq}) + F'(x_{eq}) \Delta x_{t-1}
+\end{aligned}
+$$</mathjax></p>
+<p>This yields us the simple linear difference equation:</p>
+<p><mathjax>$$
+\Delta x_t \approx F'(x_{eq}) \Delta x_{t-1}
+$$</mathjax></p>
+<p>From this we can see that if <mathjax>$|F'(x_{eq})| &gt; 1$</mathjax>, <mathjax>$\Delta x$</mathjax> grows exponentially, so the equilibrium point is unstable. If <mathjax>$|F'(x_{eq})| &lt; 1$</mathjax>, then <mathjax>$\Delta x$</mathjax> shrinks exponentially, so the equilibrium point is stable.</p>
+<p>If <mathjax>$x_t$</mathjax> is not scalar, but is instead a vector, we instead get (refer to the original text, pp91-92 for details):</p>
+<p><mathjax>$$
+x_{eq} + \Delta x_t \approx F(x_{eq}) J \Delta x_{t-1}
+$$</mathjax></p>
+<p>where <mathjax>$J$</mathjax> is the Jacobian matrix of <mathjax>$F$</mathjax> with respect to <mathjax>$x$</mathjax> at <mathjax>$x_{eq}$</mathjax>, so that we get:</p>
+<p><mathjax>$$
+\Delta x_t \approx J \Delta x_{t-1}
+$$</mathjax></p>
+<p>Then we take the eigenvalues of <mathjax>$J$</mathjax>, looking at the dominant eigenvalue as shown previously. Note that we may have unstable equilibrium points with some stable eigenvalues - this is indicative of a saddle point.</p>
+<p>When around an equilibrium <mathjax>$\lambda_d = 1$</mathjax>, it may be <em>Lyaponuv stable</em>, which means that the system's state neither diverges away from nor converges to the equilibrium point. Note that this is not a conclusive indicator of it being Lyaponuv stable!</p>
+<p>The points about complex conjugates from before also apply here.</p>
+<figure><img alt="Stability around equilibrium points for discrete-time" src="../assets/equil_stability_discrete.png" /><figcaption>Stability around equilibrium points for discrete-time</figcaption>
+</figure>
+<h2>Continuous time</h2>
+<p>Continuous time models are expressed in differential equations. To get the trajectory of the system's state over time, we just integrate over the differential equation that describes the system. This is usually done via simulation (i.e. numerically, for which there are many different methods, such as the <em>Euler forward method</em>).</p>
+<p>The linear/nonlinear and autonomous/non-autonomous distinctions still apply here, though the first-order/higher-order distinction is a little different. Here, a first-order system is a differential equation that involves first-order derivatives of state variables (<mathjax>$\frac{dx}{ty}$</mathjax>) only. A higher-order system involves higher-order derivatives of state variables.</p>
+<p>The conversion of non-autonomous, higher order equations to autonomous, first-order forms also holds here.</p>
+<p>A general formula for continuous-time linear dynamical systems is given by:</p>
+<p><mathjax>$$
+\frac{dx}{dt} = Ax
+$$</mathjax></p>
+<p>where <mathjax>$x$</mathjax> is the state vector of the system and <mathjax>$A$</mathjax> is the coefficient matrix.</p>
+<p>The asymptotic behavior of this equation has a closed-form solution:</p>
+<p><mathjax>$$
+x(t) = e^{At}x(0)
+$$</mathjax></p>
+<p>Where <mathjax>$e^X$</mathjax> is a <em>matrix exponential</em> for a square matrix <mathjax>$X$</mathjax>, defined as:</p>
+<p><mathjax>$$
+e^X = \sum_{k=0}^\infty \frac{X^k}{k!}
+$$</mathjax></p>
+<p>where <mathjax>$X^0 = I$</mathjax> This infinite series converges to a square matrix that has the same size as <mathjax>$X$</mathjax>.</p>
+<p>The matrix exponential <mathjax>$e^X$</mathjax> has the following properties:</p>
+<ul>
+<li>its eigenvalues are exponentials of <mathjax>$X$</mathjax>'s eigenvalues</li>
+<li>its eigenvectors are the same length as <mathjax>$X$</mathjax>'s eigenvectors, i.e. <mathjax>$Xv = \lambda v \Rightarrow e^v e^{\lambda}v$</mathjax></li>
+</ul>
+<p>We assume that <mathjax>$A$</mathjax> is diagonalizable (and thus has as many linearly independent eigenvectors as there are dimensions of state space).</p>
+<p>So we represent the initial state of the system as:</p>
+<p><mathjax>$$
+x(0) = b_1 v_1 + b_2 v_2 + \dots + b_n v_n
+$$</mathjax></p>
+<p>We apply this to the asymptotic behavior equation:</p>
+<p><mathjax>$$
+\begin{aligned}
+x(t) &amp;= e^{At}x(0) \\
+&amp;= e^{At}(b_1 v_2 + b_2 v_2 + \dots + b_n v_n) \\
+&amp;= b_1 e^{At} v_1 + b_2 e^{At} v_2 + \dots + b_n e^{At} v_n \\
+&amp;= b_1 e^{\lambda_1 t} v_1 + b_2 e^{\lambda_2 t} v_2 + \dots + b_n e^{\lambda_n t} v_n
+\end{aligned}
+$$</mathjax></p>
+<p>This is similar to what we saw for discrete time models except that now the asymptotic behavior is given by the summation of <mathjax>$e^{\lambda_i}$</mathjax> rather than just <mathjax>$\lambda_i$</mathjax>. So the dominant term is the largest absolute value of <mathjax>$e^{\lambda_i}$</mathjax>.</p>
+<p>Note that <mathjax>$|e^{\lambda_i}| = e^{\text{Re}(\lambda_i)}$</mathjax>, where <mathjax>$\text{Re}(\lambda_i)$</mathjax> is the real component of <mathjax>$\lambda_i$</mathjax>, so the eigenvalue that has the largest real part is the dominant eigenvalue. If we say <mathjax>$\lambda_1$</mathjax> is the dominant eigenvalue, then:</p>
+<p><mathjax>$$
+\lim_{t \to \infty} \approx e^{\lambda_1 t} b_1 v_1
+$$</mathjax></p>
+<p>Like with discrete-time models, we get a lot of info from the eigenvalues (the real part):</p>
+<ul>
+<li><mathjax>$\text{Re}(\lambda) &gt; 0$</mathjax> means the component is growing</li>
+<li><mathjax>$\text{Re}(\lambda) &lt; 0$</mathjax> means the component is shrinking</li>
+<li><mathjax>$\text{Re}(\lambda) = 0$</mathjax> means the component is conserved</li>
+</ul>
+<p>For the dominant eigenvalue <mathjax>$\lambda_d$</mathjax>:</p>
+<ul>
+<li><mathjax>$\text{Re}(\lambda_d) &gt; 0$</mathjax> means the system is unstable, diverging to infinity</li>
+<li><mathjax>$\text{Re}(\lambda_d) &lt; 0$</mathjax> means the system is stable, converging to the origin</li>
+<li><mathjax>$\text{Re}(\lambda_d) = 0$</mathjax> means the system is stable, but may converge to a non-zero equilibrium point</li>
+</ul>
+<p>Like with discrete-time nonlinear dynamical systems, we can also conduct linear stability analysis for continuous-time nonlinear dynamical systems.</p>
+<p>If we have the nonlinear differential equation:</p>
+<p><mathjax>$$
+\frac{dx}{dt} = F(x)
+$$</mathjax></p>
+<p>The equilibrium point <mathjax>$x_{eq}$</mathjax> satisfies, by definition:</p>
+<p><mathjax>$$
+0 = F(x_{eq})
+$$</mathjax></p>
+<p>Similar to discrete-time models, we apply the following replacement:</p>
+<p><mathjax>$$
+x(t) \Rightarrow x_{eq} + \Delta x(t)
+$$</mathjax></p>
+<p>which gives us:</p>
+<p><mathjax>$$
+\frac{d(x_{eq} + \Delta x){dt} = \frac{d \Delta x}{dt} = F(x_{eq} + \Delta x)
+$$</mathjax></p>
+<p>As before, the nonlinear function <mathjax>$F$</mathjax> can be approximated using the Jacobian matrix <mathjax>$J$</mathjax> of <mathjax>$F$</mathjax> as <mathjax>$x = x_{eq}$</mathjax>, so we approximate the previous equation:</p>
+<p><mathjax>$$
+\frac{d \Delta x}{dt} \approx F(x_{eq}) + J \Delta x
+$$</mathjax></p>
+<p>The rest of the process is similar to linear stability analysis for discrete-time nonlinear dynamical systems. The main difference is that you only look at the real parts of the eigenvalues, and you compare them with 0, not one.</p>
+<figure><img alt="Stability around equilibrium points for continuous-time" src="../assets/equil_stability_continuous.png" /><figcaption>Stability around equilibrium points for continuous-time</figcaption>
+</figure>
+<h2>Cellular Automata</h2>
+<p><em>Automata</em> are "machines" that change their internal state based on inputs and their previous state. <em>Cellular automata</em> (CA) arrange these automata in a spatial grid, such that each automaton is affected by the states of their neighbors. The particular way their state is affected is defined by a <em>state-transition function</em>. The automata are <em>synchronously</em> updated (i.e. simultaneously updated). CA models are discrete in both time and space.</p>
+<p>The state <mathjax>$s_{t+1}(x)$</mathjax> of an automaton at time <mathjax>$t+1$</mathjax>, located at position <mathjax>$x$</mathjax>, with the state-transition function <mathjax>$F$</mathjax>, is given by:</p>
+<p><mathjax>$$
+s_{t+1}(x) = F(s_t(x + x_0), s_t(x + x_1), \dots, x_t(x+x_{n-1}))
+$$</mathjax></p>
+<p>Where <mathjax>$N = \{x_0, x_1, \dots, x_{n-1}\}$</mathjax> is the <em>neighborhood</em> around a given automaton.</p>
+<p>If a state-transition function gives an identical state to rotated configurations of automaton, it is said that the CA model has <em>rotational symmetry</em>. If all states of the CA are orientation-free and the rotation of a situation doesn't involve any rotation of the states themselves, the rotational symmetry is <em>strong</em>, otherwise, it is <em>weak</em>.</p>
+<p>If the state-transition function depends only on the sum of the states of cells within the neighbors, the CA is <em>totalistic</em>. By definition, these totalistic state-transition functions are rotationally symmetric.</p>
+<p>The states of a CA may be either <em>quiescent</em> (it remains the same if all of its neighbors are in the same quiescent state, e.g. the "blank" state) or <em>non-quiescent</em> (also called <em>active</em> states because they change dynamically and interact with nearby states).</p>
+<p>The <em>spatial boundary conditions</em> of a CA must be specified, which describes behavior at the borders of the CA world:</p>
+<ul>
+<li>no boundaries - the space is infinite, expanding in all directions, filled with the quiescent state</li>
+<li>periodic boundaries - the space "wraps around" at the edges</li>
+<li>cut-off boundaries - the space just ends at the edges</li>
+<li>fixed boundaries - sets the cells at the edge of the finite space to have fixed states that never change</li>
+</ul>
+<p>Cellular automata may also be stochastic (i.e. the state-transition function is stochastic), they may include multiple layers (i.e. cell states can be vectors rather than scalars), and they may be asynchronous, e.g. via random updating (randomly choosing cells to update at each time step), or sequential updating (updating cells in a specified order), state-triggered updating (certain states trigger updating of nearby cells), etc.</p>
+<h2>Agent-based modeling</h2>
+<p>Involves many discrete agents. Analysis of ABMs is conducted in a more conventional experimental way, e.g. running Monte Carlo simulations, observing outcome distributions, and then determining if there is a significant difference.</p>
+<p>Agents may be stateful, they may interact with one another, they may interact with their environment, and they may have predefined rules or learned behaviors.</p>
+<p>Cellular automata and network models, because they are also composed of discrete components, are special cases of ABMs.</p>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

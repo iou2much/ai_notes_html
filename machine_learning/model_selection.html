@@ -1,0 +1,432 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Model Selection</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Model Selection</h1>
+<p><em>Model selection</em> is the process of choosing between different machine learning approaches - e.g. SVM, logistic regression, etc - or choosing between different hyperparameters or sets of features for the same machine learning approach - e.g. deciding between the polynomial degrees/complexities for linear regression.</p>
+<p>The choice of the actual machine learning algorithm (e.g. SVM or logistic regression) is less important than you'd think - there may be a "best" algorithm for a particular problem, but often its performance is not much better than other well-performing approaches for that problem.</p>
+<p>There may be certain qualities you look for in an model:</p>
+<ul>
+<li>Interpretable - can we see or understand why the model is making the decisions it makes?</li>
+<li>Simple - easy to explain and understand</li>
+<li>Accurate</li>
+<li>Fast (to train and test)</li>
+<li>Scalable (it can be applied to a large dataset)</li>
+</ul>
+<p>Though there are generally trade-offs amongst these qualities.</p>
+<h2>Model evaluation</h2>
+<p>In order to select amongst models, we need some way of evaluating their performance.</p>
+<p>You can't evaluate a model's hypothesis function with the cost function because minimizing the error can lead to overfitting.</p>
+<p>A good approach is to take your data and split it randomly into a training set and a test set (e.g. a 70%/30% split). Then you train your model on the training set and see how it performs on the test set.</p>
+<p>For linear regression, you might do things this way:</p>
+<ul>
+<li>Learn parameter <mathjax>$\theta$</mathjax> from training data by minimizing training error <mathjax>$J(\theta)$</mathjax>.</li>
+<li>
+<p>Compute test set error (using the squared error) (<mathjax>$m_{\text{test}}$</mathjax> is the test set size):</p>
+<p><mathjax>$$
+J_{\text{test}}(\theta) = \frac{1}{2m_{\text{test}}} \sum^{m_{\text{test}}}_{i=1} (h_{\theta}(x^{(i)}_{\text{test}}) - y^{(i)}_{\text{test}})
+$$</mathjax></p>
+</li>
+</ul>
+<p>For logistic regression, you might do things this way:</p>
+<ul>
+<li>Learn parameter <mathjax>$\theta$</mathjax> from training data by minimizing training error <mathjax>$J(\theta)$</mathjax>.</li>
+<li>
+<p>Compute test set error (<mathjax>$m_{\text{test}}$</mathjax> is the test set size):</p>
+<p><mathjax>$$
+J_{\text{test}}(\theta) = -\frac{1}{m_{\text{test}}} \sum^{m_{\text{test}}}_{i=1} y^{(i)}_{\text{test}} \log h_{\theta} (x^{(i)}_{\text{test}}) + (1 - y^{(i)}_{\text{test}}) \log h_{\theta} (x^{(i)}_{\text{test}})
+$$</mathjax></p>
+</li>
+<li>
+<p>Alternatively, you can use the misclassification error ("0/1 misclassification error", read "zero-one"), which is just the fraction of examples that your hypothesis has mislabeled:</p>
+<p><mathjax>$$
+\begin{aligned}
+err(h_{\theta}(x), y) &amp;=
+\begin{cases}
+1,  &amp; \text{if $h_{\theta}(x) \geq 0.5, y=0$ or if $h_{\theta}(x) &lt; 0.5, y=1$} \\[2ex]
+0,  &amp; \text{otherwise}
+\end{cases} \\
+\text{test error} &amp;= \frac{1}{m_{\text{test}}} \sum^{m_{\text{test}}}_{i=1} err(h_{\theta}(x^{(i)}_{\text{test}}), y^{(i)}_{\text{test}})
+\end{aligned}
+$$</mathjax></p>
+</li>
+</ul>
+<p>A better way of splitting the data is to not split it only into training and testing sets, but to also include a <em>validation</em> set. A typical ratio is 60% training, 20% validation, 20% testing.</p>
+<p>So instead of just measuring the test error, you would also measure the validation error.</p>
+<p>Validation is used mainly to tune hyperparameters - you don't want to tune them on the training set because that can result in overfitting, nor do you want to tune them on your test set because that results in an overly optimistic estimation of generalization. Thus we keep a separate set of data for the purpose of validation, that is, for tuning the hyperparameters - the <strong>validation set</strong>.</p>
+<p>You can use these errors to identify what kind of problem you have if your model isn't performing well:</p>
+<ul>
+<li>If your training error is large and your validation/test set error is large, then you have a high bias (underfitting) problem.</li>
+<li>If your training error is small and your validation/test set error is large, then you have a high variance (overfitting) problem.</li>
+</ul>
+<p>Because the test set is used to estimate the generalization error, it should not be used for "training" in any sense - this includes tuning hyperparameters. You should not evaluate on the test set and then go back and tweak things - this will give an overly optimistic estimation of generalization error.</p>
+<p>Some ways of evaluating a model's performance on (some of) your known data are:</p>
+<ul>
+<li>hold out (just set aside some portion of the data for validation; this is less reliable if the amount of data is small such that the held out portion is very small)</li>
+<li>k-fold cross-validation (better than hold out for small datasets)<ul>
+<li>the training set is divided into <mathjax>$k$</mathjax> folds</li>
+<li>iteratively take <mathjax>$k-1$</mathjax> folds for training and validate on the remaining fold</li>
+<li>average the results</li>
+<li>there is also "leave-one-out" cross-validation which is k-fold cross-validation where <mathjax>$k=n$</mathjax> (<mathjax>$n$</mathjax> is the number of datapoints)</li>
+</ul>
+</li>
+<li>bootstrapping<ul>
+<li>new datasets are generated by sampling with replacement (uniformly at random) from the original dataset</li>
+<li>then train on the bootstrapped dataset and validate on the unselected data</li>
+</ul>
+</li>
+<li>jackknife resampling<ul>
+<li>essentially to leave-one-out cross-validation, since leave-one-out is basically sampling without replacement</li>
+</ul>
+</li>
+</ul>
+<h3>Validation vs Testing</h3>
+<p><em>Validation</em> refers to the phase where you are tuning your model and its hyperparameters. Once you do that, you want to <em>test</em> this model on a new set of data it has not seen yet (i.e. data which has not been used in cross-validation or bootstrapping or whatever method you used). This is to simulate the model's performance on completely new data and see how it does, which is the most important quality of a model.</p>
+<h2>Evaluating regression models</h2>
+<p>The main techniques for evaluating regression models are:</p>
+<ul>
+<li>mean absolute error</li>
+<li>median absolute error</li>
+<li>(root) mean squared error</li>
+<li>coefficient of determination (<mathjax>$R^2$</mathjax>)</li>
+</ul>
+<h3>Residuals</h3>
+<p>A <strong>residual</strong> <mathjax>$e_i$</mathjax> is the difference between the observed and predicted outcome, i.e.:</p>
+<p><mathjax>$$
+e_i = y_i - \hat y_i
+$$</mathjax></p>
+<p>This can also be thought of as the vertical distance between an observed data point and the regression line.</p>
+<p>Fitting a line by <strong>least squares</strong> minimizes <mathjax>$\sum_{i=1}^n e_i^2$</mathjax>; that is, it minimizes the <strong>mean squared error</strong> (MSE) between the line and the data. But there always remain some error from the fit line; this remaining error is the residual.</p>
+<p>Alternatively, the <strong>mean absolute error</strong> or <strong>median absolute error</strong> can be used instead of the mean squared error.</p>
+<p><mathjax>$e_i$</mathjax> can be interpreted as estimates of the regression error <mathjax>$\epsilon_i$</mathjax>, since we can only compute the true error if we know the true model parameters.</p>
+<p>We can measure the quality of a linear model, which is called <strong>goodness of fit</strong>. One approach is to look at the variation of the residuals. You can also use the coefficient of determination (<mathjax>$R^2$</mathjax>), explained previously, which measures the variance explained by the least squares line.</p>
+<h4>Residual (error) variation</h4>
+<p>Residual variation measures how well a regression line fits the data points.</p>
+<p>The average squared residual (the estimated residual variance) is the same as the mean squared error, i.e. <mathjax>$\sigma^2 = \frac{1}{n} \sum_{i=1}^n e_i^2$</mathjax>.</p>
+<p>However, to make this estimator unbiased, you're more likely to see:</p>
+<p><mathjax>$$
+\hat \sigma^2 = \frac{1}{n-2} \sum_{i=1}^n e_i^2
+$$</mathjax></p>
+<p>That is, with the degrees of freedom taken into account (here for intercept and slope, which both have to be estimated).</p>
+<p>The square root of this estimated variance, <mathjax>$\sigma$</mathjax>, is the root mean squared error (RMSE).</p>
+<h4>Coefficient of determination</h4>
+<p>The <strong>total variation</strong> is equal to the residual variation (variation after removing the predictor) plus the systematic/regression variation (the variation explained by the regression model):</p>
+<p><mathjax>$$
+\sum_{i=1}^n (Y_i - \bar Y)^2 = \sum_{i=1}^n (Y_i - \hat Y_i)^2 + \sum_{i=1}^n (\hat Y_i - \bar Y)^2
+$$</mathjax></p>
+<p><mathjax>$R^2$</mathjax> (<mathjax>$0 \leq R^2 \leq 1$</mathjax>) is the percent of total variability that is explained by the regression model, that is:</p>
+<p><mathjax>$$
+R^2 = \frac{\text{regression variation}}{\text{total variation}} = \frac{\sum_{i=1}^n (\hat Y_i - \bar Y)^2}{\sum_{i=1}^n (Y_i - \bar Y)^2} = 1 - \frac{\text{residual variation}}{\text{total variation}} = 1 - \frac{\sum_{i=1}^n (Y_i - \hat Y_i)^2}{\sum_{i=1}^n (Y_i - \bar Y)^2}
+$$</mathjax></p>
+<p><mathjax>$R^2$</mathjax> can be a misleading summary of model fit since deleting data or adding terms will inflate it.</p>
+<p>TODO combine the below</p>
+<h3>Coefficient of determination</h3>
+<figure><img alt="Example of error" src="../assets/error.svg" /><figcaption>Example of error</figcaption>
+</figure>
+<p>For a line <mathjax>$y = mx+b$</mathjax>, the error of a point <mathjax>$(x_n, x_y)$</mathjax> against that line is:</p>
+<p><mathjax>$$ y_n - (mx_n + b) $$</mathjax></p>
+<p>Intuitively, this is the vertical difference between the point on the line at <mathjax>$x_n$</mathjax><br />
+and the actual point at <mathjax>$x_n$</mathjax>.</p>
+<p>The <strong>squared error of the line</strong> is the sum of the squares of all of these errors:</p>
+<p><mathjax>$$ \SE_{\text{line}} = \sum_{i=0}^n (y_i - (mx_i + b))^2 $$</mathjax></p>
+<p>To get a best fit line, you want to minimize this squared error. That is, you want to<br />
+find <mathjax>$m$</mathjax> and <mathjax>$b$</mathjax> which minimizes <mathjax>$SE_{\text{line}}$</mathjax>. This works out as ^[Reminder: a bar over a variable (<mathjax>$\bar x$</mathjax>) means the mean of those values. So <mathjax>$\bar{x^2} = \frac{x_1^2 + x_2^2 + \dots + x_n^2}{n}$</mathjax>]:</p>
+<p><mathjax>$$ m = \frac{\bar{x}\bar{y} - \bar{xy}}{\bar{x}^2 - \bar{x^2}} $$</mathjax><br />
+<mathjax>$$ b = \bar{y} - m\bar{x} $$</mathjax></p>
+<p>Note that you can alternatively calculate the regression line slope <mathjax>$m$</mathjax> as with the covariance and variance:</p>
+<p><mathjax>$$ m = \frac{\Cov(x,y)}{\Var(x)} $$</mathjax></p>
+<p>The line that these values yields is the <strong>regression line</strong>.</p>
+<p>We can calculate the total variation in <mathjax>$y$</mathjax>, <mathjax>$\SE_{\bar{y}}$</mathjax>, as:</p>
+<p><mathjax>$$ \SE_{\bar{y}} = \sum_{i=0}^n (y_i - \bar{y})^2 $$</mathjax></p>
+<p>And then we can calculate the percentage of total variation in <mathjax>$y$</mathjax> described by the<br />
+regression line:</p>
+<p><mathjax>$$ 1 - \frac{\SE_{\text{line}}}{\SE_{\bar{y}}} $$</mathjax></p>
+<p>This is known as the <strong>coefficient of determination</strong> or <strong>R-squared</strong>.</p>
+<p>The closer R-squared is to 1, the better a fit the line is.</p>
+<h2>Evaluating classification models</h2>
+<p>Important quantities:</p>
+<ul>
+<li>Sensitivity: <mathjax>$\frac{TP}{TP+FN}$</mathjax></li>
+<li>Specificity: <mathjax>$\frac{TN}{TN+FP}$</mathjax></li>
+<li>Positive predictive value: <mathjax>$\frac{TP}{TP+FP}$</mathjax></li>
+<li>Negative predictive value: <mathjax>$\frac{TN}{TN+FN}$</mathjax></li>
+<li>Accuracy: <mathjax>$\frac{TP+TN}{TP+FP+TN+FN}$</mathjax></li>
+</ul>
+<h3>Area under the curve (AUC)</h3>
+<p>This method is for binary classification and multilabel classification. In binary classification you may choose some cutoff above which you assign a sample to one class, and below which you assign a sample to the other class.</p>
+<p>Depending on your cutoff, you will get different results - there is a trade off between the true and false positive rates.</p>
+<p>You can plot a Receiver Operating Characteristic (ROC) curve, which has for its y-axis <mathjax>$P(TP)$</mathjax> and for its x-axis <mathjax>$P(FP)$</mathjax>. Every point on the curve corresponds to a cutoff value. That is, the ROC curve visualizes a sweep through all the cutoff thresholds so you can see the performance of your classifier across <em>all</em> cutoff thresholds, whereas other metrics (such as the F-score and so on) only tell you the performance for one particular cutoff. By looking at all thresholds at once, you get a more complete and honest picture of how your classifier is performing, in particular, how well it is separating the classes. It is insensitive to the bias of the data's classes - that is, if there are way more or way less of the positive class than there are of the negative class (other metrics may be deceptively favorable or punishing in such unbalanced circumstances).</p>
+<p>The <em>area under the curve</em> (AUC) is used to quantify how good the classification algorithm is. In general, an AUC of above 0.8 is considered "good". An AUC of 0.5 (a straight line) is equivalent to random guessing.</p>
+<figure><img alt="ROC curves" src="../assets/roc_curves.svg" /><figcaption>ROC curves</figcaption>
+</figure>
+<p>So ROC curves (and the associated AUC metric) are very useful for evaluating binary classification.</p>
+<p>Note that ROC curves can be extended to classification of three or more classes by using the one-vs-all approach (see section on classification).</p>
+<p>TODO incorporate the explanation below as well:</p>
+<p>AUC is a metric for binary classification and is especially useful when dealing with <em>high-bias</em> data, that is, where one class is much more common than the other. Using accuracy as a metric falls apart in high-bias datasets: for example, say you have 100 training examples, one of which is is positive, the rest of which are negative. You could develop a model which just labels every thing negative, and it would have 99% accuracy. So accuracy doesn't really tell you enough here.</p>
+<p>Many binary classifies output some continuous value (0-1), rather than class labels; there is some threshold (usually 0.5) above which one label is assigned, and below which the other label is assigned. Some models may work best with a different threshold. Changing this threshold leads to a trade off between true positives and false positives - for example, decreasing the threshold will yield more true positives, but also more false positives.</p>
+<p>AUC runs over all thresholds and plots the the true vs false positive rates. This curve is called a <em>receiver operating characteristic</em> curve, or <em>ROC</em> curve. A random classifier would give you equal false and true positives, which leads to a AUC of 0.5; the curve in this case would be a straight line. The better the classifier is, the more area under the curve there is (so the AUC approaches 1).</p>
+<h3>Confusion Matrices</h3>
+<p>This method is suitable for binary or multiclass classification.</p>
+<p>For classification, evaluation often comes in the form of a <strong>confusion matrix</strong>.</p>
+<p>The core values are:</p>
+<ul>
+<li><strong>True positives</strong> (TP): samples classified as positive which were labeled positive</li>
+<li><strong>True negatives</strong> (TN): samples classified as negative which were labeled negative</li>
+<li><strong>False positives</strong> (FP): samples classified as positive which were labeled negative</li>
+<li><strong>False negatives</strong> (FN): samples classified as negative which were labeled positive</li>
+</ul>
+<p>A few other metrics are computed from these values:</p>
+<ul>
+<li><strong>Accuracy</strong>: How often is the classifier correct? (<mathjax>$\frac{\text{TP} + \text{TN}}{\text{total}}$</mathjax>)</li>
+<li><strong>Misclassification rate</strong> (or "<strong>error rate</strong>"): How often is the classifier wrong? (<mathjax>$\frac{\text{FP} + \text{FN}}{\text{total}} = 1 - \text{accuracy}$</mathjax>)</li>
+<li><strong>Recall</strong> (or "<strong>sensitivity</strong>" or "<strong>true positive rate</strong>"): How often are positive-labeled samples predicted as positive? (<mathjax>$\frac{\text{TP}}{\text{num positive-labeled examples}}$</mathjax>)</li>
+<li><strong>False positive rate</strong>: How often are negative-labeled samples predicted as positive? (<mathjax>$\frac{\text{FP}}{\text{num negative-labeled examples}}$</mathjax>)</li>
+<li><strong>Specificity</strong> (or "<strong>true negative rate</strong>"): How often are negative-labeled samples predicted as negative? (<mathjax>$\frac{\text{TN}}{\text{num negative-labeled examples}}$</mathjax>)</li>
+<li><strong>Precision</strong>: How many of the predicted positive samples are correctly predicted? (<mathjax>$\frac{\text{TP}}{\text{TP} + \text{FP}}$</mathjax>)</li>
+<li><strong>Prevalence</strong>: How many labeled-positive samples are there in the data? (<mathjax>$\frac{\text{num positive-labeled examples}}{\text{num examples}}$</mathjax>)</li>
+</ul>
+<p>Some other values:</p>
+<ul>
+<li><strong>Positive predictive value</strong> (PPV): precision but takes prevalence into account. With a perfectly balanced dataset (i.e. equal positive and negative examples, that is prevalence is 0.5), the PPV equals the precision.</li>
+<li><strong>Null error rate</strong>: how often you would be wrong if you just predicted positive for every example. This is a good starting baseline metric to compare your classifier against.</li>
+<li><strong>F-score</strong>: The weighted average of recall and precision</li>
+<li><strong>Cohen's Kappa</strong>: a measure of how well the classifier performs compared against if it had just guessed randomly, that is a high Kappa score happens when there is a big difference between the accuracy and the null error rate.</li>
+<li><strong>ROC Curve</strong>: (see the section on this)</li>
+</ul>
+<h3>Log-loss</h3>
+<p>This method is suitable for binary, multiclass, and multilabel classification.</p>
+<p><strong>Log-loss</strong> is an accuracy metric that can be used when the classifier output is not a class but a probability, as is the case with logistic regression. It penalizes the classifier based on how far off it is, e.g. if it predicts 1 with probability of 0.51 but the correct class is 0, it is less "wrong" than if it had predicted class 1 with probability 0.95.</p>
+<p>For a binary classifier, log-loss is computed:</p>
+<p><mathjax>$$
+-\frac{1}{n} \sum_i^N y_i \log(\hat y_i) + (1-y_i) \log(1 - \hat y_i)
+$$</mathjax></p>
+<p>Log-loss is the cross-entropy b/w the distribution of the true labels and the predictions. It is related to relative entropy (that is, Kullback-Leilber divergence).</p>
+<p>Intuitively, the way this works is the <mathjax>$y_i$</mathjax> terms "turn on" the appropriate parts, e.g. when <mathjax>$y_i = 1$</mathjax> then the term <mathjax>$y_i \log(\hat y_i)$</mathjax> is activated and the other is 0. The reverse is true when <mathjax>$y_i = 0$</mathjax>.</p>
+<p>Because <mathjax>$\log(1) = 0$</mathjax>, we get the best loss (0) when the term within the <mathjax>$\log$</mathjax> operation is 1; i.e. when <mathjax>$y_i = 1$</mathjax> we want <mathjax>$\hat y_i$</mathjax> to equal 1, so the loss comes down to <mathjax>$\log(\hat y_i)$</mathjax>, but when <mathjax>$y_i = 0$</mathjax>, we want <mathjax>$\hat y_i = 0$</mathjax>, so the loss in that case comes down to <mathjax>$\log(1 - \hat y_i)$</mathjax>.</p>
+<h3>F1 score</h3>
+<p>The <strong>F1 score</strong>, also called the <strong>balanced F-score</strong> or <strong>F-measure</strong>, is the weighted average of precision and recall:</p>
+<p><mathjax>$$
+F_1 = 2 \frac{\text{precision} \times \text{recall}}{\text{precision} + \text{recall}}
+$$</mathjax></p>
+<p>The best score is 1 and the worst is 0.</p>
+<p>It can be used for binary, multiclass, and multilabel classification (for the latter two, use the weighted average of the F1 score for each class).</p>
+<h2>Metric selection</h2>
+<p>When it comes to <strong>skewed classes</strong> (or <em>high bias data</em>), metric selection is more nuanced.</p>
+<p>For instance, say you have a dataset where only 0.5% of the data is in category 1 and the rest is in category 0. You run your model and find that it categorized 99.5% of the data correctly! But because of the skew in that data, your model could just be: classify each example in category 0, and it would achieve that accuracy.</p>
+<p>Note that the convention is to set the rare class to 1 and the other class to 0. That is, we try to predict the rare class.</p>
+<p>Instead, you may want to use <em>precision/recall</em> as your evaluation metric.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>1T</th>
+<th>0T</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1P</td>
+<td>True positive</td>
+<td>False positive</td>
+</tr>
+<tr>
+<td>0P</td>
+<td>False negative</td>
+<td>True negative</td>
+</tr>
+</tbody>
+</table>
+<p>Where 1T/0T indicates the actual class and 1P/0P indicates the predicted class.</p>
+<p><strong>Precision</strong> is the number of true positives over the total number predicted as positive. That is, what fraction of the examples labeled as positive actually are positive?</p>
+<p><mathjax>$$
+\frac{\text{true positives}}{\text{true positives} + \text{false positives}}
+$$</mathjax></p>
+<p><strong>Recall</strong> is the number of true positives over the number of actual positives. That is, what fraction of the positive examples in the data were identified?</p>
+<p><mathjax>$$
+\frac{\text{true positives}}{\text{true positives} + \text{false negatives}}
+$$</mathjax></p>
+<p>So in the previous example, our simple classifier would have a recall of 0.</p>
+<p>There is a trade-off between precision and recall.</p>
+<p>Say you are using a logistic regression model for this classification task. Normally, the category threshold in logistic regression is 0.5, that is, predict class 1 if <mathjax>$h_{\theta}(x) \geq 0.5$</mathjax> and predict class 0 if <mathjax>$h_{\theta}(x) &lt; 0.5$</mathjax>.</p>
+<p>But you may want to only classify an example as 1 if you're very confidence. So you may change the threshold to 0.9 to be stricter about your classifications. In this case, you would increase precision, but lower recall since the model may not be confident enough about some of the more ambiguous positive examples.</p>
+<p>Conversely, you may want to lower the threshold to avoid false negatives, in which case recall increases, but precision decreases.</p>
+<p>So how do you compare precision/recall values across algorithms to determine which is best? You can condense precision and recall into a single metric: the <mathjax>$F_1$</mathjax> score (also just called the <strong>F-score</strong>, which is the harmonic mean of the precision and recall):</p>
+<p><mathjax>$$
+F_1 \text{score} = 2 \frac{PR}{P+R}
+$$</mathjax></p>
+<p>Although more data doesn't always help, it generally does. Many algorithms perform significantly better as they get more and more data. Even relatively simple algorithms can outperform more sophisticated ones, solely on the basis of having more training data.</p>
+<p>If your algorithm doesn't perform well, here are some things to try:</p>
+<ul>
+<li>Get more training examples (can help with high variance problems)</li>
+<li>Try smaller sets of features (can help with high variance problems)</li>
+<li>Try additional features (can help with high bias problems)</li>
+<li>Try adding polynomial features (<mathjax>$x_1^2, x_2^2, x_1 x_2$</mathjax>, etc) (can help with high bias problems)</li>
+<li>Try decreasing the regularization parameter <mathjax>$\lambda$</mathjax> (can help with high bias problems)</li>
+<li>Try increasing the regularization parameter <mathjax>$\lambda$</mathjax> (can help with high variance problems)</li>
+</ul>
+<h2>Hyperparameter selection</h2>
+<p>Another part of model selection is <em>hyperparameter selection</em>.</p>
+<p>Hyperparameter tuning is often treated as an art, i.e. without a reliable and practical systematic process for optimizing them. However, there are some automated methods that can be useful, including:</p>
+<ul>
+<li>grid search</li>
+<li>random search</li>
+<li>evolutionary algorithms</li>
+<li>Bayesian optimization</li>
+</ul>
+<p>Random search and grid search don't perform particularly well but are worth being familiar with.</p>
+<h3>Grid search</h3>
+<p>Just searching through combinations of different hyperparameters and seeing which combination performs the best. Generally hyperparameters are searched over specific intervals or scales, depending on the particular hyperparameter. It may be 10, 20, 30, etc or 1e-5, 1e-4, 1e-3, etc. It is easy to parallelize but quite brute-force.</p>
+<h3>Random search</h3>
+<p>Surprisingly, randomly sampling from the full grid often works just as well as a complete grid search, but in much less time.</p>
+<p>Intuitively: if we want the hyperparameter combination leading to the top 5% of performance, then any random hyperparameter combination from the grid has a 5% chance of leading to that result. If we want to successfully find such a combination 95% of the time, how many random combinations do we need to run through?</p>
+<p>If we take <mathjax>$n$</mathjax> hyperparameter combinations, the probability that all <mathjax>$n$</mathjax> are outside of this 5% of top combinations is <mathjax>$(1 - 0.05)^n$</mathjax>, so the probability that at least one is in the 5% is just <mathjax>$1 - (1-0.05)^n$</mathjax>. If we want to find one of these combinations 95% of the time, that is, we want the probability that at least one of them to be what we're looking for to be 95%, then we just set <mathjax>$1 - (1-0.05)^n = 0.95$</mathjax>, and thus <mathjax>$n \geq 60$</mathjax>, so we need to try only 60 random hyperparamter combinations at minimum to have a 95% chance of finding at least one hyperparameter combination that yields top 5% performance for the model.</p>
+<h3>Bayesian Hyperparameter Optimization</h3>
+<p>We can use Bayesian optimization to select good hyperparameters for us. We can sample hyperparameters from a Gaussian process (the prior) and use the result as observations to compute a posterior distribution. Then we select the next hyperparameters to try by optimizing the expected improvement over the current best result or the Gaussian process upper confidence bound (UCB). In particular, we choose an <em>acquisition function</em> to construct a utility function from the model posterior - this is what we use to decide what next set of hyperparameters to try.</p>
+<p>Basic idea: Model the generalization performance of an algorithm as a smooth function of its hyperparameters and then try to find the maxima.</p>
+<p>It has two parts:</p>
+<ul>
+<li>Exploration: evaluate this function on sets of hyperparameters where the outcome is most uncertain</li>
+<li>Exploitation: evaluate this function on sets of hyperparameters which seem likely to output high values</li>
+</ul>
+<p>Which repeat until convergence.</p>
+<p>This is faster than grid search by making "educated" guesses as to where the optimal set of hyperparameters might be, as opposed to brute-force searching through the entire space.</p>
+<p>One problem is that computing the results of a hyperparameter sample can be very expensive (for instance, if you are training a large neural network).</p>
+<p>We use a Gaussian process because its properties allow us to compute marginals and conditionals in closed form.</p>
+<p>Some notation for the following:</p>
+<ul>
+<li><mathjax>$f(x)$</mathjax> is the function drawn from the Gaussian process prior, where <mathjax>$x$</mathjax> is the set of hyperparameters</li>
+<li>observations are in the form <mathjax>$\{x_n, y_n\}_{n=1}^{N}$</mathjax>, where <mathjax>$y_n \sim \mathcal N (f(x_n), v)$</mathjax> and <mathjax>$v$</mathjax> is the variance of noise introduced into the function observations</li>
+<li>the acquisition function is <mathjax>$a : \mathcal X \to \mathbb R^+$</mathjax>, where <mathjax>$\mathcal X$</mathjax> is the hyperparameter space</li>
+<li>the next set of hyperparameters to try is <mathjax>$x_{\text{next}} = \argmax_x a(x)$</mathjax></li>
+<li>the current best set of hyperparameters is <mathjax>$x_{\text{best}}$</mathjax></li>
+<li><mathjax>$\Phi()$</mathjax> denotes the cumulative distribution function of the standard normal</li>
+</ul>
+<p>A few popular choices of acquisition functions include:</p>
+<ul>
+<li><em>probability of improvement</em>: with a Gaussian process, this can be computed analytically as:</li>
+</ul>
+<p><mathjax>$$
+\begin{aligned}
+a_{\text{PI}}(x ; \{x_n, y_n\} \theta) &amp;= \Phi(\gamma(x)) \\
+\gamma(x) &amp;= \frac{f(x_{\text{best}} - \mu(x; \{x_n, y_n\}, \theta)}{\sigma(x; \{x_n, y_n\}, \theta)}
+\end{aligned}
+$$</mathjax></p>
+<ul>
+<li><em>expected improvement</em>: under a Gaussian process, this also has a closed form:</li>
+</ul>
+<p><mathjax>$$
+a_{\text{EI}} (x; \{x_n, y_n\}, \theta) = \sigma(x; \{x_n, y_n\}, \theta) (\gamma(x)\Phi(\gamma(x)) + \mathcal N (\gamma(x); 0, 1))
+$$</mathjax></p>
+<ul>
+<li><em>Gaussian process upper confidence bound</em>: use upper confidence bounds (when maximizing, otherwise, lower confidence bounds) to construct acquisition functions that minimize regret over the course of their optimization:</li>
+</ul>
+<p><mathjax>$$
+a_{\text{LCB}} (x; \{x_n, y_n\}, \theta) = \mu(x; \{x_n, y_n\}, \theta) - \kappa \sigma(x; \{x_n, y_n\}, \theta)
+$$</mathjax></p>
+<p>Where <mathjax>$\kappa$</mathjax> is tunable to balance exploitation against exploration.</p>
+<p>Some difficulties with Bayesian optimization of hyperparameters include:</p>
+<ul>
+<li>often unclear what the appropriate choice for the covariance function and its associated hyperparameters (these hyperparameters are distinct from the ones the method is optimizing; i.e. these are in some sense "hyper-hyperparameters")</li>
+<li>the function evaluation can be a time-consuming optimization procedure. One method is to optimize expected improvement <em>per second</em>, thereby taking wall clock time into account. That way, we prefer to evaluate points that are not only likely to be good, but can also be evaluated quickly. However, we don't know the <em>duration function</em> <mathjax>$c(x) : \mathcal X \to \mathbb R^+$</mathjax>, but we can use this same Gaussian process approach to model <mathjax>$c(x)$</mathjax> alongside <mathjax>$f(x)$</mathjax>.</li>
+</ul>
+<p>Furthermore, we can parallelize these Bayesian optimization procedures (refer to paper)</p>
+<h3>Choosing the Learning Rate <mathjax>$\alpha$</mathjax></h3>
+<p>You can plot out a graph with the number of gradient descent iterations on the x-axis and the values of <mathjax>$\min_{\theta} J(\theta)$</mathjax> on the y-axis and visualize how the latter changes with the number of iterations. At some point, that curve will flatten out; that's about the number of iterations it took for gradient descent to converge on your particular problem.</p>
+<figure><img alt="Decreasing error over number of iterations" src="../assets/decreasing_error.svg" /><figcaption>Decreasing error over number of iterations</figcaption>
+</figure>
+<p>You could use an <em>automatic convergence test</em> which just declares convergence if <mathjax>$J(\theta)$</mathjax> decreases by less than some threshold value in an iteration, but in practice that threshold value may be difficult to determine.</p>
+<p>You would expect this curve to be similar to the one above. <mathjax>$min_{\theta} J(\theta)$</mathjax> should decrease with the number of iterations, if gradient descent is working correctly. If not, then you should probably be using a smaller learning rate (<mathjax>$\alpha$</mathjax>). But again, don't make it too small or convergence will be slow.</p>
+<h2>CASH</h2>
+<p>The particular problem is called the <em>CASH</em> problem (<em>Combined Algorithm Selection and Hyperparameter optimization</em> problem).</p>
+<p>It can be formalized as such:</p>
+<ul>
+<li><mathjax>$\mathcal A = \{A^{(1)}, \dots, A^{(R)}\}$</mathjax> is a set of algorithms<ul>
+<li>the algorithm <mathjax>$A^{(j)}$</mathjax>'s hyperparameters has the domain <mathjax>$\Lambda^{(j)}$</mathjax></li>
+</ul>
+</li>
+<li><mathjax>$D_{\text{train}} = \{(x_1, y_1), \dots, (x_n, y_n)\}$</mathjax> be a training set<ul>
+<li>it is split into <mathjax>$K$</mathjax> cross-validation folds <mathjax>${D_{\text{valid}}^{(1)}, \dots, D_{\text{valid}}^{(K)}}$</mathjax> and <mathjax>${D_{\text{train}}^{(1)}, \dots, D_{\text{train}}^{(K)}}$</mathjax></li>
+</ul>
+</li>
+<li>the loss <mathjax>$L(A_{\lambda}^{(j)}, D_{\text{train}}^{(i)}, D_{\text{valid}}^{(i)})$</mathjax> is the loss an algorithm <mathjax>$A^{(j)}$</mathjax> achieves on <mathjax>$D_{\text{valid}}^{(i)}$</mathjax> when trained on <mathjax>$D_{\text{train}}^{(i)}$</mathjax> with hyperparameters <mathjax>$\lambda$</mathjax></li>
+</ul>
+<p>we want to find the joint algorithm and hyperparameter settings that minimizes this loss:</p>
+<p><mathjax>$$
+A^*, \lambda_* \in \argmin_{A^{(j)} \in \mathcal A, \lambda \in \Lambda^{(j)}} \frac{1}{K} \sum_{i=1}^K L(A_{\lambda}^{(j)}, D_{\text{train}}^{(i)}, D_{\text{valid}}^{(i)})
+$$</mathjax></p>
+<p>Approaches to this problem include the aforementioned Bayesian optimization methods.</p>
+<p><em>Meta-learning</em> is another approach, in which machine learning is applied machine learning itself, that is, to algorithm and hyperparameter selection (and additionally feature preprocessing). The input data are different machine learning tasks and datasets, the output is a well-performing algorithm and hyperparameter combination. In meta-learning we learn "meta-features" to identify similar problems for which a algorithm and hyperparameter combination is good for.</p>
+<p>These meta-features can include things like the number of datapoints, features, and classes, the data skewness, the entropy of the targets, etc.</p>
+<p>Meta-learning can be combined with Bayesian optimization - it can be used to roughly identify good algorithm and hyperparameter choices, and Bayesian optimization can be used to fine-tune these choices. This approach of using meta-learning to support Bayesian optimization is called "warmstarting".</p>
+<p>As Bayesian optimization searches for hyperparameters it may come across many well-performing hyperparameters that it discards because they are not the best. However, they can be saved to construct an (weighted) ensemble model, which usually outperforms individual models. The ensemble selection method seems to work best for constructing the ensemble:</p>
+<ul>
+<li>start with an empty ensemble</li>
+<li>iteratively, up to a specified ensemble size<ul>
+<li>add a model that maximizes ensemble validation performance</li>
+</ul>
+</li>
+</ul>
+<p>Models are unweighted, but models can be added multiple time so the end result is a weighted ensemble.</p>
+<h2>References</h2>
+<ul>
+<li>Review of fundamentals, IFT725. Hugo Larochelle. 2012.</li>
+<li><a href="https://sux13.github.io/DataScienceSpCourseNotes/4_EXDATA/Exploratory_Data_Analysis_Course_Notes.pdf">Exploratory Data Analysis Course Notes</a>. Xing Su.</li>
+<li><a href="https://www.coursera.org/course/mmds">Mining Massive Datasets</a> (Coursera &amp; Stanford, 2014). Jure Leskovec, Anand Rajaraman, Jeff Ullman.</li>
+<li><a href="https://www.coursera.org/learn/machine-learning">Machine Learning</a>. 2014. Andrew Ng. Stanford University/Coursera.</li>
+<li><a href="https://www.edx.org/course/artificial-intelligence-uc-berkeleyx-cs188-1x">CS188: Artificial Intelligence</a>. Dan Klein, Pieter Abbeel. University of California, Berkeley (edX).</li>
+<li><em>Evaluating Machine Learning Models</em>. Alice Zheng. 2015.</li>
+<li><a href="https://www.youtube.com/watch?v=heFaYLKVZY4">Computational Statistics II</a> (<a href="https://github.com/fonnesbeck/scipy2015_tutorial">code</a>). Chris Fonnesbeck. SciPy 2015.</li>
+<li><a href="https://www.udacity.com/course/intro-to-artificial-intelligence--cs271">Intro to Artificial Intelligence</a>. CS271. Peter Norvig, Sebastian Thrun. Udacity.</li>
+<li><a href="http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-034-artificial-intelligence-fall-2010/">MIT 6.034 (Fall 2010): Artificial Intelligence</a>. Patrick H. Winston. MIT.</li>
+<li><a href="http://www-labs.iro.umontreal.ca/~bengioy/dlbook/">Deep Learning</a>. Yoshua Bengio, Ian Goodfellow, Aaron Courville.</li>
+<li><a href="https://cs231n.github.io/neural-networks-1/">CS231n Convolutional Neural Networks for Visual Recognition, Module 1: Neural Networks Part 2: Setting up the Data and the Loss</a>. Andrej Karpathy.</li>
+<li><a href="https://www.youtube.com/watch?v=g_4z6o7XZbQ">POLS 509: Hierarchical Linear Models</a>. Justin Esarey.</li>
+<li><a href="http://www.isi.edu/natural-language/people/bayes-with-tears.pdf">Bayesian Inference with Tears</a>. Kevin Knight, September 2009.</li>
+<li><a href="https://chronicles.mfglabs.com/learning-to-learn-or-the-advent-of-augmented-data-scientists-20873282e181">Learning to learn, or the advent of augmented data scientists</a>. Simon Benhamou.</li>
+<li><a href="http://arxiv.org/abs/1206.2944">Practical Bayesian Optimization of Machine Learning Algorithms</a>. Jasper Snoek, Hugo Larochelle, Ryan P. Adams.</li>
+<li><a href="http://www.nature.com/nbt/journal/v26/n8/full/nbt1406.html">What is the expectation maximization algorithm?</a>. Chuong B Do &amp; Serafim Batzoglou.</li>
+<li><a href="https://www.umiacs.umd.edu/~resnik/pubs/LAMP-TR-153.pdf">Gibbs Sampling for the Uninitiated</a>. Philip Resnik, Eric Hardisty. June 2010.</li>
+<li><a href="https://onlinecourses.science.psu.edu/stat414/node/191">Maximum Likelihood Estimation</a>. Penn State Eberly College of Science.</li>
+<li><a href="https://www.coursera.org/specializations/jhu-data-science">Data Science Specialization</a>. Johns Hopkins (Coursera). 2015.</li>
+<li><a href="https://www.coursera.org/learn/practical-machine-learning">Practical Machine Learning</a>. Johns Hopkins (Coursera). 2015.</li>
+<li><a href="http://statweb.stanford.edu/~tibs/ElemStatLearn/">Elements of Statistical Learning</a>. 10th Edition. Trevor Hastie, Robert Tibshirani, Jerome Friedman.</li>
+<li><a href="http://scikit-learn.org/stable/modules/model_evaluation.html">Model evaluation: quantifying the quality of predictions</a>. scikit-learn.</li>
+<li><a href="https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf">Efficient and Robust Automated Machine Learning</a>. Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Tobias Springenberg, Manuel Blum, Frank Hutter.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>

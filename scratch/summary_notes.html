@@ -1,0 +1,318 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>summary_notes</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+</head>
+
+<body>
+
+    <h1>Rush, A. M., Chopra, S., &amp; Weston, J. (2015). A neural attention model for abstractive sentence summarization. arXiv preprint arXiv:1509.00685.</h1>
+<p>A factored scoring function <mathjax>$s$</mathjax> which takes into account a fixed window of previous words:</p>
+<p><mathjax>$$
+s(x,y) \approx \sum_{i=0}^{N-1} g(y_{i+1}, x, y_c)j
+$$</mathjax></p>
+<p>where <mathjax>$y_c = y_{[i-C+1, \dots, i]}$</mathjax> for a window of size <mathjax>$C$</mathjax>.</p>
+<p>The conditional log probability of a summary given the input is:</p>
+<p><mathjax>$$
+s(x,y) = \log p(y|x;\theta)
+$$</mathjax></p>
+<p>which can be re-written as:</p>
+<p><mathjax>$$
+\log p(y|x; \theta) \approx \sum_{i=0}^{N-1} \log p(y_{i+1}|x,y_c; \theta)
+$$</mathjax></p>
+<ul>
+<li>we make a Markov assumption on the length of the context as size <mathjax>$C$</mathjax></li>
+<li>for <mathjax>$i &lt; 1$</mathjax>, <mathjax>$y_i$</mathjax> is a special start symbol</li>
+</ul>
+<p>The focus is to model <mathjax>$p(y_{i+1}|x,y_c; \theta)$</mathjax>, which is modeled directly using a neural network with an encoder.</p>
+<p>The model:</p>
+<p><mathjax>$$
+\begin{aligned}
+p(y_{i+1}|x,y_c; \theta) &amp;\varpropto \exp(Vh + W \text{enc}(x, y_c)) \\
+\bar y_c &amp;= [E y_{i-C+1}, \dots, E y_i] \\
+h &amp;= \tanh(U \bar y_c)
+\end{aligned}
+$$</mathjax></p>
+<p>where:<br />
+- <mathjax>$E$</mathjax> is the word embedding matrix<br />
+- <mathjax>$U, V, W$</mathjax> are weight matrices<br />
+- <mathjax>$h$</mathjax> is a hidden layer of size <mathjax>$H$</mathjax></p>
+<p>Various encoders were tried for <mathjax>$\text{enc}$</mathjax>:</p>
+<ol>
+<li><mathjax>$\text{enc}_1$</mathjax>: a bag-of-words encoder: embed the input sentence to size <mathjax>$H$</mathjax>, ignoring ordering</li>
+</ol>
+<p><mathjax>$$
+\begin{aligned}
+\text{enc}_1 &amp;= p^T \bar x \\
+p &amp;= [1/M, \dots, 1/M] \\
+\bar x &amp;= [Fx_1, \dots, F x_M]
+\end{aligned}
+$$</mathjax></p>
+<p>where:</p>
+<ul>
+<li><mathjax>$F$</mathjax> is an embedding matrix</li>
+<li><mathjax>$p$</mathjax> is a uniform distribution over the <mathjax>$M$</mathjax> input words</li>
+</ul>
+<p>this encoder can capture relative importance of words but is limited in representing contiguous phrases.</p>
+<ol start="2">
+<li>
+<p><mathjax>$\text{enc}_2$</mathjax>: convolutional encoder: a time-delay neural network (TDNN) architecture, alternating b/w temporal convolution layers and max pooling layers (see paper for details)</p>
+</li>
+<li>
+<p><mathjax>$\text{enc}_3$</mathjax>: attention-based encoder: takes context <mathjax>$y_c$</mathjax> into account:</p>
+</li>
+</ol>
+<p><mathjax>$$
+\begin{aligned}
+\text{enc}_3 &amp;= p^T \bar x \\
+p &amp;\varpropto \exp(\bar x P \bar{y_c'}) \\
+\bar x &amp;= [Fx_1, \dots, F x_M] \\
+\bar{y_c'} &amp;= [G y_{i-C+1}, \dots, G y_i] \\
+\forall i \bar x_i &amp;= \sum_{q=i-Q}^{i+Q} \frac{\bar x_i}{Q}
+\end{aligned}
+$$</mathjax></p>
+<p>where:</p>
+<ul>
+<li><mathjax>$G$</mathjax> is an embedding of the context</li>
+<li><mathjax>$P$</mathjax> is a new weight matrix parameter mapping between the context embedding and the input embedding</li>
+<li><mathjax>$Q$</mathjax> is a smoothing window</li>
+</ul>
+<p>so the uniform distribution from the bag-of-words model is replaced with a learned soft alignment <mathjax>$P$</mathjax> between the input and the summary</p>
+<p>To train:</p>
+<ul>
+<li>mini-batch SGD</li>
+<li>minimize negative log-likelihood of summaries:</li>
+</ul>
+<p><mathjax>$$
+-\sum_{j=1}^J \sum_{i=1}^{N-1} \log p(y_{i+1}^{(j)} | x^{(j)}, y_c; \theta)
+$$</mathjax></p>
+<p>for <mathjax>$J$</mathjax> input-summary pairs</p>
+<p>To generate the summary, a beam-search decoder is used:</p>
+<ul>
+<li>input: parameters <mathjax>$\theta$</mathjax>, beam size <mathjax>$K$</mathjax>, input <mathjax>$x$</mathjax></li>
+<li>output: approx. <mathjax>$K$</mathjax>-best summaries</li>
+<li><mathjax>$\pi[0] \leftarrow \{\epsilon\}$</mathjax></li>
+<li><mathjax>$\mathcal S = \mathcal V$</mathjax> if abstractive else <mathjax>$\{x_i | \forall i\}$</mathjax></li>
+<li>for <mathjax>$i=0$</mathjax> to <mathjax>$N-1$</mathjax> do<table>
+<thead>
+<tr>
+<th>- generate hypotheses: $\mathcal N \leftarrow {[y, y_{i+1}]</th>
+<th>y \in \pi[i], y_{i+1} \in S}$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- filter <mathjax>$K$</mathjax>-max: <mathjax>$\pi[i+1] \leftarrow \text{K-argmax}_{y \in \mathcal H} g(y_{i+1}, y_c, x) + s(y,x)$</mathjax></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>return <mathjax>$\pi[N]$</mathjax></li>
+</ul>
+<hr />
+<h1>Denil, M., Demiraj, A., &amp; de Freitas, N. (2014). Extraction of salient sentences from labelled documents. arXiv preprint arXiv:1412.6815.</h1>
+<ul>
+<li>CNNs for both sentence and document levels<ul>
+<li>sentence level: transform word embeddings in each sentence into an embedding for the entire sentence</li>
+<li>document level: transform sentence embeddings into an embedding for the entire document</li>
+</ul>
+</li>
+<li>training: feed resulting document embeddings into a softmax classifier</li>
+<li>the convolution operations are one-dimensional<ul>
+<li>convolve along rows of the embedding matrices</li>
+<li>at the sentence level this corresponds to convolving across words</li>
+<li>at the document level this corresponds to convolving across sentences</li>
+<li>wide ("full") convolutions are used</li>
+</ul>
+</li>
+<li>outputs of feature maps are stacked to form a new matrix which is fed as input to the next layer</li>
+<li>the embedding matrices will have varying widths since sentences and documents have different lengths; this is an issue when using them as input to the softmax layer and between the sentence and document levels<ul>
+<li>k-max pooling is used to compensate, applied to each row of the embedding matrix separately (keep the <mathjax>$k$</mathjax> largest values along that row and discard the rest)</li>
+</ul>
+</li>
+<li>to actually <em>extract</em> sentences:<ul>
+<li>a saliency map for the document is created by assigning an importance score to each sentence</li>
+<li>this is accomplished by performing a forward pass through the network to generate a class prediction using the softmax layer</li>
+<li>this class label is then inverted (a "pseudo-label") and this is fed to the loss function as the true label <mathjax>$\tilde y$</mathjax></li>
+<li>for input document <mathjax>$x$</mathjax> and neural network <mathjax>$f(x)$</mathjax> we approximate the loss as a linear function <mathjax>$L(\tilde y, f(x)) \approx w^T x + b$</mathjax> where <mathjax>$w = \frac{\partial L}{\partial x}\Bigr|_{(\tilde y, f(x))}$</mathjax></li>
+<li>the vector <mathjax>$w$</mathjax> has one entry for each word in the document</li>
+<li>we can use <mathjax>$|w_i|$</mathjax> as the measure of the salience of word <mathjax>$i$</mathjax> (using the gradient magnitude tells us how important words are)</li>
+<li>I do not understand what they propose for the rest of the extraction process but I think the basic idea is to use the gradient magnitude as saliency for each sentence as well, rank sentences that way and choose some top <mathjax>$m$</mathjax> sentences</li>
+</ul>
+</li>
+</ul>
+<p>architecture:</p>
+<figure><img alt="" src="../assets/extractive_cnn.png" /><figcaption></figcaption>
+</figure>
+<hr />
+<h1>Chopra, S., Auli, M., Rush, A. M., &amp; Harvard, S. E. A. S. Abstractive Sentence Summarization with Attentive Recurrent Neural Networks.</h1>
+<p><mathjax>$$
+P(y|x;\theta) = \prod_{t=1}^N p(y_t | \{y_1, \dots, y_{t-1}\}, x; \theta)
+$$</mathjax></p>
+<p>recurrent decoder:</p>
+<p><mathjax>$$
+P(y_t | \{y_1, \dots, y_{t-1}\}, x; \theta) = P_t = g_{\theta_1} (h_t, c_t)
+$$</mathjax></p>
+<p>where <mathjax>$h_t$</mathjax> is the hidden state of the RNN:</p>
+<p><mathjax>$$
+h_t = g_{\theta_1} (y_{t-1}, h_{t-1}, c_t)
+$$</mathjax></p>
+<p>where <mathjax>$c_t$</mathjax> is the output of the encoder module; it is a context vector computed as a function of the current state <mathjax>$h_{t-1}$</mathjax> and the input sequence <mathjax>$x$</mathjax></p>
+<p>more specifically, they experimented with two decoders: an Elman RNN and an LSTM</p>
+<p>the Elman RNN:</p>
+<p><mathjax>$$
+\begin{aligned}
+h_t &amp;= \sigma(W_1 y_{t-1} + W_2 h_{t-1} + W_3 c_t) \\
+P_t &amp;= \rho (W_4 h_t + W_5 c_t)
+\end{aligned}
+$$</mathjax></p>
+<p>where <mathjax>$\sigma$</mathjax> is the sigmoid function, <mathjax>$\rho$</mathjax> is the softmax, and <mathjax>$W_i$</mathjax> are weight matrices.</p>
+<p>The LSTM decoder:</p>
+<p><mathjax>$$
+\begin{aligned}
+i_t &amp;= \sigma (W_1 y_{t-1} + W_2 h_{t-1} + W_3 c_t) \\
+i_t' &amp;= \tanh (W_4 y_{t-1} + W_5 h_{t-1} + W_6 c_t) \\
+f_t &amp;= \sigma (W_7 y_{t-1} + W_8 h_{t-1} + W_9 c_t) \\
+o_t &amp;= \sigma (W_{10} y_{t-1} + W_{11} h_{t-1} + W_{12} c_t) \\
+m_t &amp;= m_{t-1} \odot f_t + i_t \odot i_t' \\
+h_t &amp;= m_t \odot o_t \\
+P_t &amp;= \rho(W_{13} h_t + W_{14} c_t)
+\end{aligned}
+$$</mathjax></p>
+<p>The attentive encoder, which generates the context vector <mathjax>$c_t$</mathjax>:</p>
+<ul>
+<li>for an input sentence <mathjax>$x$</mathjax>, <mathjax>$x_i$</mathjax> is the <mathjax>$d$</mathjax>-dimensional learnable embedding of the <mathjax>$i$</mathjax>-th word</li>
+<li>the position <mathjax>$i$</mathjax> of the word <mathjax>$x_i$</mathjax> is also associated with a learnable embedding <mathjax>$l_i$</mathjax> of size <mathjax>$d$</mathjax></li>
+<li>thus the full embedding for the <mathjax>$i$</mathjax>-th word in <mathjax>$x$</mathjax> is given by <mathjax>$a_i = x_i + l_i$</mathjax></li>
+<li>we also have a weight matrix used to convolve over the full embeddings of consecutive words, <mathjax>$B^k$</mathjax>; there are <mathjax>$d$</mathjax> such matrices, i.e. <mathjax>$k \in \{1, \dots, d\}$</mathjax>. The convolution output is:</li>
+</ul>
+<p><mathjax>$$
+z_{ik} = \sum_{h=-q/2}^{q/2} a_{i+h} b_{q/2+h}^k
+$$</mathjax></p>
+<p>where <mathjax>$b_j^k$</mathjax> is the <mathjax>$j$</mathjax>-th column of the matrix <mathjax>$B^k$</mathjax>.</p>
+<p>so we have aggregate embedding vectors <mathjax>$z_i = [z_{i1}, \dots, z_{id}]$</mathjax>, one for each word <mathjax>$x_i$</mathjax> in <mathjax>$x$</mathjax>. This essentially captures the word and its position and its surrounding context.</p>
+<p><mathjax>$q$</mathjax> is the width of the convolution (set to 5 in the experiments).</p>
+<p>the sequence is padded on both sides with dummy words for the words at the boundaries (start and end) of x.</p>
+<p>the context vector <mathjax>$c_t$</mathjax> (the encoder output) is computed:</p>
+<p><mathjax>$$
+c_t = \sum_{j=1}^M a_{j,t-1} x_j
+$$</mathjax></p>
+<p>the weights <mathjax>$\alpha_{j,t-1}$</mathjax> are computed:</p>
+<p><mathjax>$$
+a_{j,t-1} = \frac{\exp(z_j h_{t-1})}{\sum_{i=1}^M \exp(z_i h_{t-1})}
+$$</mathjax></p>
+<p>training is accomplished with a dataset <mathjax>$\mathcal S$</mathjax> of sentence-summary pairs. the model is trained with SGD to minimize the negative conditional log likelihood of the training data wrt <mathjax>$\theta$</mathjax>:</p>
+<p><mathjax>$$
+\mathcal L = - \sum_{i=1}^S \sum_{t=1}^N \log P(y_t^i | \{y_1^i, \dots, y_{t-1}^i\}, x^i; \theta)
+$$</mathjax></p>
+<p>then the beam-search procedure as described above is used to generate a summary for an input sentence <mathjax>$x$</mathjax>. The beam-search searches words such that <mathjax>$P(y|x)$</mathjax> is maximized, i.e. <mathjax>$\argmax P(y_t|\{y_1, \dots, y_{t-1}\}, x)$</mathjax>, parameterized by the number of paths <mathjax>$k$</mathjax> that are pursued at each time step</p>
+<hr />
+<h1>Nallapati, R., Zhou, B., Gulçehre, Ç., &amp; Xiang, B. Abstractive Text Summarization using Sequence-to-sequence RNNs and Beyond.</h1>
+<ul>
+<li>the encoder consists of a bidirectional GRU-RNN and the decoder is a unidirectional GRU-RNN with the same hidden-state size as the encoder and an attention mechanism over the source-hidden states and a softmax layer over the target vocabulary to generate words (detailed more in Chung et al., 2014)</li>
+<li>the "large vocabulary trick" (LVT)<ul>
+<li>the decoder vocabulary of each mini-batch is restricted to the words in the source document of that batch</li>
+<li>the most frequent words in the target dictionary are added until the vocab reaches a fixed size</li>
+<li>to reduce computation at the softmax layer</li>
+</ul>
+</li>
+<li>LVT limits vocab size for computational reasons but sacrifices the range of words available for a summary<ul>
+<li>this vocab can be re-expanded a bit by adding the 1-nearest-neighbors of each word in the source document (measured by cosine similarity in the word embeddings space)</li>
+</ul>
+</li>
+<li>additionally generate embeddings mapping words to one-hot encodings of TF-IDF (discretized into bins) and POS tags, concatenated into a single vector. this replaces the word-based embeddings on the source side; on the target side the word-based embeddings are still used.</li>
+<li>because important keywords may be rare in the overall corpus (e.g. named entities) it may be difficult to learn enough about them<ul>
+<li>they propose a "switching decoder/pointer" architecture</li>
+<li>can decide/switch between generating a word from the decoder or "pointing" back to a word position in the source text; that word is then just copied over to the output</li>
+<li>an attention distribution over source word positions is used as the generative distribution for pointers</li>
+<li>the switch is a sigmoid activation function over a linear layer based on the hidden state of the decoder, embedding vector from the previous emission and a context vector, i.e.:</li>
+</ul>
+</li>
+</ul>
+<p><mathjax>$$
+P(s_i) = \sigmoid(v^T(W_h h_i + W_e E[o{i-1}] + W_c c_i + b))
+$$</mathjax></p>
+<p>where:</p>
+<ul>
+<li><mathjax>$P(s_i)$</mathjax> is the probability of the switch turning "on"</li>
+<li><mathjax>$h_i$</mathjax> is the hidden state at the <mathjax>$i$</mathjax>th time step of the decoder</li>
+<li><mathjax>$E[o{i-1}]$</mathjax> is the embedding vector of the emission from the previous time step</li>
+<li><mathjax>$c_i$</mathjax> is the attention-weighted context vector</li>
+<li><mathjax>$W_h, W_e, W_c, b, v$</mathjax> are model parameters</li>
+</ul>
+<p>hierarchical encoder with hierarchical attention:<br />
+on the source side, there are two bi-directional RNNs: one at the word-level and one at the sentence-level. The word-level attention is re-weighted by the corresponding sentence-level attention and re-normalized as follows:</p>
+<p><mathjax>$$
+a(i) = \frac{a_w(i) a_s(s(i))}{\sum_{k=1}^N a_w(k) a_s(s(k))}
+$$</mathjax></p>
+<p>where <mathjax>$a_w(i)$</mathjax> is the word-level attention weight at the <mathjax>$i$</mathjax>th position of the source and <mathjax>$s(i)$</mathjax> is the id of the sentence at the <mathjax>$i$</mathjax>th word position, <mathjax>$a_s(j)$</mathjax> is the sentence-level attention weight for the <mathjax>$j$</mathjax>th sentence in the source, <mathjax>$N$</mathjax> is the number of words in the source document, and <mathjax>$a(i)$</mathjax> is the re-scaled attention at the <mathjax>$i$</mathjax>th word position. This re-scale attention is then used to compute the attention-weighted context vector that goes as input to the hidden state of the decoder.</p>
+<p>to generate the summary, beam search of size 5 was used.</p>
+<hr />
+<h1>Lopyrev, K. (2015). Generating News Headlines with Recurrent Neural Networks. arXiv preprint arXiv:1512.01712.</h1>
+<p>Uses an encoder-decoder architecture; both the encoder and decoder are RNNs.</p>
+<ul>
+<li>encoder<ul>
+<li>the encoder receives the input text one word at a time</li>
+<li>each word goes through an embedding layer to receive a word embedding</li>
+<li>the embedding is combined using a NN with the hidden layers generated after feeding in the previous word (which is all 0's if it is the first word in the text)</li>
+</ul>
+</li>
+<li>decoder<ul>
+<li>takes as input the hidden layers generated after feeding the last word of the input text</li>
+<li>an end-of-sequence symbol is fed in as input (first passing it through the embedding layer)</li>
+<li>using a softmax layer and attention mechanism, the decoder generates text, ending with an end-of-sequence symbol</li>
+<li>after generating each word that same word is fed in as input when generating the next word</li>
+</ul>
+</li>
+</ul>
+<p>The log-loss function is used as the loss function:</p>
+<p><mathjax>$$
+-\log p(y_1, \dots, y_{T'} | x_1, \dots, x_T) = - \sum{t=1}^{T'} \log p(y_t|y_1, \dots, y_{t-1}, x_1, \dots, x_T)
+$$</mathjax></p>
+<p>where <mathjax>$y$</mathjax> are the output words and <mathjax>$x$</mathjax> are the input words</p>
+<p>(refer to paper for more details)</p>
+<hr />
+<h1>misc references</h1>
+<ul>
+<li><a href="https://github.com/fchollet/keras/blob/master/examples/babi_memnn.py">https://github.com/fchollet/keras/blob/master/examples/babi_memnn.py</a></li>
+<li><a href="https://github.com/fchollet/keras/blob/master/examples/imdb_bidirectional_lstm.py">https://github.com/fchollet/keras/blob/master/examples/imdb_bidirectional_lstm.py</a></li>
+<li><a href="https://github.com/udibr/headlines">https://github.com/udibr/headlines</a></li>
+<li><a href="https://github.com/facebook/NAMAS">https://github.com/facebook/NAMAS</a></li>
+<li><a href="https://github.com/carpedm20/neural-summary-tensorflow">https://github.com/carpedm20/neural-summary-tensorflow</a></li>
+<li><a href="http://www.wildml.com/2016/01/attention-and-memory-in-deep-learning-and-nlp/">http://www.wildml.com/2016/01/attention-and-memory-in-deep-learning-and-nlp/</a></li>
+<li><a href="http://benjaminbolte.com/blog/2016/keras-language-modeling.html">http://benjaminbolte.com/blog/2016/keras-language-modeling.html</a></li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+
+
+</body>
+</html>
