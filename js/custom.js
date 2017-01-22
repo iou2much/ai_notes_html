@@ -50,8 +50,12 @@ $(document).ready(function() {
                 var parr = $('#tt_'+(title_idx.length-2)).parent().parent();
                 var parr_lv = parr.attr('lv');
                 while(parr_lv != undefined ){
-                    if(parr_lv<=lv){
+                    if(parr_lv==lv){
                         parr=parr.parent();
+                        break;
+                    }
+                    if(parr_lv<lv){
+                        parr=parr.children('ul');
                         break;
                     }
                     parr = parr.parent().parent().parent();
