@@ -42,13 +42,13 @@ $(document).ready(function() {
                 $('#tt_'+(title_idx.length-1)+'>ul').append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
 
             }
+            title_idx.push(this);
         }else {
             $(this).addClass('en')
         }
 
 
 
-        title_idx.push(this);
     })
 
 
