@@ -3,7 +3,7 @@ $(document).ready(function() {
         var txt = $(this).innerText;
         var patt = /[\u4e00-\u9fa5]+/;
 
-        if(txt.test(patt)){
+        if(patt.test(txt)){
             $(this).addClass('cn');
         }else{
             $(this).addClass('en');
