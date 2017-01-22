@@ -11,11 +11,14 @@
     position: fixed;
     top:0px;
     left:0px;
-    width:300px;
-    overflow-x: scroll;
+    width:240px;
+    overflow: scroll;
+    height:100%;
+    background: #eee;
 }
 .toc ul{
     width:100%;
+    padding-left:15px;
 }
 .tools{
     position: fixed;
