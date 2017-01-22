@@ -54,7 +54,7 @@ $(document).ready(function() {
                         parr=parr.parent();
                         break;
                     }
-                    parr = parr.parent().parent();
+                    parr = parr.parent();
                     parr_lv = parr.attr('lv');
                 }
                 parr.append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
