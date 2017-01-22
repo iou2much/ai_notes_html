@@ -13,11 +13,15 @@ $(document).ready(function() {
         }
     });
     var title_idx=0;
-    $('body').append("<div class='toc'></div>");
+    $('body').append("<div class='toc'><ul id='toc'></ul></div>");
+    var cur_node=$('#toc'),parr_node=$('#toc');
     $('h1,h2,h3,h4,h5,h6').each(function(){
-        console.log(this)
+        console.log(this);
+
+
         if(title_idx%2==0){
             $(this).addClass('cn')
+            $('#toc').append('<li>'+this.innerText+'</li>');
         }else {
             $(this).addClass('en')
         }
