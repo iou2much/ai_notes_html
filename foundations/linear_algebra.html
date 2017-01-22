@@ -28,17 +28,24 @@
 $$</mathjax></p>
 <h1>线性代数</h1>
 <h1>Linear Algebra</h1>
+<p>当我们处理数据时, 通常要面对由很多个<strong>维度</strong>构成的数据点, 代表一个数据点有多个组成部分, 例如, 如果人是你的数据集, 那他们可以用身高,体重,年龄这三个维度来表示.这种数据叫<strong>向量</strong>, 而单个值的数据叫<strong>标量</strong>.</p>
 <p>When working with data, we typically deal with many data points consisting of many <strong>dimensions</strong>. That is, each data point may have a several <strong>components</strong>; e.g. if people are your data points, they may be represented by their height, weight, and age, which constitutes three dimensions all together. These data points of many components are called <strong>vectors</strong>. These are contrasted with individual values, which are called <strong>scalars</strong>.</p>
+<p>而多个向量又组成了<strong>矩阵</strong>.</p>
 <p>We deal with these data points - vectors - simultaneously in aggregates known as <a href="#matrices"><em>matrices</em></a>.</p>
+<p><strong>线性代数</strong>这门知识主要是一系列关于向量与矩阵的操作.</p>
 <p>Linear algebra provides the tools needed to manipulate vectors and matrices.</p>
 <h2>向量</h2>
 <h2>Vectors</h2>
+<p>向量有<strong>大小</strong>与<strong>方向</strong>, 例如, 以5公里/小时的速度往东. 大小在某种意义上可以看作"向量的长度".</p>
 <p>Vectors have <strong>magnitude</strong> and <strong>direction</strong>, e.g. 5 miles/hour going east. The magnitude can be thought of, in some sense, as the "length" of the vector (this isn't quite right however, as there are many concepts of "length" - see <a href="#norm">norms</a>).</p>
 <figure><img alt="A vector" src="../assets/vector.svg" /><figcaption>A vector</figcaption>
 </figure>
+<p>这个例子中的向量表示为:</p>
 <p>Formally, this example would be represented:</p>
 <p><mathjax>$$ \vec{v} = \begin{bmatrix} 5 \\ 0 \end{bmatrix} $$</mathjax></p>
+<p>我们在x轴上移动了5个单位,在y轴上移动了0个单位.</p>
 <p>since we are "moving" 5 on x-axis and 0 on the y-axis.</p>
+<p>字母上的箭头经常被省略,也就是说,表示为<mathjax>$v$</mathjax>.</p>
 <p>Note that often the arrow is dropped, i.e. the vector is notated as just <mathjax>$v$</mathjax>.</p>
 <h3>实空间</h3>
 <h3>Real coordinate spaces</h3>
@@ -1376,6 +1383,7 @@ simple example where the vector was scaled up by 2, so the eigenvalue here is 2.
 <li><a href="https://www.umiacs.umd.edu/~hal/courses/2013S_ML/math4ml.pdf">Math for Machine Learning</a>. Hal Daumé III. August 28, 2009.</li>
 <li><a href="http://mathworld.wolfram.com/Tensor.html">Tensor</a>. Rowland, Todd and Weisstein, Eric W. Wolfram MathWorld.</li>
 <li><a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab">Essence of Linear Algebra</a>. 3Blue1Brown.</li>
+<li><a href="https://deeplearning4j.org/cn/eigenvector">本征向量、PCA和熵的基础教程</a></li>
 </ul>
     
     <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
