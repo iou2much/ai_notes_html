@@ -60,10 +60,10 @@ $(document).ready(function() {
                 parr.append('<li id="tt_'+(title_idx.length)+'"><a href="#anchor_'+(title_idx.length)+'" >'+this.innerText+'</a></li>');
                 $('#tt_'+(title_idx.length)).attr('lv',lv);
             }
+            $(this).before('<a id="anchor_'+(title_idx.length)+'"></a>')
         }else {
             $(this).addClass('en')
         }
-        $(this).before('<a id="anchor_'+(title_idx.length)+'"></a>')
 
         title_idx.push(this);
 
