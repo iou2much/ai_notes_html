@@ -20,14 +20,14 @@ $(document).ready(function() {
     $('h1,h2,h3,h4,h5,h6').each(function(){
         console.log(this);
 
-        if(title_idx.length==0){
-            $('#toc').append('<li id="tt_'+title_idx.length+'">'+this.innerText+this.localName+'</li>');
-            title_idx.push(this);
-            return;
-        }
-        title_idx.push(this);
+
 
         if(title_idx.length%2==0){
+            if(title_idx.length==0){
+                $('#toc').append('<li id="tt_'+title_idx.length+'">'+this.innerText+this.localName+'</li>');
+                title_idx.push(this);
+                return;
+            }
             $(this).addClass('cn')
             //parr_node=$('#tt_'+title_idx.length);
 
@@ -46,6 +46,8 @@ $(document).ready(function() {
         }else {
             $(this).addClass('en')
         }
+        
+        title_idx.push(this);
 
 
 
