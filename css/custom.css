@@ -5,6 +5,7 @@
 .en {
     font-size: 0.9em;
     color: #aaa;
+    display: none;
 }
 .toc{
     position: absolute;
@@ -15,4 +16,11 @@
 }
 .toc ul{
     width:100%;
+}
+.tools{
+    position: absolute;
+    bottom:100px;
+    right:100px;
+}
+.tools ul{
 }

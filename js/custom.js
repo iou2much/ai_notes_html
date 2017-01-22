@@ -67,9 +67,11 @@ $(document).ready(function() {
 
         title_idx.push(this);
 
-
-
     });
 
-
+    $('body').append("<div class='tools'><ul id='tools'><li><a id='#head'>Top</a></li><li><a id='show_en'>En</a></li></ul></div>");
+    $('body').prependChild('<a id="head"></a>')
+    $('#show_en').click(function () {
+        $('.en').toggle();
+    })
 });
