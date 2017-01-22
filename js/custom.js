@@ -32,20 +32,20 @@ $(document).ready(function() {
                 return;
             }
 
-            if(title_idx[title_idx.length-1].localName[1] == lv){
-                $('#tt_'+(title_idx.length-1)).parent().append('<li id="tt_'+title_idx.length+'">'+this.innerText+this.localName+'</li>');
-            }else if(title_idx[title_idx.length-1].localName[1] < lv){
-                if($('#tt_'+(title_idx.length-1)+'>ul').length==0){
-                    $('#tt_'+(title_idx.length-1)).append('<ul></ul>');
+            if(title_idx[title_idx.length/2-1].localName[1] == lv){
+                $('#tt_'+(title_idx.length/2-1)).parent().append('<li id="tt_'+title_idx.length/2+'">'+this.innerText+this.localName+'</li>');
+            }else if(title_idx[title_idx.length/2-1].localName[1] < lv){
+                if($('#tt_'+(title_idx.length/2-1)+'>ul').length==0){
+                    $('#tt_'+(title_idx.length/2-1)).append('<ul></ul>');
 
                 }
-                $('#tt_'+(title_idx.length-1)+'>ul').append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
+                $('#tt_'+(title_idx.length/2-1)+'>ul').append('<li id="tt_'+(title_idx.length/2)+'">'+this.innerText+this.localName+'</li>');
 
             }
-            title_idx.push(this);
         }else {
             $(this).addClass('en')
         }
+        title_idx.push(this);
 
 
 
