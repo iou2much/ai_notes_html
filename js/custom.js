@@ -34,19 +34,19 @@ $(document).ready(function() {
             var lv = this.localName[1];
 
             if(title_idx[title_idx.length-2].localName[1] == lv){
-                $('#tt_'+(title_idx.length-2)).parent().append('<li id="tt_'+(title_idx.length-2)+'">'+this.innerText+this.localName+'</li>');
+                $('#tt_'+(title_idx.length-2)).parent().append('<li id="tt_'+(title_idx.length-1)+'">'+this.innerText+this.localName+'</li>');
             }else if(title_idx[title_idx.length-2].localName[1] < lv){
                 if($('#tt_'+(title_idx.length-2)+'>ul').length==0){
                     $('#tt_'+(title_idx.length-2)).append('<ul></ul>');
 
                 }
-                $('#tt_'+(title_idx.length-2)+'>ul').append('<li id="tt_'+(title_idx.length-2)+'">'+this.innerText+this.localName+'</li>');
+                $('#tt_'+(title_idx.length-2)+'>ul').append('<li id="tt_'+(title_idx.length-1)+'">'+this.innerText+this.localName+'</li>');
 
             }
         }else {
             $(this).addClass('en')
         }
-        
+
         title_idx.push(this);
 
 
