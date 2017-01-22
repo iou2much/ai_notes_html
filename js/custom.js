@@ -49,7 +49,7 @@ $(document).ready(function() {
             }else{
                 var parr_lv = $('#tt_'+(title_idx.length-2)).parent().parent().attr('lv');
                 var parr;
-                while(parr_lv != undefined && parr_lv<=lv ){
+                while(parr_lv != undefined ){
                     parr = $('#tt_'+(title_idx.length-2)).parent().parent();
                     if(parr_lv==lv){
                         parr=parr.parent();
