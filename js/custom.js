@@ -23,25 +23,37 @@ $(document).ready(function() {
 
 
         if(title_idx.length%2==0){
+            $(this).addClass('cn')
+            var lv = this.localName[1];
+
             if(title_idx.length==0){
                 $('#toc').append('<li id="tt_'+title_idx.length+'">'+this.innerText+this.localName+'</li>');
+                $('#tt_'+(title_idx.length)).attr('lv',lv);
                 title_idx.push(this);
                 return;
             }
-            $(this).addClass('cn')
             //parr_node=$('#tt_'+title_idx.length);
 
-            var lv = this.localName[1];
 
             if(title_idx[title_idx.length-2].localName[1] == lv){
                 $('#tt_'+(title_idx.length-2)).parent().append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
+                $('#tt_'+(title_idx.length)).attr('lv',lv);
             }else if(title_idx[title_idx.length-2].localName[1] < lv){
                 if($('#tt_'+(title_idx.length-2)+'>ul').length==0){
                     $('#tt_'+(title_idx.length-2)).append('<ul></ul>');
 
                 }
                 $('#tt_'+(title_idx.length-2)+'>ul').append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
+                $('#tt_'+(title_idx.length)).attr('lv',lv);
 
+            }else{
+                var parr_lv = $('#tt_'+(title_idx.length-2)).parent().parent().attr('lv');
+                var parr;
+                while(parr_lv != undefined && parr_lv<lv ){
+                    parr = $('#tt_'+(title_idx.length-2)).parent().parent();
+                    parr_lv = parr.attr('lv');
+                }
+                parr.append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
             }
         }else {
             $(this).addClass('en')
