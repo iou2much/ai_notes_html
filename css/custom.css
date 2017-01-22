@@ -8,7 +8,7 @@
     display: none;
 }
 .toc{
-    position: absolute;
+    position: fixed;
     top:0px;
     left:0px;
     width:300px;
@@ -18,9 +18,9 @@
     width:100%;
 }
 .tools{
-    position: absolute;
-    bottom:100px;
-    right:100px;
+    position: fixed;
+    bottom:50px;
+    right:50px;
 }
 .tools ul{
 }

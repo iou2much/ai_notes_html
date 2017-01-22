@@ -69,8 +69,8 @@ $(document).ready(function() {
 
     });
 
-    $('body').append("<div class='tools'><ul id='tools'><li><a id='#head'>Top</a></li><li><a id='show_en'>En</a></li></ul></div>");
-    $('body').prepend('<a id="head"></a>')
+    $('body').append("<div class='tools'><ul id='tools'><li><a href='#head'>Top</a></li><li><a id='show_en'>En</a></li></ul></div>");
+    $('body').prepend('<a id="head"></a>');
     $('#show_en').click(function () {
         $('.en').toggle();
     })
