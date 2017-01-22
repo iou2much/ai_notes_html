@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('p,body>ul>li').each(function(){
+    $('p,body>ul>li,body>ol>li').each(function(){
         var txt = this.innerText;
         var patt = /[\u4e00-\u9fa5]+/;
 
