@@ -49,8 +49,12 @@ $(document).ready(function() {
             }else{
                 var parr_lv = $('#tt_'+(title_idx.length-2)).parent().parent().attr('lv');
                 var parr;
-                while(parr_lv != undefined && parr_lv<lv ){
+                while(parr_lv != undefined && parr_lv<=lv ){
                     parr = $('#tt_'+(title_idx.length-2)).parent().parent();
+                    if(parr_lv==lv){
+                        parr=parr.parent();
+                        break;
+                    }
                     parr_lv = parr.attr('lv');
                 }
                 parr.append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
