@@ -23,10 +23,14 @@ $(document).ready(function() {
 
         if(title_idx.length%2==0){
             $(this).addClass('cn')
-            // $('#toc').append('<li id="tt_'+title_idx.length+'">'+this.innerText+'</li>');
             //parr_node=$('#tt_'+title_idx.length);
 
             var lv = this.localName[1];
+            if(title_idx.length==0){
+                $('#toc').append('<li id="tt_'+title_idx.length+'">'+this.innerText+this.localName+'</li>');
+                title_idx.push(this);
+                return;
+            }
 
             if(title_idx[title_idx.length-1].localName[1] == lv){
                 $(title_idx[title_idx.length-1]).parent().append('<li id="tt_'+title_idx.length+'">'+this.innerText+this.localName+'</li>');
