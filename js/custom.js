@@ -47,15 +47,15 @@ $(document).ready(function() {
                 $('#tt_'+(title_idx.length)).attr('lv',lv);
 
             }else{
-                var parr_lv = $('#tt_'+(title_idx.length-2)).parent().parent().attr('lv');
-                var parr;
+                var parr = $('#tt_'+(title_idx.length-2)).parent().parent();
+                var parr_lv = parr.attr('lv');
                 while(parr_lv != undefined ){
-                    parr = $('#tt_'+(title_idx.length-2)).parent().parent();
                     if(parr_lv==lv){
                         parr=parr.parent();
                         break;
                     }
                     parr_lv = parr.attr('lv');
+                    parr = parr.parent().parent();
                 }
                 parr.append('<li id="tt_'+(title_idx.length)+'">'+this.innerText+this.localName+'</li>');
                 $('#tt_'+(title_idx.length)).attr('lv',lv);
