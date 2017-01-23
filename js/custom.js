@@ -13,7 +13,7 @@ $(document).ready(function() {
         }
     });
     var title_idx=[];
-    $('body').append("<div class='toc'><ul id='toc'></ul></div><a href='javascript:void(0)' id='toggle_menu'><img src='css/menu.png' /></a>");
+    $('body').append("<div class='toc'><ul id='toc'></ul></div><a href='javascript:void(0)' id='toggle_menu'><img width='50px' src='/ai_notes_html/css/menu.png' /></a>");
 
     var cur_node=$('#toc'),parr_node=$('#toc');
 
