@@ -19,9 +19,13 @@
 \def\argmax{\operatorname*{argmax}}
 \def\argmin{\operatorname*{argmin}}
 $$</mathjax></p>
+<h1>优化</h1>
 <h1>Optimization</h1>
+<p>优化是找到一组参数, 使其能产生函数的最小或最大值的任务。最佳参数用星号表示，例如, <mathjax>$x^{*}$</mathjax>.</p>
 <p>Optimization is the task of finding the arguments to a function which yield its minimum or maximum value. An optimal argument is denoted with an asterisk, e.g. <mathjax>$x^{\*}$</mathjax>.</p>
+<p>在机器学习的语境下，我们通常处理最小化。如有必要，最大化问题可以被重构为最小化：最大化函数<mathjax>$f(x)$</mathjax>，你可以转而最小化<mathjax>$-f(x)$</mathjax>.</p>
 <p>In the context of machine learning, we are typically dealing with minimization. If necessary, a maximization problem can be reframed as minimization: to maximize a function <mathjax>$f(x)$</mathjax>, you can instead minimize <mathjax>$-f(x)$</mathjax>.</p>
+<p>我们要优化的函数叫做<strong>目标函数</strong>。当特定的优化是最小化，该函数也可以被称为成本，损失或错误的功能。</p>
 <p>The function we want to optimize is called the <strong>objective function</strong>. When the particular optimization is minimization, the function may also be referred to as a <strong>cost</strong>, <strong>loss</strong>, or <strong>error</strong> function.</p>
 <p>Optimization problems can be thought of a topology where you are looking for the global peak (if you are maximizing) or the globally lowest point (if you are minimizing). For simplicity, minimizing will be the assumed goal here, as you are often trying to minimize some error function.</p>
 <p>![Local vs global minima](../assets/local_global_minima.svg textwidth=0.6)</p>

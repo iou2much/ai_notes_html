@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    var total = 0,cn_count=0,en_count=0;
     $('p,body>ul>li,body>ol>li').each(function(){
         var txt = this.innerText;
         var patt = /[\u4e00-\u9fa5]+/;
@@ -6,14 +7,17 @@ $(document).ready(function() {
         if(this.childNodes.length==1 && this.childNodes[0] != 'undefined' && this.childNodes[0].localName == 'mathjax'){
             return;
         }
+        total++;
         if(patt.test(txt)){
             $(this).addClass('cn');
+            cn_count++;
         }else{
             $(this).addClass('en');
+            en_count++;
         }
     });
     var title_idx=[];
-    $('body').append("<div class='toc'><ul id='toc'></ul></div><a href='javascript:void(0)' id='toggle_menu'><img width='50px' src='/ai_notes_html/css/menu.png' /></a>");
+    $('body').append("<div class='toc'><p>"+(cn_count/en_count*100)+"% translated</p><ul id='toc'></ul></div><a href='javascript:void(0)' id='toggle_menu'><img width='50px' src='/ai_notes_html/css/menu.png' /></a>");
 
     var cur_node=$('#toc'),parr_node=$('#toc');
 
