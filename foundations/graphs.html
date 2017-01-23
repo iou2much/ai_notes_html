@@ -21,9 +21,9 @@
 <p>A <strong>graph</strong> consists of <strong>vertices</strong> (nodes) connected by <strong>edges</strong> (arcs).</p>
 <p>图的两个主要类型是边不具有任何特定方向的无向图,和边具有方向的有向图，例如，可以存在由节点A指向节点B的边，但是没有B指向A的边.</p>
 <p>The two main categories of graphs are <strong>undirected</strong> graphs, in which edges don't have any particular direction, and <strong>directed graphs</strong>, where edges have direction - for example, there may be an edge from node A to node B, but no edge from node B to node A.</p>
-<figure><img alt="A directed graph" src="../assets/directed.svg" /><figcaption>A directed graph</figcaption>
+<figure><img alt="有向图" src="../assets/directed.svg" /><figcaption>有向图</figcaption>
 </figure>
-<figure><img alt="An undirected graph" src="../assets/undirected.svg" /><figcaption>An undirected graph</figcaption>
+<figure><img alt="无向图" src="../assets/undirected.svg" /><figcaption>无向图</figcaption>
 </figure>
 <p>一般来说，我们对图形使用以下符号<mathjax>$G$</mathjax>：<mathjax>$n$</mathjax>是顶点的数量，即<mathjax>$|V|$</mathjax>，<mathjax>$m$</mathjax>是边的数量，即<mathjax>$|E|$</mathjax>.</p>
 <p>Generally, we use the following notation for a graph <mathjax>$G$</mathjax>: <mathjax>$n$</mathjax> is the number of vertices, i.e. <mathjax>$|V|$</mathjax>, <mathjax>$m$</mathjax> is the number of edges, i.e. <mathjax>$|E|$</mathjax>.</p>
@@ -52,7 +52,7 @@
 <p>An adjacency matrix requires <mathjax>$\Theta(n^2)$</mathjax> space. If the graph is sparse, this is a waste of space, and an adjacency list is more appropriate - you have an array of vertices and an array of edges. Each edge points to its endpoints, and each vertex points to edges incident on it. This requires <mathjax>$\Theta(m+n)$</mathjax> space (because the array of vertices takes <mathjax>$\Theta(n)$</mathjax> space and the arrays of edges, edge-to-endpoints, and vertex-to-edges each take <mathjax>$\Theta(m)$</mathjax>, for <mathjax>$\Theta(n+3m) = \Theta(m+n)$</mathjax>), so it is better for sparse graphs.</p>
 <p>看一下这个例子:</p>
 <p>Consider the accompanying example graph.</p>
-<figure><img alt="Example graph" src="../assets/graph_example.svg" /><figcaption>Example graph</figcaption>
+<figure><img alt="图例" src="../assets/graph_example.svg" /><figcaption>图例</figcaption>
 </figure>
 <p>从<mathjax>$A \to B$</mathjax>的<strong>路径</strong>是指由<mathjax>$A \to B$</mathjax>的节点序列, 包含<mathjax>$A$</mathjax>和<mathjax>$B$</mathjax>.</p>
 <p>A <strong>path</strong> <mathjax>$A \to B$</mathjax> is the sequence of nodes connecting <mathjax>$A$</mathjax> to <mathjax>$B$</mathjax>, including <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax>.</p>
@@ -62,7 +62,7 @@
 <mathjax>$C,E,B$</mathjax>是<mathjax>$A$</mathjax>的后代.</p>
 <p><mathjax>$A,C,E$</mathjax> are the <strong>ancestors</strong> of <mathjax>$B$</mathjax>.<br />
 <mathjax>$C,E,B$</mathjax> are the <strong>descendants</strong> of <mathjax>$A$</mathjax>.</p>
-<figure><img alt="Example of a cyclic graph" src="../assets/graph_cycle_example.svg" /><figcaption>Example of a cyclic graph</figcaption>
+<figure><img alt="有环图示例" src="../assets/graph_cycle_example.svg" /><figcaption>有环图示例</figcaption>
 </figure>
 <p>一个<strong>循环</strong>(cycle)是一个起点与终点相同的有向路径,这里<mathjax>$A,D,C,B$</mathjax>形成一个循环，</p>
 <p>A <strong>cycle</strong> is a directed path which ends where it starts. Here, <mathjax>$A,D,C,B$</mathjax> form a cycle.</p>
@@ -70,13 +70,13 @@
 <p>A <strong>loop</strong> is any path (directed or not) which ends where it starts.</p>
 <p>一个图内没有循环, 则被称作是<strong>无环的</strong>.</p>
 <p>A graph with no cycles is said to be <strong>acyclic</strong>.</p>
-<p>一个弦是在一个循环中连接两个不相邻的节点的边。</p>
+<p>一个<strong>弦</strong>是在一个循环中连接两个不相邻的节点的边。</p>
 <p>A <strong>chord</strong> is any edge which connects two non-adjacent nodes in a loop.</p>
-<p>向无环图（DAG）会经常使用。在DAG中，指向某节点的是这个节点的<strong>父节点</strong>, 被指向的节点是<strong>子节点</strong>。一个<strong>族</strong>是某节点及其父母。</p>
+<p><strong>有向无环图</strong>（DAG）会经常使用。在DAG中，指向某节点的是这个节点的<strong>父节点</strong>, 被指向的节点是<strong>子节点</strong>。一个<strong>族</strong>是某节点及其父母。</p>
 <p><strong>Directed acyclic graphs</strong> (DAGs) are used often. In a DAG, <strong>parents</strong> are the nodes which point to a given node; the nodes that a given node points to are its <strong>children</strong>. A <strong>family</strong> of a node is the node and its parents.</p>
 <p><strong>Markov blanket</strong>是一个节点的父子节点, 以及它子节点的所有父节点(包含它自身).</p>
 <p>The <strong>Markov blanket</strong> of a node is its parents, children, and the parents of its children (including itself).</p>
-<p>在一个无向图中, 一个节点的<strong>邻节点</strong>是指直接与它有连接的节点.</p>
+<p>在一个无向图中, 一个节点的<strong>邻点</strong>是指直接与它有连接的节点.</p>
 <p>For an undirected graph, a node's <strong>neighbors</strong> are noes directly connected to it.</p>
 <p>在无向图中,<strong>团</strong>是一个全连接子集,团中所有成员都互为邻节点.</p>
 <p>In an undirected graph, a <strong>clique</strong> is a fully-connected subset of nodes. All members of a clique are neighbors.</p>

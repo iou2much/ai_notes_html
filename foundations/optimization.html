@@ -25,10 +25,11 @@ $$</mathjax></p>
 <p>Optimization is the task of finding the arguments to a function which yield its minimum or maximum value. An optimal argument is denoted with an asterisk, e.g. <mathjax>$x^{\*}$</mathjax>.</p>
 <p>在机器学习的语境下，我们通常处理最小化。如有必要，最大化问题可以被重构为最小化：最大化函数<mathjax>$f(x)$</mathjax>，你可以转而最小化<mathjax>$-f(x)$</mathjax>.</p>
 <p>In the context of machine learning, we are typically dealing with minimization. If necessary, a maximization problem can be reframed as minimization: to maximize a function <mathjax>$f(x)$</mathjax>, you can instead minimize <mathjax>$-f(x)$</mathjax>.</p>
-<p>我们要优化的函数叫做<strong>目标函数</strong>。当特定的优化是最小化，该函数也可以被称为成本，损失或错误的功能。</p>
+<p>我们要优化的函数叫做<strong>目标函数</strong>。当特定的优化是最小化，该函数也可以被称为<strong>成本</strong>，<strong>损失</strong>或<strong>错误</strong>的功能。</p>
 <p>The function we want to optimize is called the <strong>objective function</strong>. When the particular optimization is minimization, the function may also be referred to as a <strong>cost</strong>, <strong>loss</strong>, or <strong>error</strong> function.</p>
 <p>Optimization problems can be thought of a topology where you are looking for the global peak (if you are maximizing) or the globally lowest point (if you are minimizing). For simplicity, minimizing will be the assumed goal here, as you are often trying to minimize some error function.</p>
-<p>![Local vs global minima](../assets/local_global_minima.svg textwidth=0.6)</p>
+<figure><img alt="Local vs global minima" src="../assets/local_global_minima.svg" /><figcaption>Local vs global minima</figcaption>
+</figure>
 <p>Consider a very naive approach: a greedy random algorithm which starts at some position in this topology, then randomly tries moving to a new position and checks if it is better. If it is, it sets that as the current solution. It continues until it has some reason to stop, usually because it has found a minimum. This is a <strong>local minimum</strong>; that is, it is a minimum relative to its immediately surrounding points, but it is not necessarily the <strong>global minimum</strong>, which is the minimum of the entire function.</p>
 <p>This algorithm is <em>greedy</em> in that it will always prefer a better scoring position, even if it is only marginally better. Thus it can be easy to get stuck in local optima - since any step away from it seems worse, even if the global optimum is right around the corner, so to speak.</p>
 <p>Optimization may be accomplished <strong>numerically</strong> or <strong>analytically</strong>. The analytic approach involves computing derivatives and then identifying critical points (e.g. the second derivative test). These provide the exact optima.</p>
@@ -76,7 +77,8 @@ $$</mathjax></p>
 </ul>
 <p>Gradient methods tend to be more efficient, but are not always possible to use (you don't always have the gradient).</p>
 <h2>Gradient Descent</h2>
-<p>![Sphere function](../assets/spherefunc.svg textwidth=0.5)</p>
+<figure><img alt="Sphere function" src="../assets/spherefunc.svg" /><figcaption>Sphere function</figcaption>
+</figure>
 <p><strong>Gradient descent</strong> (GD) is perhaps the common minimizing optimization (for maximizing, its equivalent is <em>gradient ascent</em>) in machine learning.</p>
 <p>Say we have a function <mathjax>$C(v)$</mathjax> which we want to minimize. For simplicity, we will use <mathjax>$v \in \mathbb R^2$</mathjax>. An example <mathjax>$C(v)$</mathjax> is visualized in the accompanying figure.</p>
 <p>In this example, the global minimum is visually obvious, but most of the time it is not (especially when dealing with far more dimensions). But we can apply the model of a ball rolling down a hill and expand it to any arbitrary <mathjax>$n$</mathjax> dimensions. The ball will "roll" down to a minimum, though not necessarily the global minimum.</p>
