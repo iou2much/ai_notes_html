@@ -13,7 +13,7 @@ $(document).ready(function() {
         }
     });
     var title_idx=[];
-    $('body').append("<div class='toc'><a id='toggle_menu'>T</a><ul id='toc'></ul></div>");
+    $('body').append("<div class='toc'><a href='javascript:void(0)' id='toggle_menu'>MENU</a><ul id='toc'></ul></div>");
 
     var cur_node=$('#toc'),parr_node=$('#toc');
 
@@ -76,7 +76,7 @@ $(document).ready(function() {
     });
     $('#toggle_menu').click(function () {
         if($('.toc').height()>30){
-            $('.toc').animate({'height':'10px','width':'10px'});
+            $('.toc').animate({'height':'18px','width':'42px'});
         }else{
             $('.toc').animate({'height':'100%','width':'240px'});
         }
