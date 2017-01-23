@@ -17,7 +17,7 @@ $(document).ready(function() {
         }
     });
     var title_idx=[];
-    $('body').append("<div class='toc'><p>"+(cn_count/en_count*100)+"% translated</p><ul id='toc'></ul></div><a href='javascript:void(0)' id='toggle_menu'><img width='50px' src='/ai_notes_html/css/menu.png' /></a>");
+    $('body').append("<div class='toc'><p>"+Math.round(cn_count/en_count*100)+"% translated</p><ul id='toc'></ul></div><a href='javascript:void(0)' id='toggle_menu'><img width='50px' src='/ai_notes_html/css/menu.png' /></a>");
 
     var cur_node=$('#toc'),parr_node=$('#toc');
 
