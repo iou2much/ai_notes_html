@@ -19,7 +19,7 @@
     text-decoration: none;
 }
 #toggle_menu{
-    position: relative;
+    position: fixed;
     top:50%;
     right:-20px;
 }
@@ -29,15 +29,18 @@
 }
 .tools{
     position: fixed;
-    bottom:50px;
-    right:50px;
-    background: #;
+    bottom:5px;
+    right:5px;
+    background: #ccc;
+    text-align: right;
+    border-radius: 5px;
+    padding:4px 3px;
 }
 .tools ul{
     margin:0;
     padding: 0;
 }
 .tools ul li {
-    list-style-type: square;
+    list-style-type: none;
     line-height:19px;
 }

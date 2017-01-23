@@ -69,16 +69,17 @@ $(document).ready(function() {
 
     });
 
-    $('body').append("<div class='tools'><ul id='tools'><li><a href='#head'>Top</a></li><li><a id='show_en'>En</a></li><li><a href='http://ai-code.tech/ai_notes_html/'>HOME</a></li></ul></div>");
+    $('body').append("<div class='tools'><ul id='tools'><li><a href='#head'>TOP</a></li><li><a href='javascript:void(0)' id='show_en'>EN</a></li><li><a href='http://ai-code.tech/ai_notes_html/'>HOME</a></li></ul></div>");
     $('body').prepend('<a id="head"></a>');
     $('#show_en').click(function () {
         $('.en').toggle();
     });
     $('#toggle_menu').click(function () {
-        if($('.toc').height()>30){
+        if($('.toc').width()>30){
             $('.toc').animate({'width':'0px'});
         }else{
             $('.toc').animate({'width':'240px'});
         }
+        $('.tools').toggle();
     });
 });
