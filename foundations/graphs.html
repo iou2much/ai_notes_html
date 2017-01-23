@@ -15,17 +15,30 @@
 
 <body>
 
-    <h1>Graphs</h1>
+    <h1>图论</h1>
+<h1>Graphs</h1>
+<p><strong>图</strong>由通过<strong>边</strong>（弧）连接的<strong>顶点</strong>（节点）组成。</p>
 <p>A <strong>graph</strong> consists of <strong>vertices</strong> (nodes) connected by <strong>edges</strong> (arcs).</p>
+<p>图的两个主要类型是边不具有任何特定方向的无向图,和边具有方向的有向图，例如，可以存在由节点A指向节点B的边，但是没有B指向A的边.</p>
 <p>The two main categories of graphs are <strong>undirected</strong> graphs, in which edges don't have any particular direction, and <strong>directed graphs</strong>, where edges have direction - for example, there may be an edge from node A to node B, but no edge from node B to node A.</p>
 <figure><img alt="A directed graph" src="../assets/directed.svg" /><figcaption>A directed graph</figcaption>
 </figure>
 <figure><img alt="An undirected graph" src="../assets/undirected.svg" /><figcaption>An undirected graph</figcaption>
 </figure>
+<p>一般来说，我们对图形使用以下符号<mathjax>$G$</mathjax>：<mathjax>$n$</mathjax>是顶点的数量，即<mathjax>$|V|$</mathjax>，<mathjax>$m$</mathjax>是边的数量，即<mathjax>$|E|$</mathjax>.</p>
 <p>Generally, we use the following notation for a graph <mathjax>$G$</mathjax>: <mathjax>$n$</mathjax> is the number of vertices, i.e. <mathjax>$|V|$</mathjax>, <mathjax>$m$</mathjax> is the number of edges, i.e. <mathjax>$|E|$</mathjax>.</p>
+<p>无向图中还细分出几种类型：</p>
 <p>Within undirected graphs there are other distinctions:</p>
 <ul>
-<li>a <em>simple</em> graph is a graph in which there are no loops and only single edges are allowed</li>
+<li><strong>简单图</strong>中没有循环并且仅允许存在单个边</li>
+<li><strong>正则图</strong>是每个顶点具有相同数量的邻点（即相同的度）</li>
+<li><strong>完全图</strong>中，每对顶点都有一条边连接</li>
+<li>
+<p><strong>连接图</strong>是其中在每对顶点之间存在一条路径</p>
+</li>
+<li>
+<p>a <em>simple</em> graph is a graph in which there are no loops and only single edges are allowed</p>
+</li>
 <li>a <em>regular</em> graph is one in which each vertex has the same number of neighbors (i.e. the same degree)</li>
 <li>a <em>complete</em> graph is a simple graph where every pair of vertices is connected by an edge</li>
 <li>a <em>connected</em> graph is a graph where there exists a path between every pair of vertices</li>
