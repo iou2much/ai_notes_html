@@ -47,31 +47,54 @@
 <p>For a connected graph with no parallel edges (i.e. each pair of vertices has only zero or one edge between it), <mathjax>$m$</mathjax> is somewhere between <mathjax>$\Omega(n)$</mathjax> and <mathjax>$O(n^2)$</mathjax>.</p>
 <p>通常，如果<mathjax>$m$</mathjax>等于或接近<mathjax>$O(n)$</mathjax>（即图有更少的边数），则被称为稀疏的。如果<mathjax>$m$</mathjax>更接近<mathjax>$O(n^2)$</mathjax>，通常被称为稠密的。</p>
 <p>Generally, a graph is said to be <strong>sparse</strong> if <mathjax>$m$</mathjax> is <mathjax>$O(n)$</mathjax> or close to it (that is, it has the lower end of number of edges). If <mathjax>$m$</mathjax> is closer to <mathjax>$O(n^2)$</mathjax>, this is generally said to be a <strong>dense</strong> graph.</p>
-<p>邻接矩阵需要<mathjax>$\Theta(N^2)$</mathjax>的空间,如果图是稀疏的,这是空间的浪费,而邻接列表更合适——你有一个顶点数组和一个边数组。每条边指向其端点,每个顶点指向其上的边缘事件。这需要<mathjax>$\Theta(m+n)$</mathjax>的空间(因为顶点的数组需要<mathjax>$\Theta(n)$</mathjax>空间,以及每个取 <mathjax>$\Theta(m)$</mathjax> ,为<mathjax>$\Theta(n+3m) = \Theta(m+n)$</mathjax> )。</p>
+<p>??TODO: <mathjax>$\Theta(n+3m) = \Theta(m+n)$</mathjax> 是为何<br />
+邻接矩阵需要<mathjax>$\Theta(N^2)$</mathjax>的空间,如果图是稀疏的,就会对空间造成浪费,这种情况用邻接列表会更合适 —— 用一个顶点数组和一个边数组,每条边指向其端点,每个端点指向其上的边。这需要<mathjax>$\Theta(m+n)$</mathjax>的空间(因为顶点的数组需要<mathjax>$\Theta(n)$</mathjax>空间,边数组,边-点数组,点-边数组分别都占<mathjax>$\Theta(m)$</mathjax> ,因为<mathjax>$\Theta(n+3m) = \Theta(m+n)$</mathjax>) ,所以它对稀疏图更适合。</p>
 <p>An adjacency matrix requires <mathjax>$\Theta(n^2)$</mathjax> space. If the graph is sparse, this is a waste of space, and an adjacency list is more appropriate - you have an array of vertices and an array of edges. Each edge points to its endpoints, and each vertex points to edges incident on it. This requires <mathjax>$\Theta(m+n)$</mathjax> space (because the array of vertices takes <mathjax>$\Theta(n)$</mathjax> space and the arrays of edges, edge-to-endpoints, and vertex-to-edges each take <mathjax>$\Theta(m)$</mathjax>, for <mathjax>$\Theta(n+3m) = \Theta(m+n)$</mathjax>), so it is better for sparse graphs.</p>
+<p>看一下这个例子:</p>
 <p>Consider the accompanying example graph.</p>
 <figure><img alt="Example graph" src="../assets/graph_example.svg" /><figcaption>Example graph</figcaption>
 </figure>
+<p>从<mathjax>$A \to B$</mathjax>的<strong>路径</strong>是指由<mathjax>$A \to B$</mathjax>的节点序列, 包含<mathjax>$A$</mathjax>和<mathjax>$B$</mathjax>.</p>
 <p>A <strong>path</strong> <mathjax>$A \to B$</mathjax> is the sequence of nodes connecting <mathjax>$A$</mathjax> to <mathjax>$B$</mathjax>, including <mathjax>$A$</mathjax> and <mathjax>$B$</mathjax>.</p>
+<p>在这里<mathjax>$A \to B$</mathjax>的路径是<mathjax>$A,C,E,B$</mathjax>.</p>
 <p>Here the path <mathjax>$A \to B$</mathjax> is <mathjax>$A,C,E,B$</mathjax>.</p>
+<p><mathjax>$A,C,E$</mathjax>是<mathjax>$B$</mathjax>的祖先.<br />
+<mathjax>$C,E,B$</mathjax>是<mathjax>$A$</mathjax>的后代.</p>
 <p><mathjax>$A,C,E$</mathjax> are the <strong>ancestors</strong> of <mathjax>$B$</mathjax>.<br />
 <mathjax>$C,E,B$</mathjax> are the <strong>descendants</strong> of <mathjax>$A$</mathjax>.</p>
 <figure><img alt="Example of a cyclic graph" src="../assets/graph_cycle_example.svg" /><figcaption>Example of a cyclic graph</figcaption>
 </figure>
+<p>一个<strong>循环</strong>(cycle)是一个起点与终点相同的有向路径,这里<mathjax>$A,D,C,B$</mathjax>形成一个循环，</p>
 <p>A <strong>cycle</strong> is a directed path which ends where it starts. Here, <mathjax>$A,D,C,B$</mathjax> form a cycle.</p>
+<p>一个<strong>环</strong>是任何结束于起点的路径(无论是否有向).</p>
 <p>A <strong>loop</strong> is any path (directed or not) which ends where it starts.</p>
+<p>一个图内没有循环, 则被称作是<strong>无环的</strong>.</p>
 <p>A graph with no cycles is said to be <strong>acyclic</strong>.</p>
+<p>一个弦是在一个循环中连接两个不相邻的节点的边。</p>
 <p>A <strong>chord</strong> is any edge which connects two non-adjacent nodes in a loop.</p>
+<p>向无环图（DAG）会经常使用。在DAG中，指向某节点的是这个节点的<strong>父节点</strong>, 被指向的节点是<strong>子节点</strong>。一个<strong>族</strong>是某节点及其父母。</p>
 <p><strong>Directed acyclic graphs</strong> (DAGs) are used often. In a DAG, <strong>parents</strong> are the nodes which point to a given node; the nodes that a given node points to are its <strong>children</strong>. A <strong>family</strong> of a node is the node and its parents.</p>
+<p><strong>Markov blanket</strong>是一个节点的父子节点, 以及它子节点的所有父节点(包含它自身).</p>
 <p>The <strong>Markov blanket</strong> of a node is its parents, children, and the parents of its children (including itself).</p>
+<p>在一个无向图中, 一个节点的<strong>邻节点</strong>是指直接与它有连接的节点.</p>
 <p>For an undirected graph, a node's <strong>neighbors</strong> are noes directly connected to it.</p>
+<p>在无向图中,<strong>团</strong>是一个全连接子集,团中所有成员都互为邻节点.</p>
 <p>In an undirected graph, a <strong>clique</strong> is a fully-connected subset of nodes. All members of a clique are neighbors.</p>
+<p><strong>最大团</strong>是指不为其他团的子集的团.</p>
 <p>A <strong>maximal clique</strong> is a clique which is not a subset of another clique.</p>
 <figure><img alt="A graph demonstrating cliques" src="../assets/clique_example.svg" /><figcaption>A graph demonstrating cliques</figcaption>
 </figure>
+<p>在这图中:</p>
 <p>In this graph:</p>
 <ul>
-<li><mathjax>$\{A,B,C,D\}$</mathjax> is a maximal clique</li>
+<li><mathjax>$\{A,B,C,D\}$</mathjax> 是一个最大团</li>
+<li><mathjax>$\{B,C,E\}$</mathjax> 是一个最大团 </li>
+<li>
+<p><mathjax>$\{A,B,C\}$</mathjax> 不是一个最大团, 被包含在<mathjax>$\{A,B,C,D\}$</mathjax>中</p>
+</li>
+<li>
+<p><mathjax>$\{A,B,C,D\}$</mathjax> is a maximal clique</p>
+</li>
 <li><mathjax>$\{B,C,E\}$</mathjax> is a maximal clique</li>
 <li><mathjax>$\{A,B,C\}$</mathjax> is a non-maximal clique, contained in <mathjax>$\{A,B,C,D\}$</mathjax></li>
 </ul>
@@ -121,6 +144,7 @@ $$</mathjax></p>
 <li><a href="https://www.coursera.org/course/algo">Algorithms: Design and Analysis, Part 1</a>. Tim Roughgarden. Stanford/Coursera.</li>
 <li><em>Bayesian Reasoning and Machine Learning</em>. David Barber.</li>
 <li><a href="https://www.coursera.org/course/pgm">Probabilistic Graphical Models</a>. Daphne Koller. Stanford University/Coursera.</li>
+<li><a href="https://www.wikiwand.com/en/Markov_blanket">https://www.wikiwand.com/en/Markov_blanket</a></li>
 </ul>
     
     <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
