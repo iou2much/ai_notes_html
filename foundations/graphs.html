@@ -31,7 +31,7 @@
 <p>Within undirected graphs there are other distinctions:</p>
 <ul>
 <li><strong>简单图</strong>中没有循环并且仅允许存在单个边</li>
-<li><strong>正则图</strong>是每个顶点具有相同数量的邻点（即相同的度）</li>
+<li><strong>正则图</strong>是每个顶点具有相同数量的邻点(即相同的度)</li>
 <li><strong>完全图</strong>中，每对顶点都有一条边连接</li>
 <li>
 <p><strong>连接图</strong>是其中在每对顶点之间存在一条路径</p>
@@ -43,8 +43,11 @@
 <li>a <em>complete</em> graph is a simple graph where every pair of vertices is connected by an edge</li>
 <li>a <em>connected</em> graph is a graph where there exists a path between every pair of vertices</li>
 </ul>
+<p>对于没有平行边的连接图（即每对顶点之间只有零或一条边），<mathjax>$m$</mathjax>在<mathjax>$\Omega(n)$</mathjax>和<mathjax>$O(n^2)$</mathjax>之间。</p>
 <p>For a connected graph with no parallel edges (i.e. each pair of vertices has only zero or one edge between it), <mathjax>$m$</mathjax> is somewhere between <mathjax>$\Omega(n)$</mathjax> and <mathjax>$O(n^2)$</mathjax>.</p>
+<p>通常，如果<mathjax>$m$</mathjax>等于或接近<mathjax>$O(n)$</mathjax>（即图有更少的边数），则被称为稀疏的。如果<mathjax>$m$</mathjax>更接近<mathjax>$O(n^2)$</mathjax>，通常被称为稠密的。</p>
 <p>Generally, a graph is said to be <strong>sparse</strong> if <mathjax>$m$</mathjax> is <mathjax>$O(n)$</mathjax> or close to it (that is, it has the lower end of number of edges). If <mathjax>$m$</mathjax> is closer to <mathjax>$O(n^2)$</mathjax>, this is generally said to be a <strong>dense</strong> graph.</p>
+<p>邻接矩阵需要<mathjax>$\Theta(N^2)$</mathjax>的空间,如果图是稀疏的,这是空间的浪费,而邻接列表更合适——你有一个顶点数组和一个边数组。每条边指向其端点,每个顶点指向其上的边缘事件。这需要<mathjax>$\Theta(m+n)$</mathjax>的空间(因为顶点的数组需要<mathjax>$\Theta(n)$</mathjax>空间,以及每个取 <mathjax>$\Theta(m)$</mathjax> ,为<mathjax>$\Theta(n+3m) = \Theta(m+n)$</mathjax> )。</p>
 <p>An adjacency matrix requires <mathjax>$\Theta(n^2)$</mathjax> space. If the graph is sparse, this is a waste of space, and an adjacency list is more appropriate - you have an array of vertices and an array of edges. Each edge points to its endpoints, and each vertex points to edges incident on it. This requires <mathjax>$\Theta(m+n)$</mathjax> space (because the array of vertices takes <mathjax>$\Theta(n)$</mathjax> space and the arrays of edges, edge-to-endpoints, and vertex-to-edges each take <mathjax>$\Theta(m)$</mathjax>, for <mathjax>$\Theta(n+3m) = \Theta(m+n)$</mathjax>), so it is better for sparse graphs.</p>
 <p>Consider the accompanying example graph.</p>
 <figure><img alt="Example graph" src="../assets/graph_example.svg" /><figcaption>Example graph</figcaption>
