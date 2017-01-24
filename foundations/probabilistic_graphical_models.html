@@ -566,7 +566,8 @@ $$</mathjax></p>
 </ul>
 <p>That is, it is just an aggregate ("unrolled") of the previously shown network up to time slice <mathjax>$t_T$</mathjax>.</p>
 <h4>Hidden Markov Models (HMMs)</h4>
-<p>![Hidden Markov Model](../assets/hmm.svg textwidth=0.5)</p>
+<figure><img alt="Hidden Markov Model" src="../assets/hmm.svg" /><figcaption>Hidden Markov Model</figcaption>
+</figure>
 <p>Often we have a sequence of observations and we want to use these observations to learn something about the underlying process that generated them. As such we need to introduce time or space to our models.</p>
 <p>An <strong>Hidden Markov Model</strong> (HMM) is a simple dynamic Bayes' net. In particular, it is a Markov model in which we don't directly observe the state. That is, there is a Markov chain where we don't see <mathjax>$S_t$</mathjax> but rather we see some evidence/observations/emissions/outputs/effects/etc <mathjax>$O_t$</mathjax>.</p>
 <p>The actual observations are stochastic (e.g. an underlying state may produce one of many observations with some probability). We try to infer the state based on these observations.</p>

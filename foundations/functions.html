@@ -55,25 +55,34 @@ $$</mathjax></p>
 Say we have a function <mathjax>$f: X \to Y$</mathjax>, where <mathjax>$f(a) = b$</mathjax> for any <mathjax>$a \in X$</mathjax>.</p>
 <p>我们说<mathjax>$f$</mathjax>是<strong>可逆的</strong>, 如果存在一个函数<mathjax>$f^{-1}: Y \to X$</mathjax>,使 <mathjax>$f^{-1} \circ f = I_X$</mathjax> and <mathjax>$f \circ f^{-1} = I_Y$</mathjax>,</p>
 <p>We say <mathjax>$f$</mathjax> is <strong>invertible</strong> if and only if there exists a function <mathjax>$f^{-1}: Y \to X$</mathjax> such that <mathjax>$f^{-1} \circ f = I_X$</mathjax> and <mathjax>$f \circ f^{-1} = I_Y$</mathjax>. Note that <mathjax>$\circ$</mathjax> denotes <strong>function composition</strong>, i.e. <mathjax>$f \circ g = f(g)$</mathjax>, which is the same as <mathjax>$f(g(x))$</mathjax>.</p>
+<p>函数的逆是具有<strong>唯一性</strong>,它是满射且是一一映射,每一个<mathjax>$y$</mathjax>都有唯一的<mathjax>$x$</mathjax>与之对应.</p>
 <p>The inverse of a function is <em>unique</em>, that is, it is <em>surjective</em> and <em>injective</em> (described below), that is, there is a unique <mathjax>$x$</mathjax> for each <mathjax>$y$</mathjax>.</p>
 <h3>满射</h3>
 <h3>Surjective functions</h3>
+<p><strong>满射</strong>函数，是一个函数<mathjax>$f: X \to Y$</mathjax> ，对每个<mathjax>$y \in Y$</mathjax>存在_至少_一个<mathjax>$x \in X$</mathjax>,使<mathjax>$f(x) = y$</mathjax>.</p>
 <p>A <strong>surjective</strong> function, also called "onto", is a function <mathjax>$f: X \to Y$</mathjax> where, for every <mathjax>$y \in Y$</mathjax> there exists <em>at least</em> one <mathjax>$x \in X$</mathjax> such that <mathjax>$f(x) = y$</mathjax>. That is, every <mathjax>$y$</mathjax> has at least one corresponding <mathjax>$x$</mathjax> value.</p>
+<p>等价于:</p>
 <p>This is equivalent to:</p>
 <p><mathjax>$$ \text{range}(f) = Y $$</mathjax></p>
-<h3>一一映射</h3>
+<h3>单射</h3>
 <h3>Injective functions</h3>
+<p><strong>单射</strong>函数，是一个函数<mathjax>$f: X \to Y$</mathjax>, 对每个<mathjax>$y \in Y$</mathjax>存在_至多_一个<mathjax>$x \in X$</mathjax>,使<mathjax>$f(x) = y$</mathjax>.</p>
 <p>An <strong>injective</strong> function, also called "one-to-one", is a function <mathjax>$f: X \to Y$</mathjax> where, for every <mathjax>$y \in Y$</mathjax>, there exists <em>at most</em> one <mathjax>$x \in X$</mathjax> such that <mathjax>$f(x) = y$</mathjax>.</p>
+<p>也就是说，不是全部 <mathjax>$y$</mathjax> 都必然具有对应的<mathjax>$X$</mathjax>, 但有对应的都只有一个<mathjax>$x$</mathjax>.</p>
 <p>That is, not all <mathjax>$y$</mathjax> necessarily has a corresponding <mathjax>$x$</mathjax>, but those that do only have <em>one</em> corresponding <mathjax>$x$</mathjax>.</p>
-<h3>满射与一一映射</h3>
+<h3>满射与单射</h3>
 <h3>Surjective &amp; injective functions</h3>
+<p>一个函数可以同时是满射和单射，这只是意味着对每个<mathjax>$y \in Y$</mathjax>存在都有且只有一个<mathjax>$x \in X$</mathjax>,使<mathjax>$f(x) = y$</mathjax>.</p>
 <p>A function can be both surjective and injective, which just means that for every <mathjax>$y \in Y$</mathjax> there exists exactly one <mathjax>$x \in X$</mathjax> such that <mathjax>$f(x) = y$</mathjax>, that is, every <mathjax>$y$</mathjax> has exactly one corresponding <mathjax>$x$</mathjax>.</p>
+<p>如前所述，函数的逆函数就是满射和单射的！</p>
 <p>As mentioned before, the inverse of a function is both surjective and injective!</p>
 <h3>凸函数与非凸函数</h3>
 <h3>Convex and non-convex functions</h3>
 <blockquote>
+<p>凸函数是一个连续函数，其域中每个间隔中点的值不超过这间隔两端的算术平均值。(<a href="http://mathworld.wolfram.com/ConvexFunction.html">Convex Function</a>.Weisstein, Eric W. Wolfram MathWorld</p>
 <p>A convex function is a continuous function whose value at the midpoint of every interval in its domain does not exceed the arithmetic mean of its values at the ends of the interval. (<a href="http://mathworld.wolfram.com/ConvexFunction.html">Convex Function</a>. Weisstein, Eric W. Wolfram MathWorld)</p>
 </blockquote>
+<p>一个<strong>凸</strong>域是在该区域中任何两点都可以在不离开该区域情况下用直线连接。</p>
 <p>A <strong>convex</strong> region is one in which any two points in the region can be joined by a straight line that does not leave the region.</p>
 <p>Which is to say that a convex function has a minimum, and only one (and this is also the only position where the derivative is 0).</p>
 <p>More formally, a function is convex if the second derivative is positive everywhere. A function can be convex on a range <mathjax>$[a,b]$</mathjax> if its second derivative is positive everywhere in that range.</p>
