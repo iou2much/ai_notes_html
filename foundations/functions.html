@@ -141,19 +141,15 @@ $$</mathjax></p>
 <p>我们如何定义“相似”？</p>
 <p>How do we define "similar"?</p>
 <p>我们将使用距离函数 <mathjax>$\mu: V \times V \to R^+$</mathjax>，满足：</p>
-<p>We'll use a distance function <mathjax>$\mu: V \times V \to R^+$</mathjax>, which needs to satisfy:</p>
 <ul>
 <li><strong>自反性</strong>: 对所有<mathjax>$v$</mathjax>有<mathjax>$\mu(v,v)=0$</mathjax> </li>
 <li><strong>对称性</strong>: 对所有<mathjax>$v_1, v_2$</mathjax> 有 <mathjax>$\mu(v_1,v_2)=\mu(v_2, v_1)$</mathjax></li>
-<li>
-<p><strong>三角不等性</strong>: 对所有<mathjax>$v_1, v_2, v_3$</mathjax>, 有 <mathjax>$\mu(v_1, v_2) \leq \mu(v_1, v_3) + \mu(v_3, v_2)$</mathjax>  </p>
-</li>
-<li>
-<p><em>reflexivity</em>: <mathjax>$\mu(v,v)=0$</mathjax> for all <mathjax>$v$</mathjax></p>
-</li>
-<li><em>symmetry</em>: <mathjax>$\mu(v_1,v_2)=\mu(v_2, v_1)$</mathjax> for all <mathjax>$v_1, v_2$</mathjax></li>
-<li><em>triangle inequality</em>: <mathjax>$\mu(v_1, v_2) \leq \mu(v_1, v_3) + \mu(v_3, v_2)$</mathjax> for all <mathjax>$v_1, v_2, v_3$</mathjax></li>
+<li><strong>三角不等性</strong>: 对所有<mathjax>$v_1, v_2, v_3$</mathjax>, 有 <mathjax>$\mu(v_1, v_2) \leq \mu(v_1, v_3) + \mu(v_3, v_2)$</mathjax>  </li>
 </ul>
+<p>We'll use a distance function <mathjax>$\mu: V \times V \to R^+$</mathjax>, which needs to satisfy:<br />
+- <em>reflexivity</em>: <mathjax>$\mu(v,v)=0$</mathjax> for all <mathjax>$v$</mathjax><br />
+- <em>symmetry</em>: <mathjax>$\mu(v_1,v_2)=\mu(v_2, v_1)$</mathjax> for all <mathjax>$v_1, v_2$</mathjax><br />
+- <em>triangle inequality</em>: <mathjax>$\mu(v_1, v_2) \leq \mu(v_1, v_3) + \mu(v_3, v_2)$</mathjax> for all <mathjax>$v_1, v_2, v_3$</mathjax></p>
 <p>如果所有这些都得到满足，我们说 <mathjax>$\mu$</mathjax> 是一个度量。</p>
 <p>If all these are satisfied, we say that <mathjax>$\mu$</mathjax> is a <strong>metric</strong>.</p>
 <p>如果只自反性和对称性满足，我们用半度量代替。</p>
