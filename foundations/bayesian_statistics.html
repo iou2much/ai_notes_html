@@ -48,11 +48,13 @@ $$</mathjax></p>
 <li>Specifying a marginal or distribution <mathjax>$\pi(\theta)$</mathjax> for <mathjax>$\theta$</mathjax>, which is the prior distribution ("prior" for short): <mathjax>$\theta \sim \pi(\theta)$</mathjax></li>
 <li>From this we wish to compute the posterior, that is, uncover the distribution for <mathjax>$\theta$</mathjax> given the observed data <mathjax>$X$</mathjax>, like so: <mathjax>$\pi(\theta|X) = \frac{\pi(\theta)L(\theta|X)}{\int \pi(\theta) L(\theta|X) d\theta}$</mathjax>, where <mathjax>$L(\theta|X) \propto f(\theta|X)$</mathjax> in <mathjax>$\theta$</mathjax>, called the likelihood of <mathjax>$\theta$</mathjax> given <mathjax>$X$</mathjax>. More often than not, the posterior must be approximated through Markov Chain Monte Carlo (detailed later).</li>
 </ol>
+<h3>频率派与贝叶斯派</h3>
 <h3>Frequentist vs Bayesian approaches</h3>
 <p>For frequentists, probability is thought of in terms of frequencies, i.e. the probability of the event is the amount of times it happened over the total amount of times it could have happened.</p>
 <p>In frequentist statistics, the observed data is considered random; if you gathered more observations they would be different according to the underlying distribution. The parameters of the model, however, are considered fixed.</p>
 <p>For Bayesians, probability is belief or certainty about an event. Observed data is considered fixed, but the model parameters are random (uncertain) instead and considered to be drawn from some probability distribution.</p>
 <p>Another way of phrasing this is that frequentists are concerned with uncertainty in the data, whereas Bayesians are concerned with uncertainty in the parameters.</p>
+<h2>贝叶斯定理</h2>
 <h2>Bayes' Theorem</h2>
 <p>In frequentist statistics, many different estimators may be used, but in Bayesian statistics the only estimator is Bayes' Formula (aka Bayes' Rule or Bayes' Theorem).</p>
 <p>Bayes' Theorem, aka Bayes' Rule:</p>
@@ -80,6 +82,7 @@ $$</mathjax></p>
 <p>Another workaround to approximate the posterior using simulation methods such as Monte Carlo.</p>
 <p>Given a set of hypotheses <mathjax>$H_0, H_1, \dots, H_n$</mathjax>, the distribution for the priors of these hypotheses is the <em>prior distribution</em>, i.e. <mathjax>$P(H_0), P(H_1), \dots, P(H_n)$</mathjax>.</p>
 <p>The distribution of the posterior probabilities is the <em>posterior distribution</em>, i.e. <mathjax>$P(H_0|D), P(H_1|D), \dots, P(H_n|D)$</mathjax>.</p>
+<h3>似然</h3>
 <h3>Likelihood</h3>
 <p>Likelihood is not the same as probability (thus it does not have to sum to 1), but it is <em>proportional</em> to probability. More specifically, the likelihood of a hypothesis <mathjax>$H$</mathjax> given some data <mathjax>$D$</mathjax> is proportional to the probability of <mathjax>$D$</mathjax> given that <mathjax>$H$</mathjax> is true:</p>
 <p><mathjax>$$
@@ -91,6 +94,7 @@ $$</mathjax></p>
 <p>We can also quantify <em>how much</em> better <mathjax>$H_1$</mathjax> is than <mathjax>$H_2$</mathjax> with the ratio of their likelihoods, i.e. <mathjax>$\frac{L(H_1|D)}{L(H_2|D)}$</mathjax>, which is proportional to <mathjax>$\frac{P(D|H_1)}{P(D|H_2)}$</mathjax>.</p>
 <p>Likelihoods are meaningless in isolation (because of the constant <mathjax>$k$</mathjax>), they must be compared to other likelihoods, such that the constants cancel out, i.e. as ratios like the example above, to be meaningful.</p>
 <p>A <strong>Bayes factor</strong> is an extension of likelihood ratios: it is a weighted average likelihood ratio based on the prior distribution of hypotheses. So we have some prior bias as to what hypotheses we expect, i.e. how probable we expect some hypotheses to be, and we weigh the likelihood ratios by these expected probabilities.</p>
+<h2>选择先验分布</h2>
 <h2>Choosing a prior distribution</h2>
 <p>With Bayesian inference, we must <em>choose</em> a prior distribution, then apply data to get our posterior distribution. The prior is chosen based on domain knowledge or intuition or perhaps from the results of previous analysis; that is, it is chosen subjectively - there is no prescribed formula for picking a prior. If you have no idea what to pick, you can just pick a uniform distribution as your prior.</p>
 <p>Your choice of prior will affect the posterior that you get, and the subjectivity of this choice is what makes Bayesian statistics controversial - but it's worth noting that all of statistics, whether or frequentist or Bayesian, involves many subjective decisions (e.g. frequentists must decide on an estimator to use, what data to collect and how, and so on) - what matters most is that you are explicit about your decisions and why you made them.</p>
@@ -105,6 +109,7 @@ $$</mathjax></p>
 </ul>
 <p>An example objective prior is a <strong>uniform</strong> (flat) prior where every value has equal weighting. Using a uniform prior is called <em>The Principle of Indifference</em>. Note that a uniform prior restricted within a range is <em>not</em> objective - it has to be over <em>all</em> possibilities.</p>
 <p>Note that the more data you have (as <mathjax>$N$</mathjax> increases), the choice of prior becomes less important.</p>
+<h3>共轭先验</h3>
 <h3>Conjugate priors</h3>
 <p><strong>Conjugate priors</strong> are priors which, when combined with the likelihood, result in a posterior which is in the same family. These are very convenient because the posterior can be calculated analytically, so there is no need to use approximation such as Markov Chain Monte Carlo (see below).</p>
 <p>For example, a binomial likelihood is a conjugate with a beta prior - their combination results in a beta-binomial posterior.</p>
@@ -117,6 +122,7 @@ $$</mathjax></p>
 <p><mathjax>$$
 \overbrace{p_{\beta}}^{\text{prior}} \cdot \overbrace{f_{\alpha}(X)}^{\text{data}} = \overbrace{p_{\beta'}}^{\text{posterior} }
 $$</mathjax></p>
+<h4>Beta-二项型</h4>
 <h4>Beta-Binomial Model</h4>
 <p>The Beta-Binomial model is a useful Bayesian model because it provides values between 0 and 1, which is useful for estimating probabilities or percentages.</p>
 <p>It involves, as you might expect, a beta and a binomial distribution.</p>
@@ -135,6 +141,7 @@ p \, | \, n, N &amp;\sim \Bet(\alpha + n, \beta + N - n)
 $$</mathjax></p>
 <p>So with these two distributions, we can directly compute the posterior with no need for simulation (e.g. MCMC).</p>
 <p>How do you choose the parameters for a Beta prior? Well, it depends on the particular problem, but a conservative one, for when you don't have a whole lot of info to go on, is <mathjax>$\Bet(\frac{1}{2}, \frac{1}{2})$</mathjax>, known as <strong>Jeffrey's prior</strong>.</p>
+<h5>示例</h5>
 <h5>Example</h5>
 <p>We run 100 trials and observe 10 successes. What is the probability <mathjax>$p$</mathjax> of a successful trial?</p>
 <p>Our knowns are <mathjax>$N=100, n=10$</mathjax>. A binomial distribution describes these observations, but we have the unknown parameter <mathjax>$p$</mathjax>.</p>
@@ -147,8 +154,10 @@ p &amp;\sim \Bet(11, 91)
 \end{aligned}
 $$</mathjax></p>
 <p>Then we can draw samples from the distribution and compute its mean or other descriptive statistics such as the credible interval.</p>
+<h3>敏感性分析</h3>
 <h3>Sensitivity Analysis</h3>
 <p>The strength of the prior affects the posterior - the stronger your prior beliefs, the more difficult it is to change those beliefs (it requires more data/evidence). You can conduct <strong>sensitivity analysis</strong> to try your approach with various different priors to get an idea of how different priors affect your resulting posterior.</p>
+<h3>经验贝叶斯</h3>
 <h3>Empirical Bayes</h3>
 <p>Empirical Bayes is a method which combines frequentist and Bayesian approaches by using frequentist methods to select the hyperparameters.</p>
 <p>For instance, say you want to estimate the <mathjax>$\mu$</mathjax> parameter for a normal distribution.</p>
@@ -158,9 +167,11 @@ $$</mathjax></p>
 $$</mathjax><br />
 Where <mathjax>$\mu_p$</mathjax> denotes the prior <mathjax>$\mu$</mathjax>.</p>
 <p>Though if working with not much data, this kind of ends like double-counting your data.</p>
+<h2>马尔可夫链蒙特卡罗理论(MCMC)</h2>
 <h2>Markov Chain Monte Carlo (MCMC)</h2>
 <p>With Bayesian inference, in order to describe your posterior, you often must evaluate complex multidimensional integrals (i.e. from very complex, multidimensional probability distributions), which can be computationally intractable.</p>
 <p>Instead you can generate sample points from the posterior distribution and use those samples to compute whatever descriptions you need. This technique is called <strong>Monte Carlo integration</strong>, and the process of drawing repeated random samples in this way is called <strong>Monte Carlo simulation</strong>. In particular, we can use a family of techniques known as <strong>Markov Chain Monte Carlo</strong>, which combine Monte Carlo integration and simulation with Markov chains, to generate samples for us.</p>
+<h3>蒙特卡罗积分法</h3>
 <h3>Monte Carlo Integration</h3>
 <p>Monte Carlo integration is a way to approximate complex integrals using random number generation.</p>
 <p>Say we have a complex integral:</p>
@@ -197,6 +208,7 @@ $$</mathjax></p>
 </pre></div>
 
 
+<h3>马尔可夫链</h3>
 <h3>Markov Chains</h3>
 <p>Markov chains are a stochastic process in which the next state depends only on the current state.</p>
 <p>Consider a random variable <mathjax>$X$</mathjax> and a time index <mathjax>$t$</mathjax>. The state of <mathjax>$X$</mathjax> at time <mathjax>$t$</mathjax> is notated <mathjax>$X_t$</mathjax>.</p>
@@ -207,6 +219,7 @@ $$</mathjax></p>
 <p>Where <mathjax>$P(X_{t+1} = x_{t+1})$</mathjax> is the <strong>transition probability</strong> of <mathjax>$X_{t+1} = x_{t+1}$</mathjax>. The collection of transition probabilities is called a <strong>transition matrix</strong> (for discrete states); more generally is is called a <strong>transition kernel</strong>.</p>
 <p>If we consider <mathjax>$t$</mathjax> going to infinity, the Markov chain settles on a <strong>stationary distribution</strong>, where <mathjax>$P(X_t) = P(X_{t-1})$</mathjax>. The stationary distribution does not depend on the initial state of the network. Markov chains are <em>erdogic</em>, i.e. they "mix", which means that the influence of the initial state weakens with time (the rate at which it mixes is its <em>mixing speed</em>).</p>
 <p>If we call the <mathjax>$k \times k$</mathjax> transition matrix <mathjax>$P$</mathjax> and the marginal probability of a state at time <mathjax>$t$</mathjax> is a <mathjax>$k \times 1$</mathjax> vector <mathjax>$\pi$</mathjax>, then the distribution of the state at time <mathjax>$t+1$</mathjax> is <mathjax>$\pi'P$</mathjax>. If <mathjax>$\pi'P = \pi'$</mathjax>, then <mathjax>$pi$</mathjax> is the stationary distribution of the Markov chain.</p>
+<h3>马尔可夫链蒙特卡罗理论</h3>
 <h3>Markov Chain Monte Carlo</h3>
 <p>MCMC is useful because often we may encounter distributions which aren't easily expressed mathematically (e.g. their functions may have very strange shapes), but we still want to compute some descriptive statistics (or make other computations) from them. MCMC allows us to work with such distributions without needing precise mathematical formulations of them.</p>
 <p>More generally, MCMC is really useful if you don't want to (or can't) find the underlying function describing something. As long as you can simulate that process in some way, you don't need to know the exact function - you can just generate enough sample data to work with in its stead. So MCMC is a brute force but effective method.</p>
@@ -218,6 +231,7 @@ E[f(x)] \approx \frac{1}{N} \sum^N_{i=1}f(x_i)
 $$</mathjax></p>
 <p>Because of the random initialization, there is a "<strong>burn-in</strong>" phase in which the sampling model needs to be "warmed up" until it reaches an equilibrium sampling state, the <em>stationary distribution</em>. So you discard the first hundred or thousand or so samples as part of this burn-in phase. You can (eventually) arrive at this stationary distribution <em>independent of where you started</em> which is why the random initialization is ok - this is an important feature of Markov Chains.</p>
 <p>MCMC is a general technique of which there are several algorithms.</p>
+<h4>拒绝采样</h4>
 <h4>Rejection Sampling</h4>
 <p>Monte Carlo integration allows us to draw samples from a posterior distribution with a known parametric form. It does not, however, enable us to draw samples from a posterior distribution without a known parametric form. We may instead use <strong>rejection sampling</strong> in such cases.</p>
 <p>We can take our function <mathjax>$f(x)$</mathjax> and if it has bounded/finite <em>support</em> ("support" is the <mathjax>$x$</mathjax> values where <mathjax>$f(x)$</mathjax> is non-zero, and can be thought of the range of meaningful <mathjax>$x$</mathjax> values for <mathjax>$f(x)$</mathjax>), we can calculate its maximum and then define a bounding rectangle with it, encompassing all of the support values. This envelope function should contain all possible values of <mathjax>$f(x)$</mathjax>  Then we can randomly generate points from within this box and check if they are under the curve (that is, less than <mathjax>$f(x)$</mathjax> for the point's <mathjax>$x$</mathjax> value). If a point is not under the curve, we reject it. Thus we approximate the integral like so:</p>
@@ -228,6 +242,7 @@ $$</mathjax></p>
 <p>Then, for each <mathjax>$x_i$</mathjax> we draw (i.e. sample), we also draw a uniform random value <mathjax>$u_i$</mathjax>. Then if <mathjax>$u_i &lt; \frac{f(x_i)}{cg(x_i)}$</mathjax>, we accept <mathjax>$x_i$</mathjax>, otherwise, we reject it.</p>
 <p>The intuition here is that the probability of a given point being accepted is proportional to the function <mathjax>$f$</mathjax> at that point, so when there is greater density in <mathjax>$f$</mathjax> for that point, that point is more likely to be accepted.</p>
 <p>In multidimensional cases, you draw candidates from every dimension simultaneously.</p>
+<h4>Metropolis-Hastings算法</h4>
 <h4>Metropolis-Hastings</h4>
 <p>The <strong>Metropolis-Hastings</strong> algorithm uses Markov chains with rejection sampling.</p>
 <p>The proposal density <mathjax>$g(\theta_t)$</mathjax> is chosen as in rejection sampling, but it depends on <mathjax>$\theta_{t-1}$</mathjax>, i.e. <mathjax>$g(\theta_t|\theta_{t-1})$</mathjax>.</p>
@@ -258,6 +273,7 @@ $$</mathjax></p>
 <p>Alternatively, you can look at an autocorrelation plot, which measures the internal correlation (from -1 to 1) over time, called "lag". We expect that the greater the lag, the less the points should be autocorrelated - that is, we expect autocorrelation to smoothly decrease to 0 with increasing lag. If autocorrelation remains high, then the chain is not fully exploring the space. Autocorrelation can be improved by <em>thinning</em>, which is a technique where only every <mathjax>$k$</mathjax>th draw is kept and others are discarded.</p>
 <p>Finally, you also have the options of running multiple chains, each with different starting values, and combining those samples.</p>
 <p>You should also use burn-in.</p>
+<h4>Gibbs采样</h4>
 <h4>Gibbs Sampling</h4>
 <p>It is easy to sample from simple distributions. For example, for a binomial distribution, you can basically just flip a coin. For a multinomial distribution, you can basically just roll a dice.</p>
 <p>If you have a multinomial, multivariate distribution, e.g. <mathjax>$P(x_1, x_2, \dots, x_n)$</mathjax>, things get more complicated. If the variables are independent, you can factorize the multivariate distribution as a product of univariate distributions, treating each as a univariate multinomial distribution, i.e. <mathjax>$P(x_1, x_2, \dots, x_n) = P(x_1) \times P(x_2) \times \dots \times P(x_n)$</mathjax>. Then you can just sample from each distribution individually, i.e. as a dice roll.</p>
@@ -381,10 +397,12 @@ $$</mathjax></p>
 <p>Now we fix <mathjax>$c=0,t=1$</mathjax> and randomly pick another <mathjax>$r$</mathjax> value. Here <mathjax>$r$</mathjax> is dependent only on <mathjax>$c$</mathjax>. <mathjax>$c=0$</mathjax> so we have a <mathjax>$0.9$</mathjax> probability of picking <mathjax>$r=0$</mathjax>. Say that we do. We have another sample <mathjax>$c=0,r=0,t=1$</mathjax>, which happens to be the same as the previous sample.</p>
 <p>Now we fix <mathjax>$c=0,r=0$</mathjax> and pick a new <mathjax>$t$</mathjax> value. <mathjax>$t$</mathjax> is dependent on both <mathjax>$c$</mathjax> and <mathjax>$r$</mathjax>. <mathjax>$c=0,r=0$</mathjax>, so we have a <mathjax>$0.9$</mathjax> chance of picking <mathjax>$t=0$</mathjax>. Say that we do. Now we have another sample <mathjax>$c=0,r=0,t=0$</mathjax>. Then we repeat this process until convergence (or for some specified number of iterations).</p>
 <p>Your samples will reflect the actual joint distribution of these values, since more likely samples are, well, more likely to be generated.</p>
+<h2>变分推断</h2>
 <h2>Variational Inference</h2>
 <p>MCMC can take a long time to get good answers - in theory if you run it infinitely it will generate enough samples to get a perfectly accurate distribution, but that's not a fair criterion (many algorithms do well if they have infinite time).</p>
 <p>With <em>variational inference</em> we don't need to take samples - instead we fit an approximate joint distribution <mathjax>$Q(x; \theta)$</mathjax> to approximate the true joint posterior <mathjax>$P(x)$</mathjax>, turning it into an optimization problem (we try to get them as close as possible according to the KL divergence <mathjax>$\text{KL}[Q(x;\theta)||P(x)]$</mathjax>. So we are interested in the parameters <mathjax>$\theta$</mathjax>.</p>
 <p>The <em>mean-field</em> form of variational inference assumes that <mathjax>$Q$</mathjax> factorizes into independent single-variable factors, i.e. <mathjax>$Q(x) = \prod_i Q_i(x_i|\theta_i)$</mathjax>.</p>
+<h2>贝氏点估计</h2>
 <h2>Bayesian point estimates</h2>
 <p>Bayesian inference returns a distribution (the posterior) but we often need a single value (or a vector in multivariate cases). So we choose a value from the posterior. This value is a <strong>Bayesian point estimate</strong>.</p>
 <p>Selecting the MAP (<em>maximum a posterior</em>) value is insufficient because it neglects the shape of the distribution.</p>
@@ -403,6 +421,7 @@ $$</mathjax></p>
 <p><mathjax>$$
 \argmin_{\hat \theta} E_{\theta}[L(\theta, \hat \theta)]
 $$</mathjax></p>
+<h2>置信区间</h2>
 <h2>Credible Intervals (Credible Regions)</h2>
 <p>In Bayesian statistics, The closest analog to confidence intervals in frequentist statistics is the <strong>credible interval</strong>. It is <em>much</em> easier to interpret than the confidence interval because it is exactly what most people confuse the confidence interval to be. For instance, the 95% credible interval is the interval in which we expect to find <mathjax>$\theta$</mathjax> 95% of the time.</p>
 <p>Mathematically this is expressed as:</p>
@@ -410,6 +429,7 @@ $$</mathjax></p>
 P(a(y) &lt; \theta &lt; b(y)|Y=y) = 0.95
 $$</mathjax></p>
 <p>We condition on <mathjax>$Y$</mathjax> because in Bayesian statistics, the data is fixed and the parameters are random.</p>
+<h2>贝叶斯回归</h2>
 <h2>Bayesian Regression</h2>
 <p>The Bayesian methodology can be applied to regression as well. In conventional regression the parameters are treated as fixed values that we uncover. In Bayesian regression, the parameters are treated as random variables, as they are elsewhere in Bayesian statistics. We define prior distributions for each parameter - in particular, normal priors, so that for each parameter we define a prior mean as well as a covariance matrix for all the parameters.</p>
 <p>So we specify:</p>
@@ -436,6 +456,7 @@ f(\beta~|~y,x) &amp;= \int f(\beta~|~\sigma^2,y,x) f(\sigma^2~|~y,x)d\sigma^2 = 
 \end{aligned}
 $$</mathjax></p>
 <p>So the resulting distribution of parameters is a multivariate <mathjax>$t$</mathjax> distribution.</p>
+<h2>贝叶斯示例</h2>
 <h2>A Bayesian example</h2>
 <p>Let's say we have a coin. We are uncertain whether or not it's a fair coin. What can we learn about the coin's fairness from a Bayesian approach?</p>
 <p>Let's restate the problem. We can represent the outcome of a coin flip with a random variable, <mathjax>$X$</mathjax>. If the coin is not fair, we expect to see heads 100% of the time. That is, if the coin is unfair, <mathjax>$P(X=\text{heads}) = 1$</mathjax>. Otherwise, we expect it to be around <mathjax>$P(X=\text{heads}) = 0.5$</mathjax>.</p>
@@ -459,6 +480,7 @@ $$</mathjax></p>
 </figure>
 <p>Since our prior belief is stronger than it was with a flat prior, the same amount of evidence doesn't change the prior belief as much. For instance, now if we see a streak of heads, we are less convinced it is unfair.</p>
 <p>In either case, we could take the expected value of <mathjax>$p$</mathjax>'s posterior distribution as our estimate for <mathjax>$p$</mathjax>, and then use that as evidence for a fair or unfair coin.</p>
+<h3>引用</h3>
 <h3>References</h3>
 <ul>
 <li><a href="https://www.youtube.com/watch?v=ps5MYi81IsE">POLS 506: Simple Bayesian Models</a>. Justin Esarey.</li>
