@@ -35,7 +35,7 @@ $$</mathjax></p>
 <p>Consider a very naive approach: a greedy random algorithm which starts at some position in this topology, then randomly tries moving to a new position and checks if it is better. If it is, it sets that as the current solution. It continues until it has some reason to stop, usually because it has found a minimum. This is a <strong>local minimum</strong>; that is, it is a minimum relative to its immediately surrounding points, but it is not necessarily the <strong>global minimum</strong>, which is the minimum of the entire function.</p>
 <p>这种算法是<strong>贪婪的</strong>，因为它总是会找个更好的得分位置，哪怕只是略微好一点。因此，它可能很容易陷入局部最优 - 因为似乎往任何远离它的点都不如它，即使全局最优解是在一个角落。</p>
 <p>This algorithm is <em>greedy</em> in that it will always prefer a better scoring position, even if it is only marginally better. Thus it can be easy to get stuck in local optima - since any step away from it seems worse, even if the global optimum is right around the corner, so to speak.</p>
-<p>优化可以用<em>数值法<strong>或</strong>解析法</em>*实现。解析法包括计算导数，然后识别临界点（例如二阶导数测试）。这些提供了确切的最优。</p>
+<p>优化可以用<strong>数值法</strong>或<strong>解析法</strong>实现。解析法包括计算导数，然后识别临界点（例如二阶导数测试）。这些提供了确切的最优。</p>
 <p>Optimization may be accomplished <strong>numerically</strong> or <strong>analytically</strong>. The analytic approach involves computing derivatives and then identifying critical points (e.g. the second derivative test). These provide the exact optima.</p>
 <p>然而，这种解析法对于许多函数是不可行的。在这种情况下，我们采用数值优化，在某种意义上，相当以撞大运的方式去猜最优猜。以下所涉及的方法都是数值优化方法。</p>
 <p>However, this analytic approach is infeasible for many functions. In such cases we resort to numerical optimization, which involves, in a sense, guessing your way to the optima. The methods covered here are all numerical optimization methods.</p>
@@ -83,12 +83,25 @@ $$</mathjax></p>
 $$</mathjax></p>
 <h2>梯度方法 vs 非梯度方法</h2>
 <h2>Gradient vs non-gradient methods</h2>
-<p>Broadly we can categorize optimization methods into those that use gradients and those that do not:</p>
+<p>我们大致可以将优化方法分类为使用梯度的方法和不使用梯度的方法：<br />
+Broadly we can categorize optimization methods into those that use gradients and those that do not:</p>
+<p>非梯度方法包括：</p>
+<ul>
+<li>hill climbing</li>
+<li>simplex/amoeba/Nelder Mead</li>
+<li>遗传算法</li>
+</ul>
 <p>Non-gradient methods include:</p>
 <ul>
 <li>hill climbing</li>
 <li>simplex/amoeba/Nelder Mead</li>
 <li>genetic algorithms</li>
+</ul>
+<p>梯度方法包括：</p>
+<ul>
+<li>梯度下降</li>
+<li>共轭梯度</li>
+<li>拟牛顿</li>
 </ul>
 <p>Gradient methods include:</p>
 <ul>
@@ -96,11 +109,13 @@ $$</mathjax></p>
 <li>conjugate gradient</li>
 <li>quasi-newton</li>
 </ul>
+<p>渐变方法往往更有效率，但不总有条件能使用（不会总存在梯度）。</p>
 <p>Gradient methods tend to be more efficient, but are not always possible to use (you don't always have the gradient).</p>
 <h2>梯度下降</h2>
 <h2>Gradient Descent</h2>
 <figure><img alt="Sphere function" src="../assets/spherefunc.svg" /><figcaption>Sphere function</figcaption>
 </figure>
+<p><strong>梯度下降</strong>（GD）也许是在机器学习中最常见的最小化方法（对于最大化，相应为<strong>梯度上升</strong>）。</p>
 <p><strong>Gradient descent</strong> (GD) is perhaps the common minimizing optimization (for maximizing, its equivalent is <em>gradient ascent</em>) in machine learning.</p>
 <p>Say we have a function <mathjax>$C(v)$</mathjax> which we want to minimize. For simplicity, we will use <mathjax>$v \in \mathbb R^2$</mathjax>. An example <mathjax>$C(v)$</mathjax> is visualized in the accompanying figure.</p>
 <p>In this example, the global minimum is visually obvious, but most of the time it is not (especially when dealing with far more dimensions). But we can apply the model of a ball rolling down a hill and expand it to any arbitrary <mathjax>$n$</mathjax> dimensions. The ball will "roll" down to a minimum, though not necessarily the global minimum.</p>
