@@ -1,0 +1,107 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>mcsfpp</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+    <link rel="stylesheet" href="http://ai-code.tech/ai_notes_html/css/custom.css">
+</head>
+
+<body>
+
+    <p><em>Modeling Complex Systems for Public Policies</em>. Edited by Bernardo Alves Furtado, Patrícia A. M. Sakowski, Marina H. Tóvolli. 2015.</p>
+<ul>
+<li>complex systems includes network analysis, information theory, cellular automata, and agent-based models.</li>
+<li>CAs vs ABMs: CAs are fixed in space (i.e. for focusing on local, physically bounded interactions)</li>
+<li>"the whole is more than the sum of the parts"; complex systems cannot be reduced to its individual components; the interaction between all the parts leads to emergent phenomena</li>
+</ul>
+<hr />
+<h2>Chapter 2: Complex Systems: Concepts, Literature, Possibilities, and Limitations. William Rand.</h2>
+<p>Two main phenomena of complex systems are:</p>
+<ul>
+<li><em>emergence</em>: the whole is more than the mere sum of its parts; it cannot be described or reduced to the behavior or properties of its components</li>
+<li><em>feedback</em>: the emergent properties and behaviors affect the individual components which in turn affects the emergent properties and behaviors and so on</li>
+</ul>
+<p><em>Leverage points</em> are points within the complex system that can, when changed, affect the system itself.</p>
+<p><em>Tipping points</em> (also called <em>phase transitions</em> or <em>bifurcations</em>) are points where the system suddenly changes drastically due to a comparatively small adjustment.</p>
+<p>Complex systems may exhibit <em>path dependence</em>, where (distantly) past events affect the possibilities of present state. <em>Sensitivity to initial conditions</em> is a characteristic form of path dependence in complex systems, where slight changes in the system's starting point can lead to drastically different outcomes.</p>
+<p>Complex systems are <em>nonlinear</em>; that is, the outputs are not linearly related to the inputs. The aforementioned properties describe this nonlinearity - changes in the input are not proportional to changes in the output.</p>
+<p>The <em>robustness</em> of a complex system is its ability to withstand wholesale removal of or large changes to its components without significant differences in its outcomes. Complex systems may also <em>adapt</em> and <em>evolve</em>.</p>
+<p>An important critique of modeling is <em>the Lucas critique of policy</em> (1976), which states that models (in terms of understanding policy) are focused on macro-level behaviors, but because low-level individual behaviors will shift in response to policy, the predictions such models make will be wrong. Complex systems modeling, because it focuses on the low-level individual, are more resistant to this critique.</p>
+<p>Complex systems modeling also works well with diversity and heterogeneity, which are often left out of models because they complicate things, even though they may be crucial to a good model. They also model networks well, and the interconnectedness and interactions that come with them.</p>
+<p>A common tool for modeling complex systems is <em>agent-based modeling</em> (ABM). The advantage of ABMs is that they are relatively easy to describe - they aren't as abstract as purely mathematical models.</p>
+<p>The power of complex systems modeling comes at a cost - they may be computationally expensive and contain large numbers of free parameters. They also require theoretical expertise around what is modeled.</p>
+<hr />
+<h2>Chapter 4: Simulation Models for Public Policy. James E. Gentile, Chris Glazner, Matthew Koehler.</h2>
+<blockquote>
+<p>Given the complexity of even the smallest of social systems, [the analysis of policy outcomes] is not trivial. Social systems are comprised of autonomous people who do not behave in perfectly rational ways, and they have different explanatory mental models for how society works. Social systems do not behave in deterministic ways that lend themselves to a simple spreadsheet analysis or a closed form mathematical formulation at the causal level. The behavior of social systems cannot be neatly constructed, as a watchmaker would build a watch to keep time. (p. 73)</p>
+<p>The relationship between a cause and its effect can be understood through models. At its most basic form, a model can simply be a mental concept, a description of a belief for how a system will respond to change. (p. 73)</p>
+<p>...one might be tempted to argue that "big data" are the solution. One could simply analyze enough data from a system to understand all of its potential dynamics to include outliers. However, from a policy perspective this analytic approach is of limited utility. What a big data analysis can provide is the correlative structures present within a dataset. This is quite different than the causal structure. Moreover, policy analysis is typically undertaken to inform a desired change to the system. This being the case, the potential new system would be "out of sample" from the big data analysis and how the old and new systems relate may not be clear.</p>
+<p>ABMs, on the other hand, allow one to investigate potential generating mechanisms and experiment with causal structures. As Epstein has termed it: "If we did not generate <mathjax>$x$</mathjax>, we did not explain <mathjax>$x$</mathjax>" (Epstein, 2006). As pointed out by Axtell, growing a particular outcome only demonstrates sufficiency (Axtell, 2000). One can demonstrate what will cause an outcome but, likely, will not be able to prove that is the actual mechanism being used by the system under study. (pp. 76-77)</p>
+</blockquote>
+<p>With ABMs, the model must be run many times to explore the mapping between the inputs and outputs. Outputs can be broadly categorized as so:</p>
+<ul>
+<li><em>expected valid</em> - by using input values known to result in known proper behavior</li>
+<li><em>expected invalid</em> - by using input values known to result in degenerate behavior</li>
+<li><em>unexpected results</em></li>
+</ul>
+<p><em>Axtell's Levels of Epmirical Relevance</em> (2005) give a rough categorization of ABMs' specificity.</p>
+<ul>
+<li>Level 0: "micro-level qualitative correspondence-agents that behave plausibly for a given system"</li>
+<li>Level 1: "macro-level qualitative correspondence to the referent"</li>
+<li>Level 2: "macro-level quantitative correspondence"</li>
+<li>Level 3: "micro-level quantitative correspondence-agents that behave identically to their 'real world counterparts'"</li>
+</ul>
+<p>Levels 0 and 1 are more appropriate for "thought experiments and initial investigations"; for more serious applications, levels 2 and 3 should be used.</p>
+<p>Axtell also describes three levels of correspondence between the ABM and the referent system:</p>
+<ul>
+<li><em>identity</em> - the simulation produces identical results to the referent</li>
+<li><em>distributional</em> - the simulation produces results that are statistically indistinguishable from the referent</li>
+<li><em>relational</em> - the simulation produces results that are statistically distinguishable but qualitatively similar to the referent</li>
+</ul>
+<p>The process of developing such simulations typically involves working with domain experts, implementing a model, verifying the model's implementation (e.g. via unit testing), and then validating the model's outputs against external data sources (if available). It is extremely important to carefully document the modeling process and its implementation so that it may be reproduced. This is especially true because these models can get very complicated very quickly.</p>
+<hr />
+<h2>Chapter 5: Operationalizing Complex Systems. Jaime Simão Sichman.</h2>
+<p><em>Multi-agent systems</em> (formerly called "distributed artificial intelligence", or DAI), which form the basis of the <em>multi-agent-based simulation</em> (MABS) simulation technique.</p>
+<p>Another property of complex systems it that they are <em>open</em> - new individuals or entities may come and go from the system. There is also the property of <em>2nd order emergence</em>, in which the global patterns that emerge from individual behavior may persist after their originating individuals have left the system, and remaining individuals perceive and respond to those effects (perhaps in different ways), generating more emergent effects.</p>
+<p>Multi-agent systems are essentially societies of autonomous artificial agents. These agents may have varying complexity. The simplest are <em>reactive</em> agents, and more complex ones are <em>deliberative</em> agents.</p>
+<p>These systems can be quite difficult to develop - more of an art than a science. The typical process involves real-world data collection, a development of an initial simulation model and parameters/exogenous factors (which ideally are based on real values, but such values may not be available), verification (e.g. unit testing) that the implementation works as expected, running of the simulation, and validation of the simulation's results with other data collected (various statistical methods, such as R2 and mean absolute error, can be used for validation). Determining what data is relevant to the agents' internal decision making process and how that works is tricky and nuanced. Validation may also be difficult, because of path dependence, or because of stochastic elements of the simulation, and so on.</p>
+<p>After validation, <em>sensitivity analysis</em> is necessary to determine how sensitive the simulation is to the initial assumptions that were made. This process involves slightly changing the initial conditions and parameters and rerunning the simulation. The easiest way to do this is to vary these parameters randomly so that a distribution over outcomes is generated.</p>
+<hr />
+<h2>Chapter 7: The Complex Nature of Social Systems. Claudio J. Tessone</h2>
+<blockquote>
+<p>A model is an abstract, and to some extent idealised, description of reality that still captures a specific phenomenon. It is therefore limited by construction. This is true in particular for the complex systems approach to social systems. Models in this realm are not intended to reproduce <em>society</em> as a whole, but to shed light on mechanisms behind social phenomena. (pp. 141-142)</p>
+</blockquote>
+<p>Social systems in particular are characterized by heterogeneity, unlike other systems such as molecular or biological ones. Complex behavior arises out of the interactions between these heterogeneous individuals (as part of networks) as well as interactions with <em>signals</em> which are typically exogenous and environmental (e.g. advertisements, media, etc), though they may be influenced by agent behavior as well.</p>
+<p>Social systems are finite, a result of which is <em>demographic noise</em> - an "intrinsic randomness" (p. 143).</p>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+
+
+</body>
+</html>

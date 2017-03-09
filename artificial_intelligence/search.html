@@ -1,0 +1,935 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Search</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+    <link rel="stylesheet" href="http://ai-code.tech/ai_notes_html/css/custom.css">
+</head>
+
+<body>
+
+    <h1>Search</h1>
+<h2>State-space and situation-space representations</h2>
+<p>In artificial intelligence, problems are often represented using the <strong>state-space</strong> representation (sometimes called a <strong>state-transition system</strong>), in which the possible states of the problem and the operations that move between them are represented as a graph or a tree:</p>
+<ul>
+<li>Nodes are (abstracted) world configurations (states)</li>
+<li>Arcs represent successors (action results)</li>
+<li>A goal test is a set of goal nodes (which may just include a single goal)</li>
+<li>Each state occurs only once as a node</li>
+</ul>
+<p>More formally, we consider a problem to have a set of possible starting states <mathjax>$S$</mathjax>, a set of operators <mathjax>$F$</mathjax> which can be applied to the states, and a set of goal states <mathjax>$G$</mathjax>. A solution to a problem formalized in this way, called a <em>procedure</em>, consists of a starting state <mathjax>$s \in S$</mathjax> and a sequence of operators that define a path from <mathjax>$s$</mathjax> to a state in <mathjax>$G$</mathjax>. Typically a problem is represented as a tuple of these values, <mathjax>$(S,F,G)$</mathjax>.</p>
+<p>The distinction between state-space and <strong>situation-space</strong> is as follows: if the relevant parts of the problem are <strong>fully-specified</strong> (fully-known), then we work with <em>states</em> and <em>operators</em>, and have a state-space problem. If there is missing information (i.e., the problem is <strong>partially-specified</strong>), then we work with <em>situations</em> and <em>actions</em> (note that operators are often referred to actions in state-space as well), and we have a situation-space problem. Most of what is said for state-space problems is applicable to situation-space problems.</p>
+<p>For now we will focus on state-space problems.</p>
+<p>This state-space model can be applied to itself, in such that a given problem can be decomposed into subproblems (also known as <em>subgoals</em>); the relationships between the problem and its subproblems (and their subproblems' subproblems, etc) are also represented as a graph. Successor relationships can be grouped by AND or OR arcs which group edges together. A problem node with subproblems linked by AND edges must have all of the grouped subproblems resolved; a problem with subproblems linked by OR edges must have only one of the subproblems resolved. Using this graph, you can identify a path of subproblems which can be used to solve the primary problem. This process is known as <em>problem reduction</em>.</p>
+<p>We take this state-space representation as the basis for a search problem.</p>
+<h3>Search problems (planning)</h3>
+<p>A search problem consists of:</p>
+<ul>
+<li>an <strong>initial state</strong></li>
+<li>a set of possible <em>actions</em>/applicability conditions</li>
+<li>a <strong>successor function</strong>: from a state to a set of (action, state)</li>
+<li>the successor function plus the initial state is the <em>state space</em> (which is a directed graph as described before)</li>
+<li>a <strong>path</strong> (i.e. a solution)</li>
+<li>a <strong>goal</strong> (a goal state or a goal test function)</li>
+<li>a <strong>path cost</strong> function (for optimality, generally it is the sum of the step costs)</li>
+</ul>
+<p>To clarify some terminology:</p>
+<ul>
+<li>if node A leads to node B, then node A is a <em>parent</em> of B and B is a <strong>successor</strong> or <em>child</em> of A<ul>
+<li>if the edge connecting A to B is due to an operator <mathjax>$q$</mathjax>, we say that "B is a successor to A under the operator <mathjax>$q$</mathjax>".</li>
+</ul>
+</li>
+<li>if a node has no successors, it is a <strong>terminal</strong></li>
+<li>if there is a path between node A and node C such that node A is a parent of a parent ... of a parent of C, then A is an <em>ancestor</em> of C and C is a <em>descendant</em> of A.<ul>
+<li>if the graph is cyclical, e.g. there is a path from A through C back to A, then A is both an ancestor and a descendant of C.</li>
+</ul>
+</li>
+</ul>
+<p>Practically, we may use a data structure for nodes that encapsulate the following information for the node:</p>
+<ul>
+<li><em>state</em> - a state in the state space</li>
+<li><em>parent node</em> - the immediate predecessor in the search tree (only the root node has no parent)</li>
+<li><em>action</em> - the action that, when performed in the parent node's state, leads to this node's state</li>
+<li><em>path cost</em> - the path cost leading to this node</li>
+<li><em>depth</em> - the depth of this node in the search tree</li>
+</ul>
+<p>In the context of artificial intelligence, a path through state-space is called a <em>plan</em> - search is fundamental to planning (other aspects of planning are covered in more detail later).</p>
+<h3>Problem formulation</h3>
+<p><em>Problem formulation</em> can itself be a problem, as it typically is with real-world problems. We have to consider how granular/abstract we want to be and what actions and states to include. To make this a bit easier, we typically make the following assumptions about the environment:</p>
+<ul>
+<li>finite and discrete</li>
+<li>fully observable</li>
+<li>deterministic</li>
+<li>static (no events)</li>
+</ul>
+<p>And other assumptions are typically included as well:</p>
+<ul>
+<li>restricted goals</li>
+<li>sequential plans (no parallel activity in plans)</li>
+<li>implicit time (activities do not have a duration)</li>
+<li>offline planning (the state transition system is not changing while we plan)</li>
+</ul>
+<h3>Trees</h3>
+<p>In practice, we rarely build the full state-space graph in memory (because it is often way too big). Rather, we work with <strong>trees</strong>.</p>
+<p>Trees have a few constraints:</p>
+<ul>
+<li>only one node does not have a parent: the <strong>root node</strong>.</li>
+<li>every other node in the tree is a descendant of the root node</li>
+<li>every other node has only one parent</li>
+</ul>
+<p>An additional term relevant to trees is <strong>depth</strong>, which is the number of ancestors a node has.</p>
+<p>The root node is the current state and branches out into possible future states (i.e. the children are successors).</p>
+<p>Given a tree with branching factor <mathjax>$b$</mathjax> and maximum depth <mathjax>$m$</mathjax>, there are <mathjax>$O(b^m)$</mathjax> nodes in the tree. These trees can get quite big, so often we can't build the full tree either (it would be infinite if there are circular paths in the state space graph). Thus we only build sections that we are immediately concerned with.</p>
+<p>To build out parts of the tree we are interested in, we take a node and apply a <strong>successor function</strong> (sometimes called a <strong>generator function</strong>) to <strong>expand</strong> the node, which gives us all of that node's successors (children).</p>
+<p>There is also often a lot of repetition in search trees, which some search algorithm enhancements take advantage of.</p>
+<h2>Search algorithms</h2>
+<p>We apply algorithms to this tree representation in order to identify paths (ideally the optimal path) from the root node (start state) to a goal node (a goal state, of which there may be many).</p>
+<p>Most search algorithms share some common components:</p>
+<ul>
+<li>a <strong>fringe</strong> (sometimes called a <strong>frontier</strong>) of unexplored nodes is maintained</li>
+<li>some process for deciding which nodes to expand</li>
+</ul>
+<p>The <strong>general tree search</strong> algorithm is as follows:</p>
+<ul>
+<li>initialize the fringe with a search node for the initial state</li>
+<li>iteratively:</li>
+<li>if the fringe is empty, return a failure</li>
+<li>otherwise, select a node from the fringe based on the current search strategy</li>
+<li>if this node's state passes the goal test (or is the goal state), return the path to this node</li>
+<li>otherwise, expand the fringe with this node's children (successors)</li>
+</ul>
+<p>Most search algorithms are based on this general structure, varying in how they choose which node to expand from the fringe.</p>
+<p>When considering search algorithms, we care about:</p>
+<ul>
+<li><em>completeness</em> - is it guaranteed to find a solution if one exists?</li>
+<li><em>optimal</em> - is it guaranteed to find the optimal solution, if one exists?</li>
+<li><em>size complexity</em> - how much space does the algorithm need? Basically, how big can the fringe get?</li>
+<li><em>time complexity</em> - how does runtime change with input size? Basically, how many nodes get expanded?</li>
+</ul>
+<p>These search algorithms discussed here are <em>unidirectional</em>, since they only expand in one direction (from the start state down, or, in some cases, from the terminal nodes up). However, there are also <em>bidirectional</em> search procedures which start from both the start state and from the goal state. They can be difficult to use, however.</p>
+<h2>Uninformed search</h2>
+<p><strong>Uninformed</strong> search algorithms, sometimes called <strong>blind</strong> search algorithms, vary in how they decide which node to expand.</p>
+<p>Consider the following search space, where <mathjax>$S$</mathjax> is our starting point and <mathjax>$G$</mathjax> is our goal:</p>
+<figure><img alt="Example search space" src="../assets/search.svg" /><figcaption>Example search space</figcaption>
+</figure>
+<h3>Exhaustive ("British Museum") search</h3>
+<p>Exhaustively search all paths (without revisiting any previously visited points) - it doesn't really matter how you decide which node to expand because they will all be expanded.</p>
+<figure><img alt="&quot;British Museum&quot; search" src="../assets/british_museum.svg" /><figcaption>"British Museum" search</figcaption>
+</figure>
+<h3>Depth-First Search (DFS)</h3>
+<ul>
+<li>time complexity: expands <mathjax>$O(b^m)$</mathjax> nodes (if <mathjax>$m$</mathjax> is finite)</li>
+<li>size complexity: the fringe takes <mathjax>$O(bm)$</mathjax> space</li>
+<li>complete if <mathjax>$m$</mathjax> is not infinite (i.e. if there are no cycles)</li>
+<li>optimal: no, it finds the "leftmost" solution</li>
+</ul>
+<p>Go down the left branch of the tree (by convention) until you can't go any further.</p>
+<p>If that is not your target, then <strong>backtrack</strong> - go up to the closest branching node and take the other leftmost path. <em>Backtracking</em> is a technique that appears in almost every search algorithm, where we try extending a path, and if the extension fails or is otherwise unsatisfactory, we take a step back and try a different successor.</p>
+<p>Repeat until you reach your target.</p>
+<figure><img alt="Depth-first search" src="../assets/depth_first.svg" /><figcaption>Depth-first search</figcaption>
+</figure>
+<p>It stops just on the first complete path, which may not be the optimal path.</p>
+<p>Another way to think about depth-first search is with a queue (LIFO) which holds your candidate paths as you construct them.</p>
+<p>Your starting "path" includes just the starting point:</p>
+<p><mathjax>$$
+[(S)]
+$$</mathjax></p>
+<p>Then on each iteration, you take the left-most path (which is always the first in the queue) and check if it reaches your goal.</p>
+<p>If it does not, you extend it to build new paths, and replace it with those new paths.</p>
+<p><mathjax>$$
+[(SA),(SB)]
+$$</mathjax></p>
+<p>On this next iteration, you again take the left-most path. It still does not reach your goal, so you extend it. And so on:</p>
+<p><mathjax>$$
+\begin{aligned}
+[(SAB),(SAD),(SB)] \\
+[(SABC),(SAD),(SB)] \\
+[(SABCE),(SAD),(SB)]
+\end{aligned}
+$$</mathjax></p>
+<p>You can no longer extend the left-most path, so just remove it from the queue.</p>
+<p><mathjax>$$
+[(SAD),(SB)]
+$$</mathjax></p>
+<p>Then keep going.</p>
+<h3>Breadth-First Search (BFS)</h3>
+<ul>
+<li>time complexity: expands <mathjax>$O(b^s)$</mathjax> nodes, where <mathjax>$s$</mathjax> is the depth of the shallowest solution</li>
+<li>size complexity: the fringe takes <mathjax>$O(b^s)$</mathjax> space</li>
+<li>complete: yes</li>
+<li>optimal: yes, if all costs are 1, otherwise, a deeper path could have a cheaper cost</li>
+</ul>
+<p>Build out the tree level-by-level until you reach your target.</p>
+<figure><img alt="Breadth-first search" src="../assets/breadth_first.svg" /><figcaption>Breadth-first search</figcaption>
+</figure>
+<p>In the queue representation, the only thing that is different from depth-first is that instead of placing new paths at the front of the queue, you place them at the back. Another way of putting this is that instead of a LIFO data structure for its fringe (as is used with DFS), BFS uses a FIFO data structure for its fringe.</p>
+<h3>Uniform Cost Search</h3>
+<p>We can make breadth-first search sensitive to path cost with <strong>uniform cost search</strong> (also known as <em>Dijkstra's algorithm</em>), in which we simply prioritize paths by their cost <mathjax>$g(n)$</mathjax> (that is, the distance from the root node to <mathjax>$n$</mathjax>) rather than by their depth.</p>
+<ul>
+<li>time complexity: If we say the solution costs <mathjax>$C*$</mathjax> and arcs cost at least <mathjax>$\epsilon$</mathjax>, then the "effective depth" is roughly <mathjax>$\frac{C*}{/epsilon}$</mathjax>, so the time complexity is <mathjax>$O(b^{C*/\epsilon})$</mathjax></li>
+<li>size complexity: the fringe takes <mathjax>$O(b^{C*/\epsilon})$</mathjax> space</li>
+<li>complete: yes if the best solution has finite cost and minimum arc cost is positive</li>
+<li>optimal: yes</li>
+</ul>
+<h3>Branch &amp; Bound</h3>
+<p>On each iteration, extend the shortest cumulative path. Once you reach your goal, extend every other extendible path to check that its length ends up being longer than your current path to the goal.</p>
+<p>The fringe is kept sorted so that the shortest path is first.</p>
+<figure><img alt="Branch and bound search" src="../assets/branch_and_bound.svg" /><figcaption>Branch and bound search</figcaption>
+</figure>
+<p>This approach can be quite exhaustive, but it can be improved by using extended list filtering.</p>
+<h3>Iterative deepening DFS</h3>
+<p>The general idea is to combine depth-first search's space advantage with breadth-first search's time/shallow-solution advantages.</p>
+<ul>
+<li>Run depth-first search with depth limit 1</li>
+<li>If no solution:</li>
+<li>Run depth-first search with depth limit 2</li>
+<li>If no solution:<ul>
+<li>Run depth-first search with depth limit 3</li>
+</ul>
+</li>
+</ul>
+<p>(etc)</p>
+<h2>Search enhancements</h2>
+<h3>Extended list filtering</h3>
+<p><strong>Extended list filtering</strong> involves maintaining a list of visited nodes and only expanding nodes in the fringe if they have not already been expanded - it would be redundant to search again from that node.</p>
+<p>For example, branch and bound search can be combined with extended list filtering to make it less exhaustive.</p>
+<figure><img alt="Branch and bound search w/ extended list" src="../assets/branch_and_bound_extended.svg" /><figcaption>Branch and bound search w/ extended list</figcaption>
+</figure>
+<h2>Informed (heuristic) search</h2>
+<p>Informed search algorithms improve on uninformed search by incorporating <strong>heuristics</strong> which tell us whether or not we're getting closer to the goal. With heuristics, we can search less of the search space.</p>
+<p>In particular, we want <strong>admissible</strong> heuristics, which is simply a heuristic that never overestimates the distance to the goal.</p>
+<p>Formally, we can define the admissible heuristic as:</p>
+<p><mathjax>$$
+H(x, G) \leq D(x, G)
+$$</mathjax></p>
+<p>That is, a node is admissible if the estimated distance <mathjax>$H(x, G)$</mathjax> between and node <mathjax>$x$</mathjax> and the goal <mathjax>$G$</mathjax> is less than or equal to the actual distance <mathjax>$D(x, G)$</mathjax> between the node and the goal.</p>
+<p>Note that sometimes inadmissible heuristics (i.e. those that sometimes overestimate the distance to the goal) can still be useful.</p>
+<p>The specific heuristic function is chosen depending on the particular problem (i.e. we estimate the distance to the goal state differently in different problems, for instance, with a travel route, we might estimate the cost with linear distance to the target city).</p>
+<p>The typical trade-off with heuristics is between simplicity/efficiency and accuracy.</p>
+<p>The question of finding good heuristics, and doing so automatically, has been a big topic in AI planning recently.</p>
+<h3>Greedy best-first search</h3>
+<p><strong>Best-first</strong> search algorithms are those that select the next node from the fringe by <mathjax>$\argmin_n f(n)$</mathjax>, where <mathjax>$f(n)$</mathjax> is some evaluation function.</p>
+<p>With <strong>greedy best-first search</strong>, the fringe is kept sorted by heuristic distance to the goal; that is, <mathjax>$f(n) = h(n)$</mathjax>.</p>
+<p>This often ends up with a suboptimal path, however.</p>
+<h3>Beam Search</h3>
+<p>Beam search is essentially breadth-first search, but we set a <em>beam width</em> <mathjax>$w$</mathjax> which is the limit to the number of paths you will consider at any level. This is typically a low number like 2, but can be iteratively expanded (similar to iterative deepening) if necessary.</p>
+<figure><img alt="Beam search" src="../assets/beam.svg" /><figcaption>Beam search</figcaption>
+</figure>
+<p>The fringe is the same as in breadth-first search, but we keep only the <mathjax>$w$</mathjax> best paths as determined by the heuristic distance.</p>
+<p>Beam search is <em>not</em> complete, unless the iterative approach is used.</p>
+<h3>A* Search</h3>
+<p>A* is an extension of branch &amp; bound search which includes (admissible) heuristic distances in its sorting.</p>
+<p>We define <mathjax>$g(n)$</mathjax> as the known distance from the root to the node <mathjax>$n$</mathjax> (this is what we sort the fringe by in branch &amp; bound search). We additionally define <mathjax>$h(n)$</mathjax> as the admissible heuristic distance from the node <mathjax>$n$</mathjax> to a goal node.</p>
+<p>With A* search, we simply sort the fringe by <mathjax>$g(n) + h(n)$</mathjax>. That is, A* search is a best-first search algorithm where <mathjax>$f(n) = g(n) + h(n)$</mathjax>.</p>
+<p>A* search is optimal if <mathjax>$h(n)$</mathjax> is <em>admissible</em>; that is, it never overestimates the distance to the goal. It is complete as well; i.e. if a solution exists, A* will find it.</p>
+<p>A* is also <em>optimally efficient</em> (with respect to the number of expanded nodes) for a given heuristic function. That is, no other optimal algorithm is guaranteed to expand fewer nodes than A*.</p>
+<p>Uniform cost search is a special case of A* where <mathjax>$h(n) = 0$</mathjax>, i.e. <mathjax>$f(n) = g(n)$</mathjax>.</p>
+<p>The downside of A* vs greedy best-first search is that it can be slower since it explores the space more thoroughly - it has worst case time and space complexity of <mathjax>$O(B^l)$</mathjax>, where <mathjax>$b$</mathjax> is the branching factor (the number of successors per node on average) and <mathjax>$l$</mathjax> is the length of the path we're looking for.</p>
+<p>Typically we are dealing with the worst case; the fringe usually grows exponentially. Sometimes the time complexity is permissible, but the space complexity is problematic because there may simply not be enough memory for some problems.</p>
+<p>There is a variation of A* called <strong>iterative deepening A*</strong> (IDA*) which uses significantly less memory.</p>
+<h3>Iterative Deepening A* (IDA*)</h3>
+<p>Iterative deepening A* is an extension of A* which uses an iterative approach, searching up to a distance <mathjax>$g(x)$</mathjax> and increasing that distance until a solution is found.</p>
+<h2>Local search</h2>
+<p>Local search algorithms do not maintain a fringe; that is, we don't keep track of unexplored alternatives. Rather, we continuously try to improve a single option until we can't improve it anymore.</p>
+<p>Instead of extending a plan, the successor function in local search takes an existing plan and just modifies a part of it.</p>
+<p>Local search is generally much faster and more memory efficient, but because it does not keep track of unexplored alternatives, it is incomplete and suboptimal.</p>
+<h3>Hill-Climbing</h3>
+<p>A basic method in local search is <strong>hill climbing</strong> - we choose a starting point, move to the best neighboring state (i.e. closest as determined by the heuristic), and repeat until there are no better positions to move to - we've reached the top of hill. As mentioned, this is incomplete and suboptimal, as it can end up in local maxima.</p>
+<figure><img alt="Hill-climbing search" src="../assets/hill_climbing.svg" /><figcaption>Hill-climbing search</figcaption>
+</figure>
+<p>The difference between hill climbing and greedy search is that with greedy search, the entire fringe is sorted by heuristic distance to the goal. With hill climbing, we only sort the children of the currently expanded node, choosing the one closest to the goal.</p>
+<h3>Other local search algorithms</h3>
+<p>You can also use <em>simulated annealing</em> (detailed elsewhere) to try to escape local maxima - and this helps, and has a theoretical guarantee that it will converge to the optimal state given infinite time, but of course, this is not a practical guarantee for real-world applications. So simulated annealing in practice can do better but still can end up in local optima.</p>
+<p>You can also use <em>genetic algorithms</em> (detailed elsewhere).</p>
+<h2>Graph search</h2>
+<p>Up until now we have considered search algorithms in the context of trees.</p>
+<p>With search trees, we often end up with states repeated throughout the tree, which will have redundant subtrees, and thus end up doing (potentially a lot of) redundant computation.</p>
+<p>Instead, we can consider the search space as a graph.</p>
+<p>Graph search algorithms are typically just slight modifications of tree search algorithms. One main modification is the introduction of a list of <strong>explored</strong> (or <strong>expanded</strong>) nodes, so that we only expand states which have not already expanded.</p>
+<p>Completeness is not affected by graph search, but it is not optimal. We may close off a branch because we have already expanded that state elsewhere, but it's possible that the shortest path still goes through that state. Graph search algorithms (such as the graph search version of A*) can be made optimal through an additional constraint to admissible heuristics: <em>consistency</em>.</p>
+<h3>Consistent heuristics</h3>
+<p>The main idea of <strong>consistency</strong> is that the estimated heuristic costs should be less than or equal to the actual costs for each arc between <em>any</em> two nodes, not just between any node and the goal state:</p>
+<p><mathjax>$$
+|H(x, G) - H(y, G)| \leq D(x,y)
+$$</mathjax></p>
+<p>That is, the absolute value of the difference between the estimated distance between a node <mathjax>$x$</mathjax> and the goal and the estimated distance between a node <mathjax>$y$</mathjax> and the goal is less than or equal to the distance between the nodes <mathjax>$x$</mathjax> and <mathjax>$y$</mathjax>.</p>
+<p>Consistency enforces this for any two nodes, which includes the goal node, so consistency implies admissibility.</p>
+<h2>Adversarial search (games)</h2>
+<p><strong>Adversarial search</strong> is essentially search for games involving two or more players.</p>
+<p>There are many kinds of games - here we primarily consider games that are:</p>
+<ul>
+<li>deterministic (sometimes called "non-chance")</li>
+<li>two-player</li>
+<li>turn-based</li>
+<li>zero-sum: agents have opposite utilities (one's gain is another's loss), also known as a "pure competition" or "strictly competitive" game.</li>
+<li>perfect information: every player has full knowledge of what state the game is in and what actions are possible</li>
+</ul>
+<p>Note that while we are only considering zero-sum games, in <em>general</em> games agents have independent utilities, so there is opportunity for cooperation, indifference, competition, and so on.</p>
+<p>One way of formulating of games (there are many) is as a tree:</p>
+<ul>
+<li>states <mathjax>$S$</mathjax>, starting with <mathjax>$s_0$</mathjax></li>
+<li>players <mathjax>$P=\{1, \dots, n\}$</mathjax>, usually taking turns</li>
+<li>actions <mathjax>$A$</mathjax> (may depend on player/state)</li>
+<li>transition function (analogous to a successor function), <mathjax>$S \times A \to S$</mathjax></li>
+<li>terminal test (analogous to a goal test): <mathjax>$S \to \{t, f\}$</mathjax></li>
+<li>terminal utility function (computes how much an end/terminal state is worth to each player): <mathjax>$S \times P \to R$</mathjax>. For example, we may assign a utility of 100 for terminal states where we win, and -100 for terminal states where we lose.</li>
+</ul>
+<p>We want our adversarial search algorithm to return a <strong>strategy</strong> (a <strong>policy</strong>) which is essentially a function which returns an action given a state. That is, a policy tells us what action take in a state - this is constrasted to a plan, which details a step-by-step procedure from start to finish. This is because we can't plan on opponents acting in a particular way, so we need a strategy to respond to their actions.</p>
+<p>The solution then, for an adversarial search algorithm for a player is a policy <mathjax>$S \to A$</mathjax>.</p>
+<h3>Minimax</h3>
+<p>In <strong>minimax</strong>, we start at the bottom of the tree (where we have utilities computed terminal nodes), moving upwards. We propagate the terminal utilities through the graph up to the root node, propagating the utility at each depth that satisfies a particular criteria.</p>
+<p>For nodes at depths that correspond to the opponent's turns, we assume that the opponent chooses their best move (that is, we assume they are a perfect adversary), which means we propagate the <em>minimum</em> utility for us.</p>
+<p>For nodes at depths that correspond to our turn, we want to choose our best move; that is, we propagate the <em>maximum</em> utility for us.</p>
+<p>The propagated utility is known as the <strong>backed-up evaluation</strong>.</p>
+<p>At the end, this gives us a utility for the root node, which gives us a value for the current state.</p>
+<figure><img alt="Minimax" src="../assets/minimax.svg" /><figcaption>Minimax</figcaption>
+</figure>
+<p>Minimax is just like exhaustive depth-first search, so its time complexity is <mathjax>$O(b^m)$</mathjax> and space complexity is <mathjax>$O(bm)$</mathjax>.</p>
+<p>Minimax is optimal against a perfect adversarial player (that is, an opponent that always takes their best action), but it is not otherwise.</p>
+<h4>Depth-limited minimax</h4>
+<p>Most interesting games have game trees far too deep to expand all the way to the terminal nodes.</p>
+<p>Instead, we can use depth-limited search to only go down a few levels. However, since we don't reach the terminal nodes, their values never propagate up the tree. How will we compute the utility of any given move?</p>
+<p>We can introduce an <strong>evaluation function</strong> which computes a utility for non-terminal positions, i.e. it estimates the value of an action. For instance, with chess, you could just take the different of the number of your units vs the number of the opponent's units. Generally moves that lower your opponent's units is better, but not always.</p>
+<h4>Iterative deepening minimax</h4>
+<p>Often in games there are some time constraints - for instance, the computer opponent should respond within a reasonable amount of time.</p>
+<p>Iterative deepening can be applied to minimax, running for a set amount of time, and return the best policy found thus far.</p>
+<p>This type of algorithm is called an <strong>anytime algorithm</strong> because it has an answer ready at anytime.</p>
+<h4>Generalizing minimax</h4>
+<p>If the game is not zero-sum or has multiple players, we can generalize minimax as such:</p>
+<ul>
+<li>terminal nodes have utility <em>tuples</em></li>
+<li>node values are also utility tuples</li>
+<li>each player maximizes their own component</li>
+</ul>
+<p>This can model cooperation and competition dynamically.</p>
+<h3>Alpha-Beta</h3>
+<p>We can further improve minimax by <em>pruning</em> the game tree; i.e. removing branches we know won't be worthwhile. This variation is known as <strong>alpha-beta</strong> search.</p>
+<figure><img alt="Alpha-Beta Minimax" src="../assets/minimax_alphabeta.svg" /><figcaption>Alpha-Beta Minimax</figcaption>
+</figure>
+<p>Here we can look at branching and figure out a bound for describing its score.</p>
+<p>First we look at the left-most branch and see the value 2 in its left-most terminal node. Since we are looking for the min here, we know that the score for this branch node will be at most 2. If we then look at the other terminal node, we see that it is 7 and we know the branch node's score is 2.</p>
+<p>At this point we can apply a similar logic to the next node up (where we are looking for the max). We know that it will be at least 2.</p>
+<p>So then we look at the next branch node and see that it will be at most 1. We don't have to look at the very last terminal node because now we know that the max node can only be 2. So we have saved ourselves a little trouble.</p>
+<p>In larger trees this approach becomes very valuable, since you are effectively discounting entire branches and saving a lot of unnecessary computation. This allows you to compute deeper trees.</p>
+<p>Note that with alpha-beta, the minimax value computed for the root is always correct, but the values of intermediate nodes may be wrong, and as such, (naive) alpha-beta is not great for action selection. Good ordering of child nodes improves upon this. With a "perfect ordering", time complexity drops to <mathjax>$O(b^{m/2})$</mathjax>.</p>
+<h4>Ordering</h4>
+<p>Generally you want to generate game trees so that successors to each node are ordered left-to-right in descending order of their eventual backed-up evaluations (such an ordering is called the "correct" ordering). Naturally, it is quite difficult to generate this ordering before these evaluations have been computed.</p>
+<p>Thus a <em>plausible</em> ordering must suffice. These are a few techniques for generating plausible orderings of nodes:</p>
+<ul>
+<li><strong>Generators</strong> first produce the most immediately desirable choices (though without regard to possible consequences further on)</li>
+<li><strong>Shallow search</strong> first generates some of the tree and then uses some static evaluation function and compute backed-up evaluations upwards to order the results.</li>
+<li><strong>Dynamic generation</strong>, in which alpha-beta is applied to identify plausible branches of the game tree, then branch is evaluated which can cause the ordering to change.</li>
+</ul>
+<h2>Non-deterministic search</h2>
+<p>In many situations the outcomes of actions are uncertain. Another way of phrasing is that actions may be <em>noisy</em>.</p>
+<p>Like adversarial search, non-deterministic search solutions take the form of policies.</p>
+<h3>Expectimax search</h3>
+<p>We can model uncertainty as a "dumb" adversary in a game.</p>
+<p>Whereas in minimax we assume a "smart" adversary, and thus consider worst-case outcomes (i.e. that the opponent plays their best move), with non-deterministic search, we instead consider average-case outcomes (i.e. expected utilities). This is called <strong>expectimax</strong> search.</p>
+<p>So instead of minimax's min nodes, we have "chance" nodes, though we still keep max nodes. For a chance node, we compute its expected utility as the weighted (by probability) average of its children.</p>
+<p>Because we take the weighted average of children for a chance node's utility, we cannot use alpha-beta pruning as we could with minimax. There could conceivably be an unexplored child which increases the expected utility enough to make that move ideal, so we have to explore all child nodes to be sure.</p>
+<h4>Expectiminimax</h4>
+<p>We can have games that involve adversaries <em>and</em> chance, in which case we would have both minimax layers and expectimax layers. This approach is called <strong>expectiminimax</strong>.</p>
+<h3>Monte Carlo Tree Search</h3>
+<p>Say you are at some arbitrary position in your search tree (it could be the start or somewhere further along). You can treat the problem of what node to move to next as a multi-armed bandit problem and apply the <strong>Monte Carlo search</strong> technique.</p>
+<h4>Multi-armed bandit</h4>
+<p>Say you have multiple options with uncertain payouts. You want to maximize your overall payout, and it seems the most prudent strategy would be to identify the one option which consistently yields better payouts than the other options.</p>
+<p>However - how do you identify the best option, and do so quickly?</p>
+<p>This problem is known as the <strong>multi-armed bandit</strong> problem, and a common strategy is based on upper confidence bounds (UCB).</p>
+<p>To start, you randomly try the options and compute confidence intervals for each options' payout:</p>
+<p><mathjax>$$
+\bar x_i \pm \sqrt{\frac{2\ln(n)}{n_i}}
+$$</mathjax></p>
+<p>where:</p>
+<ul>
+<li><mathjax>$\bar x_i$</mathjax> is the mean payout for option <mathjax>$i$</mathjax></li>
+<li><mathjax>$n_i$</mathjax> is the number of times option <mathjax>$i$</mathjax> was chosen</li>
+<li><mathjax>$n$</mathjax> is the total number of trials</li>
+</ul>
+<p>You take the upper bound of these confidence intervals and continue to choose the option with the highest upper bound. As you use this option more, it's confidence interval will narrow (since you have collected more data on it), and eventually another option's confidence interval upper bound will be higher, at which point you switch to that option.</p>
+<h4>Monte Carlo Tree Search</h4>
+<p>At first, you have no statistical information about the child nodes to compute confidence intervals. So you randomly choose a child and run Monte Carlo simulations down that branch to see the outcomes.</p>
+<p>For each simulation run, you go along each node in the branch that was walked and increment its play count (i.e. number of trials) by 1, and if the outcome is a win, you increment its win count by 1 as well (this explanation assumes a game, but is generalizes to other cases).</p>
+<p>You repeat this until you have enough statistics for the direct child nodes of your current position to make a UCB choice as to where to move next.</p>
+<p>You will need to run less simulations over time because you accumulate these statistics for the search tree.</p>
+<h5>First-Play Urgency (FPU)</h5>
+<p>A variation of MCTS where fixed scores are assigned to unvisited nodes.</p>
+<h3>Markov Decision Processes (MDPs)</h3>
+<p>MDPs are another way of modeling non-deterministic search.</p>
+<p>MDPs are essentially Markov models, but there's a choice of action.</p>
+<p>In MDPs, there may be two types of rewards (which can be positive or negative):</p>
+<ul>
+<li>terminal rewards (i.e. those that come at the end, these aren't always present)</li>
+<li>"living" rewards, which are given for each step (these are always present)</li>
+</ul>
+<p>For instance, you could imagine a maze arranged on a grid. The desired end of the maze has a positive terminal reward and a dead end of the maze has a negative terminal reward. Every non-terminal position in the maze also has a reward ("living" rewards) associated with it. Often these living rewards are negative so that each step is penalized, thus encouraging the agent to find the desired end in as few steps as possible.</p>
+<p>The agent doesn't have complete knowledge of the maze so every action has an uncertain outcome. It can try to move north - sometimes it will successfully do so, but sometimes it will hit a wall and remain in its current position. Sometimes our agent may even move in the wrong direction (e.g. maybe a wheel gets messed up or something).</p>
+<p>This kind of scenario can be modeled as a Markov Decision Process, which includes:</p>
+<ul>
+<li>a set of states <mathjax>$s \in S$</mathjax></li>
+<li>a set of actions <mathjax>$a \in A$</mathjax></li>
+<li>a transition function <mathjax>$T(s,a,s')$</mathjax>, sometimes called a <strong>state transition matrix</strong></li>
+<li>gives the probability that <mathjax>$a$</mathjax> from <mathjax>$s$</mathjax> leads to <mathjax>$s'$</mathjax>, i.e. <mathjax>$P(s'|s,a)$</mathjax></li>
+<li>also called the "model" or the "dynamics"</li>
+<li>a reward function <mathjax>$R(s,a,s')$</mathjax> (sometimes just <mathjax>$R(s)$</mathjax> or <mathjax>$R(s')$</mathjax>), sometimes called a <em>utility function</em>, which associates a reward (or penalty) with each state</li>
+<li>a discount <mathjax>$\gamma$</mathjax></li>
+<li>a start state</li>
+<li>maybe a terminal state</li>
+</ul>
+<p>MDPs, as non-deterministic search problems, can be solved with expectimax search.</p>
+<p>MDPs are so named because we make the assumption that action outcomes depend only on the current state (i.e. the Markov assumption).</p>
+<p>The solution of an MDP is an optimal <em>policy</em> <mathjax>$\pi* : S \to A$</mathjax>:</p>
+<ul>
+<li>gives us an action to take for each state</li>
+<li>an optimal policy maximizes expected utility if followed</li>
+<li>an explicit policy defines a reflex agent</li>
+</ul>
+<p>In contrast, expectimax does not give us entire policies. Rather, it gives us an action for a single state only. It's similar to a policy, but requires re-computing at each step. Sometimes this is fine because a problem may be too complicated to compute an entire policy anyways.</p>
+<p>The objective MDP is to maximize the expected sum of all future rewards, i.e.</p>
+<p><mathjax>$$
+\max(E[\sum_{t=0}^{\infty} R_t])
+$$</mathjax></p>
+<p>Sometimes a <strong>discount factor</strong> <mathjax>$\gamma \in [0,1]$</mathjax> is included, e.g. <mathjax>$\gamma=0.9$</mathjax>, which decays future reward:</p>
+<p><mathjax>$$
+\max(E[\sum_{t=0}^{\infty} \gamma^t R_t])
+$$</mathjax></p>
+<p>Using this, we can define a <strong>value function</strong> <mathjax>$V(s)$</mathjax> for each state:</p>
+<p><mathjax>$$
+V^{\pi}(s) = E[\sum_{t=0} \gamma^t R_t | s_0 = s]
+$$</mathjax></p>
+<p>That is, it is the expected sum of future discounted reward provided we start in state <mathjax>$s$</mathjax> with policy <mathjax>$\pi$</mathjax>.</p>
+<p>This can be computed empirically via simulations. In particular, we can use the <strong>value iteration</strong> algorithm.</p>
+<p>With value iteration, we recursively calculate the value function, starting from the goal states, to get the optimal value function, from which we can derive the optimal policy.</p>
+<p>More formally - we want to recursively estimate the value <mathjax>$V(s)$</mathjax> of a state <mathjax>$s$</mathjax>. We do this by estimating the value of possible successor states <mathjax>$s'$</mathjax>, discounting by <mathjax>$\gamma$</mathjax>, and incorporating the reward/cost of the state <mathjax>$R(s')$</mathjax>, across possible actions from <mathjax>$s$</mathjax>. We take the maximum of these estimates.</p>
+<p><mathjax>$$
+V(s) = \max_a [\gamma \sum_{s'} P(s'|s,a) V(s')] + R(s)
+$$</mathjax></p>
+<p>This method is called <em>back-up</em>.</p>
+<p>In terminal states, we just set <mathjax>$V(s) = R(s)$</mathjax>.</p>
+<p>We estimate these values over all our states - these estimates eventually converge.</p>
+<p>This function essentially defines the optimal policy - that is:</p>
+<p><mathjax>$$
+\pi(s) = \argmax_a \sum_{s'} P(s' | s,a) V(s')
+$$</mathjax></p>
+<p>(since it's maximization we can drop <mathjax>$\gamma$</mathjax> and <mathjax>$R(s)$</mathjax>)</p>
+<h4>Example: Grid World</h4>
+<p>Note that the X square is a wall. Every movement has an uncertain outcome, e.g. if the agent moves to the east, it may only successfully do so with an 80% chance.</p>
+<p>For <mathjax>$R(s) = -0.01$</mathjax>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>→</td>
+<td>→</td>
+<td>→</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>↑</td>
+<td>X</td>
+<td>←</td>
+<td>-1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>↑</td>
+<td>←</td>
+<td>←</td>
+<td>↓</td>
+</tr>
+</tbody>
+</table>
+<p>At C1 the agent plays very conservatively and moves in the opposite direction of the negative terminal position because it can afford doing so many times until it accidentally randomly moves to another position.</p>
+<p>Similar reasoning is behind the policy at D2.</p>
+<p>For <mathjax>$R(s) = -0.03$</mathjax>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>→</td>
+<td>→</td>
+<td>→</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>↑</td>
+<td>X</td>
+<td>↑</td>
+<td>-1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>↑</td>
+<td>←</td>
+<td>←</td>
+<td>←</td>
+</tr>
+</tbody>
+</table>
+<p>With a stronger step penalty, the agent finds it better to take a risk and move upwards at C1, since it's too expensive to play conservatively.</p>
+<p>Similar reasoning is behind the change in policy at D2.</p>
+<p>For <mathjax>$R(s) = -2$</mathjax>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+<th>D</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>→</td>
+<td>→</td>
+<td>→</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>↑</td>
+<td>X</td>
+<td>→</td>
+<td>-1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>→</td>
+<td>→</td>
+<td>→</td>
+<td>↑</td>
+</tr>
+</tbody>
+</table>
+<p>With such a large movement penalty, the agent decides it's better to "commit suicide" by diving into the negative terminal node and end the game as soon as possible.</p>
+<h4>q-states</h4>
+<p>Each MDP state projects an expectimax-like search tree; that is, we build a search tree from the current state detailing what actions can be taken and the possible outcomes for each action.</p>
+<p>We can describe actions and states together as a <strong>q-state</strong> <mathjax>$(s,a)$</mathjax>. When you're in a state <mathjax>$s$</mathjax> and you take an action <mathjax>$a$</mathjax>, you end up in this <em>q-state</em> (i.e. you are committed to action <mathjax>$a$</mathjax> in state <mathjax>$s$</mathjax>) and the resolution of this q-state is described by the <em>transition</em> <mathjax>$(s,a,s')$</mathjax>, described by the probability which is given by transition function <mathjax>$T(s,a,s')$</mathjax>. There is also a reward associated with a transition, <mathjax>$R(s,a,s')$</mathjax>, which may be positive or negative.</p>
+<h4>Utility sequences</h4>
+<p>How should we encode preferences for <em>sequences</em> of utilities? For example, should the agent prefer the reward sequence <mathjax>$[0,0,1]$</mathjax> or <mathjax>$[1,0,0]$</mathjax>? It's reasonable to prefer rewards closer in time, e.g. to prefer <mathjax>$[1,0,0]$</mathjax> over <mathjax>$[0,0,1]$</mathjax>.</p>
+<p>We can model this by <em>discounting</em>, that is, <em>decaying</em> reward value exponentially. If a reward is worth 1 now, it is worth <mathjax>$\gamma$</mathjax> one step later, and worth <mathjax>$\gamma^2$</mathjax> two steps later (<mathjax>$\gamma$</mathjax> is called the "discount" or "decay rate").</p>
+<p><strong>Stationary preferences</strong> are those which are invariant to the inclusion of another reward which delays the others in time, i.e.:</p>
+<p><mathjax>$$
+[a_1, a_2, \dots] \succ [b_1, b_2, \dots] \Leftrightarrow [r, a_1, a_2, \dots] \succ [r, b_1, b_2, \dots]
+$$</mathjax></p>
+<p>Nonstationary preferences are possible, e.g. if the delay of a reward changes its value relative to other rewards (maybe it takes a greater penalty for some reason).</p>
+<p>With stationary preferences, there are only two ways to define utilities:</p>
+<ul>
+<li>Additive utility: <mathjax>$U([r_0, r_1, r_2, \dots]) = r_0 + r_1 + r_2 + \dots$</mathjax></li>
+<li>Discounted utility: <mathjax>$U([r_0, r_1, r_2, \dots]) = r_0 + \gamma r_1 + \gamma^2 r_2 + \dots$</mathjax></li>
+</ul>
+<p>Note that additive utility is just discounted utility where <mathjax>$\gamma = 1$</mathjax>.</p>
+<p>For now we will assume stationary preferences.</p>
+<p>If a game lasts forever, do we have infinite rewards? Infinite rewards makes it difficult to come up with a good policy.</p>
+<p>We can specify a finite horizon (like depth-limited search) and just consider only up to some fixed number of steps. This gives us nonstationary policies, since <mathjax>$\pi$</mathjax> depends on the time left.</p>
+<p>Alternatively, we can just use discounting, where <mathjax>$0 &lt; \gamma &lt; 1$</mathjax>:</p>
+<p><mathjax>$$
+U([r_0, \dots, r_{\infty}]) = \sum_{t=0}^{\infty} \gamma^t r_t \leq \frac{R_{\max}}{1 - \gamma}
+$$</mathjax></p>
+<p>A smaller <mathjax>$\gamma$</mathjax> means a shorter-term focus (a smaller <em>horizon</em>).</p>
+<p>Another way is to use an <strong>absorbing state</strong>. That is, we guarantee that for every policy, a terminal state will eventually be reached.</p>
+<p>Usually we use discounting.</p>
+<h4>Solving MDPs</h4>
+<p>We say that the value (utility) of a state <mathjax>$s$</mathjax> is <mathjax>$V^*(s)$</mathjax>, which is the expected utility of starting in <mathjax>$s$</mathjax> and acting optimally. This is equivalent to running expectimax from <mathjax>$s$</mathjax>.</p>
+<p>While a reward is for a state in a single time step, a value is the expected utility over all paths from that state.</p>
+<p>The value (utility) of a q-state <mathjax>$(s,a)$</mathjax> is <mathjax>$Q^*(s,a)$</mathjax>, called a <strong>Q-value</strong>, which is the expected utility starting out taking action <mathjax>$a$</mathjax> from state <mathjax>$s$</mathjax> and subsequently acting optimally. This is equivalent to running expectimax from the chance node that follows from <mathjax>$s$</mathjax> when taking action <mathjax>$a$</mathjax>.</p>
+<p>The optimal policy <mathjax>$\pi*(s)$</mathjax> gives us the optimal action from a state <mathjax>$s$</mathjax>.</p>
+<p>So the main objective is to compute (expectimax) values for the states, since this gives us the expected utility (i.e. average sum of discounted rewards) under optimal action.</p>
+<p>More concretely, we can define value recursively:</p>
+<p><mathjax>$$
+\begin{aligned}
+V^*(s) &amp;= \max_a Q^*(s,a) \\
+Q^*(s,a) &amp;= \sum_{s'} T(s,a,s') [R(s,a,s') + \gamma V^*(s')]
+\end{aligned}
+$$</mathjax></p>
+<p>These are the <strong>Bellman equations</strong>.</p>
+<p>They can be more compactly written as:</p>
+<p><mathjax>$$
+V^*(s) = \max_a \sum_{s'} T(s,a,s') [R(s,a,s') + \gamma V^*(s')]
+$$</mathjax></p>
+<p>Again, because these trees can go on infinitely (or may just be very deep), we want to limit how far we search (that is, how far we do this recursive computation). We can specify <em>time-limited values</em>, i.e. define <mathjax>$V_k(s)$</mathjax> to be the optimal value of <mathjax>$s$</mathjax> if the game ends in <mathjax>$k$</mathjax> more time steps. This is equivalent to depth-<mathjax>$k$</mathjax> expectimax from <mathjax>$s$</mathjax>.</p>
+<p>To clarify, <mathjax>$k=0$</mathjax> is the <em>bottom</em> of the tree, that is, <mathjax>$k=0$</mathjax> is the <em>last</em> time step (since there are 0 more steps to the end).</p>
+<p>We can use this with the <em>value iteration</em> algorithm to efficiently compute these <mathjax>$V_k(s)$</mathjax> values in our tree:</p>
+<ul>
+<li>start with <mathjax>$V_0(s) = 0$</mathjax> (i.e. with no time steps left, we have an expected reward sum of zero). Note that this is a zero vector over all states.</li>
+<li>given a vector of <mathjax>$V_k(s)$</mathjax> values, do one ply of expectimax from each state:</li>
+</ul>
+<p><mathjax>$$
+V_{k+1}(s) = \max_a \sum_{s'} T(s,a,s') [R(s,a,s') + \gamma V_k(s')]
+$$</mathjax></p>
+<p>Note that since we are starting at the last time step <mathjax>$k=0$</mathjax> and moving up, when we compute <mathjax>$V_{k+1}(s)$</mathjax> we have already computed <mathjax>$V_k(s')$</mathjax>, so this saves us extra computation.</p>
+<p>Then we simply repeat until convergence. This converges if the discount is less than 1.</p>
+<p>With the value iteration algorithm, each iteration has complexity <mathjax>$O(S^2 A)$</mathjax>. There's no penalty for depth here, but the more states you have, the slower this gets.</p>
+<p>The approximations get refined towards optimal values the deeper you go into the tree. However, the policy may converge long before the values do - so while you may not have a close approximation of values, the policy/strategy they convey early on may already be optimal.</p>
+<h4>Partially-Observable MDPs (POMDPs)</h4>
+<p><strong>Partially-observed MDPs</strong> are MDPs in which the states are not (fully) observed. They include <em>observations</em> <mathjax>$O$</mathjax> and an <strong>observation function</strong> <mathjax>$P(o|s)$</mathjax> (sometimes notated <mathjax>$O(s,o)$</mathjax>; it gives a probability for an observation given a state).</p>
+<p>When we take an action, we get an observation which puts us in a new <em>belief</em> state (a distribution of possible states).</p>
+<p>Partially-observable environments may require information-gathering actions in addition to goal-oriented actions. Such information-gathering actions may require detours from goals but may be worth it in the long run. See the section on reinforcement learning for more.</p>
+<p>With POMDPs the state space becomes very large because there are many (infinite) probability distributions over a set of states.</p>
+<p>As a result, you can't really run value iteration on POMDPs, but you can use approximate Q-learning (see the section on reinforcement learning) or a truncated (limited lookahead) expectimax approach to approximate the value of actions.</p>
+<p>In general, however, POMDPs are very hard/expensive to solve.</p>
+<h3>Decision Networks</h3>
+<p>Decision networks are a generalization of Bayes' networks. Some nodes are random variables (these are essentially embedded Bayes' networks), some nodes are <strong>action variables</strong>, in which a decision is made, and some nodes are utility functions, which computes a utility for its parent nodes.</p>
+<p>For instance, an action node could be "bring (or don't bring) an umbrella", and a random variable node could be "it is/isn't raining". These nodes may feed into a utility node which computes a utility based on the values of these nodes. For instance, if it is raining and we don't bring an umbrella, we will have a very low utility, compared to when it isn't raining and we don't bring an umbrella, for which we will have a high utility.</p>
+<p>We want to choose actions that maximize the expected utility given observed evidence.</p>
+<p>The general process for action selection is:</p>
+<ul>
+<li>instantiate all evidence</li>
+<li>set action node(s) each possible way</li>
+<li>calculate the posterior for all parents of the utility node, given the evidence</li>
+<li>calculated the expected utility for each action</li>
+<li>choose the maximizing action (it will vary depending on the observed evidence)</li>
+</ul>
+<p>This is quite similar to expectimax/MDPs, except now we can incorporate evidence we observe.</p>
+<figure><img alt="An example decision network. Rectangles are action nodes, ellipses are chance nodes, and diamonds are utility nodes. From Artificial Intelligence: Foundations of Computational Agents" src="../assets/decision_network.png" /><figcaption>An example decision network. Rectangles are action nodes, ellipses are chance nodes, and diamonds are utility nodes. From <a href="http://artint.info/html/ArtInt_219.html">Artificial Intelligence: Foundations of Computational Agents</a></figcaption>
+</figure>
+<h4>Value of information</h4>
+<p>More evidence helps, but typically there is a cost to acquiring it. We can quantify the value of acquiring evidence as the <em>value of information</em> to determine whether or not it is more evidence is worth the cost. We can compute this with a decision network.</p>
+<p>The value of information is simply the expected gain in the maximum expected utility given the new evidence.</p>
+<p>For example, say someone hides 100 dollars behind one of two doors, and if we can correctly guess which door it is behind, we get the money.</p>
+<p>There is a 0.5 chance that the money is behind either door.</p>
+<p>In this scenario, we can use the following decision network:</p>
+<p><mathjax>$$
+\begin{aligned}
+\text{choose door} \to U \\
+\text{money door} \to U
+\end{aligned}
+$$</mathjax></p>
+<p>Where <mathjax>$\text{choose door}$</mathjax> is the action variable, <mathjax>$\text{money door}$</mathjax> is the random variable, and <mathjax>$U$</mathjax> is the utility node.</p>
+<p>The utility function at <mathjax>$U$</mathjax> is as follows:</p>
+<table>
+<thead>
+<tr>
+<th>choose door</th>
+<th>money door</th>
+<th>utility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>a</td>
+<td>100</td>
+</tr>
+<tr>
+<td>a</td>
+<td>b</td>
+<td>0</td>
+</tr>
+<tr>
+<td>b</td>
+<td>a</td>
+<td>0</td>
+</tr>
+<tr>
+<td>b</td>
+<td>b</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<p>In this current scenario, our maximum expected utility is 50. That is, choosing either door <mathjax>$a$</mathjax> or <mathjax>$b$</mathjax> gives us <mathjax>$100 \times 0.5 = 50$</mathjax> expected utility.</p>
+<p>How valuable is knowing which door the money is behind?</p>
+<p>We can consider that if we know which door the money is behind, our maximum expected utility becomes 100, so we can quantify the value of that information as <mathjax>$100-50=50$</mathjax>, which is what we'd be willing to pay for that information.</p>
+<p>In this scenario, we get <em>perfect information</em>, because we observe the evidence "perfectly" (that is, our friend tells us the truth and there's no chance that we misheard them).</p>
+<p>More formally, the value of perfect information of evidence <mathjax>$E'$</mathjax>, given existing evidence <mathjax>$e$</mathjax> (of which there might be none), is:</p>
+<p><mathjax>$$
+\text{VPI}(E'|e) = (\sum_{e'} P(e'|e) \text{MEU}(e, e')) - \text{MEU}(e)
+$$</mathjax></p>
+<p>Properties of VPI:</p>
+<table>
+<thead>
+<tr>
+<th>- nonnegative: $\forall E', e: \text{VPI}(E'</th>
+<th>e) \geq 0<mathjax>$, i.e. is not possible for $</mathjax>\text{VPI}$ to be negative (proof not shown)</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- order-independent: $\text{VPI}(E_j,E_k</td>
+<td>e) = \text{VPI}(E_j</td>
+<td>e) + \text{VPI}(E_k</td>
+<td>e,E_j) = \text{VPI}(E_k</td>
+</tr>
+</tbody>
+</table>
+<p>Also: generally, if the parents of the utility node is conditionally independent of another node <mathjax>$Z$</mathjax> given the current evidence <mathjax>$e$</mathjax>, then <mathjax>$\text{VPI}(Z | e) = 0$</mathjax>. Evidence has to affect the utility node's parents to actually affect the utility.</p>
+<p>What's the value of <em>imperfect</em> information? Well, we just say that "imperfect" information is perfect information of a noisy version of the variable in question.</p>
+<p>For example, say we have a "light level" random variable that we observe through a sensor. Sensors always have some noise, so we add an additional random variable to the decision network (connected to the light level random variable) which corresponds to the sensor's light level measurement. Thus the sensor's observations are "perfect" in the context of the sensor random variable, because they are exactly what the sensor observed, though technically they are noisy in the context of the light level random variable.</p>
+<h2>Policies</h2>
+<h3>Policy evaluation</h3>
+<p>How do we evaluate policies?</p>
+<p>We can compute the values under a fixed policy. That is, we construct a tree based on the policy (it is a much simpler tree because for any given state, we only have one action - the action the policy says to take from that state), and then compute values from that tree.</p>
+<p>More specifically, we compute the value of applying a policy <mathjax>$\pi$</mathjax> from a state <mathjax>$s$</mathjax>:</p>
+<p><mathjax>$$
+V^{\pi}(s) = \sum_{s'} T(s, \pi(s), s') [R(s, \pi(s), s') + \gamma V^{\pi}(s')]
+$$</mathjax></p>
+<p>Again, since we only have one action to choose from, the <mathjax>$\max_a$</mathjax> term has been removed.</p>
+<p>We can use an approach similar to value iteration to compute these values, i.e.</p>
+<p><mathjax>$$
+\begin{aligned}
+V_0^{\pi}(s) &amp;= 0 \\
+V_{k+1}^{\pi}(s) &amp;= \sum_{s'} T(s, \pi(s), s') [R(s, \pi(s), s') + \gamma V_k^{\pi}(s')]
+\end{aligned}
+$$</mathjax></p>
+<p>This approach is sometimes called <em>simple value iteration</em> since we've dropped <mathjax>$\max_a$</mathjax>.</p>
+<p>This has complexity <mathjax>$O(S^2)$</mathjax> per iteration.</p>
+<h3>Policy extraction</h3>
+<p><strong>Policy extraction</strong> is the problem opposite to policy evaluation - that is, given values, how do we extract the policy which yields these values?</p>
+<p>Say we have optimal values <mathjax>$V^*(s)$</mathjax>. We can extract the optimal policy <mathjax>$\pi^*(s)$</mathjax> like so:</p>
+<p><mathjax>$$
+\pi^*(s) = \argmax_a \sum_{s'} T(s,a,s') [R(s,a,s') + \gamma V^*(s')]
+$$</mathjax></p>
+<p>That is, we do one step of expectimax.</p>
+<p>What if we have optimal Q-values instead?</p>
+<p>With Q-values, it is trivial to extract the policy, since the hard work is already capture by the Q-value:</p>
+<p><mathjax>$$
+\pi^*(s) = \argmax_a Q^*(s,a)
+$$</mathjax></p>
+<h3>Policy iteration</h3>
+<p>Value iteration is quite slow - <mathjax>$O(S^2 A)$</mathjax> per iteration. However, you may notice that the maximum value calculated for each state rarely changes. The result of this is that the policy often converges long before the values.</p>
+<p><strong>Policy iteration</strong> is another way of solving MDPs (an alternative to value iteration) in which we start with a given policy and improve on it iteratively:</p>
+<ul>
+<li>First, we evaluate the policy (calculate utilities for the given policy until the utilities converge).</li>
+<li>Then we update the policy using one-step look-ahead (one-step expectimax) with the resulting converged utilities as the future (given) values (i.e. policy extraction).</li>
+<li>Repeat until the policy converges.</li>
+</ul>
+<p>Policy iteration is optimal and, under some conditions, can converge must faster.</p>
+<p>More formally:</p>
+<p>Evaluation: iterate values until convergence:</p>
+<p><mathjax>$$
+V_{k+1}^{\pi_i}(s) = \sum_{s'} T(s, \pi_k(s), s') [R(s, \pi_k(s), s') + \gamma V_k^{\pi_i}(s')]
+$$</mathjax></p>
+<p>Improvement: compute the new policy with one-step lookahead:</p>
+<p><mathjax>$$
+\pi_{i+1}(s) = \argmax_a \sum_{s'} T(s,a,s') [R(s,a,s') + \gamma V^{\pi_i} (s')]
+$$</mathjax></p>
+<p>Policy iteration and value iteration are two ways of solving MDPs, and they are quite similar - they are just variations of Bellman updates that use one-step lookahead expectimax.</p>
+<h2>Constraint satisfaction problems (CSPs)</h2>
+<p>Search as presented thusfar has been concerned with producing a plan or a policy describing how to act to achieve some goal state. However, there are search problems in which the aim is to identify the goal states themselves - such problems are called <strong>identification problems</strong>.</p>
+<p>In <strong>constraint satisfaction problems</strong>, we want to identify states which statisfy a set of constraints.</p>
+<p>We have a set of variables <mathjax>$X_i$</mathjax>, with values from a domain <mathjax>$D$</mathjax> (sometimes the domain varies according to <mathjax>$i$</mathjax>, e.g. <mathjax>$X_1$</mathjax> may have a different domain than <mathjax>$X_2$</mathjax>). We <strong>assign</strong> each variable <mathjax>$X_i$</mathjax> with a value from its corresponding domain, each unique assignment of these variables (which may be partial, i.e. some may be unassigned) is a state.</p>
+<p>We want to satisfy a set of <strong>constraints</strong> on what combinations of values are allowed on different subsets of variables. So we want to identify states which satisfy these constraints; that is, we want to identify variable assignments that satisfy the constraints.</p>
+<p>Constraints can be specified using a formal language, e.g. code that <mathjax>$A \neq B$</mathjax> or something like that.</p>
+<p>We can represent constraints as a graph.</p>
+<p>In a binary CSP, each constraint relates at most two variables. We can construct a binary constraint graph in which the nodes are variables, and arcs show constraints. We don't need to specify what the constraints are.</p>
+<p>If we have constraints that are more than binary (that is, they relate more than just two variables), we can represent the constraints as square nodes in the graph and link them to the variables they relate (as opposed to representing constraints as the arcs themselves).</p>
+<p>General-purpose CSP algorithms use this graph structure for faster search.</p>
+<h3>Varieties of CSPs</h3>
+<p>Variables may be:</p>
+<ul>
+<li>discrete, and come from</li>
+<li>finite domains</li>
+<li>infinite domains (integers, strings, etc)</li>
+<li>continuous</li>
+</ul>
+<p>Constraints may be:</p>
+<ul>
+<li>unary (involve a single variable, this is essentially reducing a domain, e.g. <mathjax>$A \neq \text{green}$</mathjax>)</li>
+<li>binary (involve a pair of variables)</li>
+<li>higher-order (involve three or more variables)</li>
+</ul>
+<p>We may also have <em>preferences</em>, i.e. soft constraints. We can represent these as costs for each variable assignment. This gives us a <em>constraint optimization problem</em>.</p>
+<h3>Search formulation</h3>
+<p>We can formulate CSPs as search problems using search trees or search graphs (in the context of CSPs, they are called <strong>constraint graphs</strong>).</p>
+<p>States are defined by the values assigned so far (partial assignments).</p>
+<p>The initial state is the empty assignment, <mathjax>$\{\}$</mathjax>.</p>
+<p>Successor functions assign a value to an unassigned variable (one at a time).</p>
+<p>The goal test is to check if the current assignment is complete (all variables have values) and satisfies all constraints.</p>
+<p>Breadth-first search does not work well here because all the solutions will be at the bottom of the search tree (all variables must have values assigned, and that happens only at the bottom).</p>
+<p>Depth-first search does a little better, but it is very naive - it can make a mistake early on in its path, but not realize it until reaching the end of a branch.</p>
+<p>The main shortcoming with these approaches is that we aren't checking constraints until it's far too late.</p>
+<h3>Backtracking search</h3>
+<p>Backtracking search is the basic uninformed search algorithm for solving CSPs. It is a simple augmentation of depth-first search.</p>
+<p>Rather than checking the constraint satisfaction at the very end of a branch, we check constraints as we go, i.e. we only try values that do not conflict with previous assignments. This is called an <strong>incremental goal test</strong>.</p>
+<p>Furthermore, we only consider one variable at a time in some order. Variable assignments are commutative (i.e. the order in which we assign them doesn't matter, e.g. <mathjax>$A=1$</mathjax> and then <mathjax>$B=2$</mathjax> leads to the same variable assignment as <mathjax>$B=2$</mathjax> then <mathjax>$A=1$</mathjax>). So at one level, we consider assignments for <mathjax>$A$</mathjax>, at the next, for <mathjax>$B$</mathjax>, and so on.</p>
+<p>The moment we violate a constraint, we backtrack and try different a variable assignment.</p>
+<p>Simple backtracking can be improved in a few ways:</p>
+<ul>
+<li>ordering</li>
+<li>we can be smarter about in what order we assign variables</li>
+<li>we can be smarter about what we try for the next value for a variable</li>
+<li>filtering: we can detect failure earlier</li>
+<li>structure: we can exploit the problem structure</li>
+</ul>
+<p>Backtracking pseudocode:</p>
+<pre><code>def backtracking(csp):
+    def backtracing_recursive(assignment):
+        if is_complete(assignment):
+            return assignment
+        var = select_unassigned_variable(csp.variables, assignment)
+        for val in csp.order_domain_values(var, assignment):
+            if is_consistent_with_constraints(val, assignment, csp.constraints):
+                assignment[var] = val
+                result = backtracking_recursive(assignment)
+                if result is not None: # if not a failure
+                    return result
+                else: # otherwise, remove the assignment
+                    del assignment[var]
+        return None # failure
+</code></pre>
+<h4>Filtering</h4>
+<p>Filtering looks ahead to eliminate incompatible variable assignments early on.</p>
+<p>With <strong>forward checking</strong>, when we assign a new variable, we look ahead and eliminate values for other variables that we know will be incompatible with this new assignment. So when we reach that variable, we only have to check values we know will not violate a constraint (that is, we only have to consider a subset of the variable's domain).</p>
+<p>If we reach an empty domain for a variable, we know to backup.</p>
+<p>With <strong>constraint propagation</strong> methods, we can check for failure ahead of time.</p>
+<p>One constraint propagation method is <strong>arc consistency</strong> (AC3).</p>
+<p>First, we must consider the <em>consistency</em> of an arc (here, in the context of binary constraints, but this can be extended to higher-order constraints). In the context of filtering, an arc <mathjax>$X \to Y$</mathjax> is <em>consistent</em> if and only if for <em>every</em> <mathjax>$x$</mathjax> in the tail there is <em>some</em> <mathjax>$y$</mathjax> in the head which could be assigned without violating a constraint.</p>
+<p>An inconsistent arc can be made consistent by deleting values from its tail; that is, by deleting tail values which lead to constraint-violating head values.</p>
+<p>Note that since arcs are directional, a consistency relationship (edge) must be checked in both directions.</p>
+<p>We can re-frame forward checking as just enforcing consistency of arcs pointing to each new assignment.</p>
+<p>A simple form of constraint propagation is to ensure all arcs in the CSP graph are consistent. Basically, we visit each arc, check if its consistent, if not, delete values from its tail until it is consistent. If we encounter an empty domain (that is, we've deleted all values from its tail), then we know we have failed.</p>
+<p>Note that if a value is deleted from a tail of a node, its incoming arcs must be-rechecked.</p>
+<p>We combine this with backtracking search by applying this filtering after each new variable assignment. It's extra work at each step, but it should save us backtracking.</p>
+<p>Arc consistency (AC3) pseudocode:</p>
+<pre><code>function AC3(csp):
+    queue = csp.all_arcs()
+    while queue:
+        from_node, to_node = queue.pop()
+        if remove_inconsistent_values(from_node, to_node):
+            for node in neighbors(from_node):
+                queue.append((node, from_node))
+    return csp
+
+function remove_inconsistent_values(from_node, to_node):
+    removed = False
+    for x in domain[from_node]:
+        if no value y in domain[to_node] allows (x,y) to satisfy the constraint from_node &lt;-&gt; to_node:
+            domain[from_node].remove(x)
+            removed = True
+    return removed
+</code></pre>
+<p>Arc consistency can be generalized to <mathjax>$k$</mathjax>-consistency:</p>
+<ul>
+<li>1-consistency is <em>node consistency</em>, i.e. each node's domain has a value which satisfies its own unary constraints.</li>
+<li>2-consistency is arc consistency: for each pair of nodes, any consistent assignment to one can be extended to the other ("extended" meaning from the tail to the head).</li>
+<li><mathjax>$k$</mathjax>-consistency: for each <mathjax>$k$</mathjax> nodes, any consistent assignment to <mathjax>$k-1$</mathjax> can be extended to the <mathjax>$k$</mathjax>th node.</li>
+<li>3-consistency is called <em>path consistency</em></li>
+</ul>
+<p>Naturally, a higher <mathjax>$k$</mathjax> consistency is more expensive to compute.</p>
+<p>We can extend this further with <em>strong</em> <mathjax>$k$</mathjax>-consistency which means that all lower orders of consistency (i.e. <mathjax>$k-1$</mathjax> consistency, <mathjax>$k-2$</mathjax> consistency, etc) are also satisfied. With strong <mathjax>$k$</mathjax>-consistency, no backtracking is necessary - but in practice, it's never practical to compute.</p>
+<h4>Ordering</h4>
+<p>One method for selecting the next variable to assign to is called <strong>minimum remaining values</strong> (MRV), in which we choose the variable with the fewest legal values left in its domain (hence this is sometimes called <em>most constrained variable</em>). We know this number if we are running forward checking. Essentially we decide to try the hardest variables first so if we fail, we fail early on and thus have to do less backtracking (for this reason, this is sometimes called <em>fail-fast ordering</em>).</p>
+<p>For choosing the next value to try, a common method is <strong>least constraining value</strong>. That is, we try the value that gives us the most options later on. We may have to re-run filtering to determine what the least constraining value is.</p>
+<h4>Problem Structure</h4>
+<p>Sometimes there are features of the problem structure that we can use to our advantage.</p>
+<p>For example, we may have independent subproblems (that is, we may have multiple connected components; i.e. isolated subgraphs), in which case we can divide-and-conquer.</p>
+<p>In practice, however, you almost never see independent subproblems.</p>
+<h5>Tree-Structured CSPs</h5>
+<p>Some CSPs have a tree structure (i.e. have no loops). Tree-structured CSPs can be solved in <mathjax>$O(nd^2)$</mathjax> time, much better than the <mathjax>$O(d^n)$</mathjax> for general CSPs.</p>
+<p>The algorithm for solving tree-structured CSPs is as follows:</p>
+<ol>
+<li>For order in a tree-structured CSP, we first choose a root variable, then order variables such that parents precede children.</li>
+<li>Backward pass: starting from the end moving backwards, we visit each arc once (the arc pointing from parent to child) and make it consistent.</li>
+<li>Forward assignment: starting from the root and moving forward, we assign each variable so that it is consistent with its parent.</li>
+</ol>
+<p>This method has some nice properties:</p>
+<ul>
+<li>after the backward pass, all root-to-leaf arcs are consistent</li>
+<li>if root-to-leaf arcs are consistent, the forward assignment will not backtrack</li>
+</ul>
+<p>Unfortunately, in practice you don't typically encounter tree-structured CSPs.</p>
+<p>Rather, we can improve an existing CSPs structure so that it is <em>nearly</em> tree-structured.</p>
+<p>Sometimes there are just a few variables which prevent the CSP from having a tree structure.</p>
+<p>With <strong>cutset conditioning</strong>, we assign values to these variables such that the rest of the graph is a tree.</p>
+<p>This, for example, turns binary constraints into unary constraints, e.g. if we have a constraint <mathjax>$A \neq B$</mathjax> and we fix <mathjax>$B = \text{green}$</mathjax>, then we can rewrite that constraint as simply <mathjax>$A \neq \text{green}$</mathjax>.</p>
+<p>Cutset conditioning with a cutset size <mathjax>$c$</mathjax> gives runtime <mathjax>$O(d^c (n-c) d^2)$</mathjax>, so it is fast for a small <mathjax>$c$</mathjax>.</p>
+<p>More specifically, the cutset conditioning algorithm:</p>
+<ol>
+<li>choose a cutset (the variables to set values for)</li>
+<li>instantiate the cutset in all possible ways (e.g. produce a graph for each possible combination of values for the cutset)</li>
+<li>for each instantiation, compute the <em>residual</em> (tree-structured) CSP by removing the cutset constraints and replacing them with simpler constraints (e.g. replace binary constraints with unary constraints as demonstrated above)</li>
+<li>solve the residual CSPs</li>
+</ol>
+<p>Unfortunately, finding the smallest cutset is an NP-hard problem.</p>
+<p>There are other methods for improving the CSP structure, such as <em>tree decomposition</em>.</p>
+<p>Tree decomposition involves creating "mega-variables" which represent subproblems of the original problem, such that the graph of these mega-variables has a tree structure. For each of these mega-variables we consider valid combinations of assignments to its variables.</p>
+<p>These subproblems must overlap in the right way (the <em>running intersection property</em>) in order to ensure consistent solutions.</p>
+<h3>Iterative improvement algorithms for CSPs</h3>
+<p>Rather than building solutions step-by-step, iterative algorithms start with an incorrect solution and try to fix it.</p>
+<p>Such algorithms are <em>local search</em> methods in that they work with "complete" states (that is, all variables are assigned, though constraints may be violated/unsatisfied), and there is no fringe.</p>
+<p>Then we have operators which reassign variable values.</p>
+<p>A very simple iterative algorithm:</p>
+<ul>
+<li>while not solved</li>
+<li>randomly select any conflicted variable</li>
+<li>select a value which violates the fewest constraints (the <em>min-conflicts</em> heuristic), i.e. hill climb with <mathjax>$h(n) = \text{num. of violated constraints}$</mathjax></li>
+</ul>
+<p>In practice, this min-conflicts approach tends to perform quickly for randomly-generated CSPs; that is, there are some particular CSPs which are very hard for it, but for the most part, it can perform in almost constant time for arbitrarily difficult randomly-generated CSPs.</p>
+<p>Though, again, unfortunately many real-world CSPs fall in this difficult domain.</p>
+<h2>Online Evolution</h2>
+<p>Multi-action adversarial games (assuming turn-based) are tricky because they have enormous branching factors. The problem is no longer what the best single action is for a turn - now we need to find the best <em>sequence</em> of actions to take. An evolutionary algorithm can be applied to select these actions in a method called <em>online evolution</em> because the agent doesn't not learn in advance (offline learning), rather, it learns the best moves while it plays.</p>
+<p>Online evolution evolves the actions in a single turn and uses an estimation of the state at the end of the turn as a fitness function. This is essentially a single iteration of <em>rolling horizon evolution</em>, a method that evolves a sequence of actions and evolves new action sequences as those actions are executed. In its application here, we have a horizon of just one turn.</p>
+<p>An individual (to be evolved) in this context is a candidate sequence of actions for the turn. A basic genetic algorithm can be applied. The fitness function can include rollouts, e.g. to a depth of one extra turn, to incorporate how an opponent might counter move, but it may not help performance.</p>
+<h2>References</h2>
+<ul>
+<li><a href="http://jeffbradberry.com/posts/2015/09/intro-to-monte-carlo-tree-search/">Introduction to Monte Carlo Tree Search</a>. Jeff Bradberry.</li>
+<li><a href="http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-034-artificial-intelligence-fall-2010/">MIT 6.034 (Fall 2010): Artificial Intelligence</a>. Patrick H. Winston. MIT.</li>
+<li>Introduction to Artificial Intelligence (2nd ed). Philip C. Jackson, Jr. 1985.</li>
+<li><a href="http://alumni.soe.ucsc.edu/~bweber/bweber-dissertation.pdf">Integrating Learning in a Multi-Scale Agent</a>. Ben G. Weber. 2012.</li>
+<li><a href="http://planning.cs.uiuc.edu/booka4.pdf">Planning Algorithms</a>. Steven M. LaValle. 2006.</li>
+<li><a href="https://www.coursera.org/course/aiplan">Artificial Intelligence Planning</a>. Dr. Gerhard Wickler, Prof. Austin Tate. The University of Edinburgh (Coursera). 2015.</li>
+<li><a href="https://www.udacity.com/course/intro-to-artificial-intelligence--cs271">Intro to Artificial Intelligence</a>. CS271. Peter Norvig, Sebastian Thrun. Udacity.</li>
+<li>Logical Foundations of Artificial Intelligence (1987) (Chapter 12: Planning)</li>
+<li><a href="https://www.edx.org/course/artificial-intelligence-uc-berkeleyx-cs188-1x">CS188: Artificial Intelligence</a>. Dan Klein, Pieter Abbeel. University of California, Berkeley (edX).</li>
+<li><a href="http://artint.info/index.html">Artificial Intelligence: Foundations of Computational Agents</a>. David Poole, Alan Mackworth.</li>
+<li><em>Algorithmic Puzzles</em>. Anany Levitin, Maria Levitin. 2011.</li>
+<li><a href="http://togelius.blogspot.com/2016/03/a-way-to-deal-with-enormous-branching.html?m=1">A way to deal with enormous branching factors</a>. Julian Togelius. March 25, 2016.</li>
+<li><a href="http://julian.togelius.com/Justesen2016Online.pdf">Online Evolution for Multi-Action Adversarial Games</a>. Niels Justesen, Tobias Mahlmann, Julian Togelius.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+
+
+</body>
+</html>

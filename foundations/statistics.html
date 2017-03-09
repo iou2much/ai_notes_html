@@ -1,0 +1,1521 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Statistics</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+    <link rel="stylesheet" href="http://ai-code.tech/ai_notes_html/css/custom.css">
+</head>
+
+<body>
+
+    <p><mathjax>$$
+\def\argmax{\operatorname*{argmax}}
+\def\argmin{\operatorname*{argmin}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\CDF}{CDF}
+\DeclareMathOperator{\df}{df}
+\DeclareMathOperator{\SE}{SE}
+\DeclareMathOperator{\SST}{SST}
+\DeclareMathOperator{\SSW}{SSW}
+\DeclareMathOperator{\SSB}{SSB}
+\DeclareMathOperator{\MSG}{MSG}
+\DeclareMathOperator{\SSG}{SSG}
+\DeclareMathOperator{\MSE}{MSE}
+\DeclareMathOperator{\SSE}{SSE}
+$$</mathjax></p>
+<h1>统计学</h1>
+<h1>Statistics</h1>
+<p>广义上,统计学是关于收集和分析数据的学科.它是描述严谨的方法去收集数据(样本), 并描述数据, 推断结论. 现实世界中有很多过程可以产生可观察的数据, 但是这些过程通常是黑盒, 我们想要洞悉它们内部是怎样工作的.</p>
+<p>Broadly, statistics is concerned with collecting and analyzing data. It seeks to describe rigorous methods for collecting data (samples), for describing the data, and for inferring conclusions from the data. There are processes out there in the world that generate observable data, but these processes are often black boxes and we want to gain some insight into how they work.</p>
+<p>我们可以大致把统计学分成两个主要的分支: <strong>描述统计学</strong>, 它提供各种描述数据的工具; 以及 <strong>推断统计学</strong>,它提供从数据中学习(推断或预估)的工具.</p>
+<p>We can crudely cleave statistics into two main practices: <strong>descriptive statistics</strong>, which provides tools for <em>describing</em> data, and <strong>inferential statistics</strong>, which provides tools for learning (inferring or <em>estimating</em>) from data.</p>
+<p>本节主要聚焦于频率论(经典)统计学, 这与<strong>贝叶斯统计</strong>区分开.</p>
+<p>This section is focused on <em>frequentist</em> (or classical) statistics, which is distinguished from <em>Bayesian statistics</em> (covered in another chapter).</p>
+<h3>记号</h3>
+<ul>
+<li>普通字母,如 <mathjax>$X, Y$</mathjax>, 代表<strong>观察(已知)</strong>变量</li>
+<li>希腊字母,如 <mathjax>$\mu, \sigma$</mathjax>, 代表<strong>未知</strong>变量, 我们正是要去估算这些变量</li>
+<li>带帽字母,如 <mathjax>$\hat \theta$</mathjax>, 表示估计法则, 我们根据这个法则来基于观察数据去计算一个估计结果, 例如参数的估计值.</li>
+</ul>
+<h3>Notation</h3>
+<ul>
+<li>Regular letters, e.g. <mathjax>$X, Y$</mathjax>, typically denote <strong>observed</strong> (known) variables</li>
+<li>Greek letters, e.g. <mathjax>$\mu, \sigma$</mathjax>, typically denote <strong>unknown</strong> variables which we are trying to estimate</li>
+<li>Hats over letters, e.g. <mathjax>$\hat \theta$</mathjax>, denote estimators (an estimator is a rule for calculating an estimate given some observed data), e.g. an estimated value for a parameter.</li>
+</ul>
+<h2>描述统计学</h2>
+<h2>Descriptive Statistics</h2>
+<p>描述统计学是计算能总结一组数据的值, 经典的包括如平均值,标准差,中位数,最小值,最大值等, 这些值称作<strong>概括统计量</strong>.</p>
+<p>Descriptive statistics involves computing values which summarize a set of data. This typically includes statistics like the mean, standard deviation, median, min, max, etc, which are called <strong>summary statistics</strong>.</p>
+<h3>测量尺度</h3>
+<h3>Scales of Measurement</h3>
+<p>在统计学中, 数字和变量有几种分类方式.</p>
+<p>In statistics, numbers and variables are categorized in certain ways.</p>
+<p>变量有一种是<strong>分类的</strong>(也称<strong>定性的</strong>), 它们是离散值(数字代表不同分类的特性), 另一种是<strong>数值的</strong>(也称<strong>定量的</strong>),这种代表连续值.</p>
+<p>Variables may be <strong>categorical</strong> (also called <strong>qualitative</strong>), in which they represent discrete values (numbers here are arbitrarily assigned to represent categories of qualities), or <strong>numerical</strong> (also called <strong>quantitative</strong>) in which they represent continuous values.</p>
+<p>这些变量更进一步分类为测量尺度:</p>
+<ul>
+<li><strong>定类</strong> ：包括只能计数的定性变量; 他们没有顺序或间隔。<br />
+    -- 示例：性别，婚姻状况</li>
+<li><strong>定序</strong>：包括有序的定性变量，因此它们可以被排列成相应的有序排列。但是它们在该序列中的项之间没有任何量值。所以一个对象<mathjax>$A$</mathjax>可能会在一个对象 <mathjax>$B$</mathjax> 之后, 但是两者之间不存在可测量的间隔（例如, 我们不能说 <mathjax>$A$</mathjax> 比 <mathjax>$B$</mathjax> 多10）。<br />
+    -- 示例：教育水平（一些高中，高中，大学等）</li>
+<li><strong>定距</strong>：间隔变量是定量变量; 在某种意义上，它们就像是普通变量那样,在变量之间有可测量的间隔。但是它们没有基准0，因此我们不能将值作为比率进行比较（例如，我们不能<mathjax>$A$</mathjax> 是 <mathjax>$B$</mathjax>的两倍）。<br />
+    -- 示例：日期（我们可以说两个日期之间有多少天，但是，例如，我们不能说一个日期是另一个日期的两倍）</li>
+<li><strong>定比</strong>：比率变量类似于区间变量（也是定量变量），但具有固定且有意义的零点，因此它们可以作为比率进行比较。<br />
+    -- 示例：年龄，长度</li>
+</ul>
+<p>These variables are further categorized into <strong>scales of measurement</strong>.</p>
+<ul>
+<li><strong>Nominal</strong>: Includes qualitative variables that can only be counted; they have no order or intervals.<ul>
+<li>Example: Gender, marital status</li>
+</ul>
+</li>
+<li><strong>Ordinal</strong>: Includes qualitative variables that have a concept of order, so they can be arranged into some sequence accordingly and meaningfully ranked. But they are without any measure of magnitude between items in that sequence. So some object <mathjax>$A$</mathjax> may come after some object <mathjax>$B$</mathjax> but there is no measurement of interval between the two (we can't, for instance, say that <mathjax>$A$</mathjax> is 10 more than <mathjax>$B$</mathjax>).<ul>
+<li>Example: Education level (some high school, high school, college, etc)</li>
+</ul>
+</li>
+<li><strong>Interval</strong>: Interval variables are quantitative variables; in some sense they are like ordinal variables that do have a measure of interval between items. But they do not have an absolute zero point, so we can't compare values as ratios (we can't, for instance, say <mathjax>$A$</mathjax> is twice of <mathjax>$B$</mathjax>).<ul>
+<li>Example: Dates (we can say how many days there are between two dates, but, for example, we can't say one date is twice of another)</li>
+</ul>
+</li>
+<li><strong>Ratio</strong>: Ratio variables are like interval variables (also quantitative variables) but have a fixed and meaningful zero point, so they can be compared as ratios.<ul>
+<li>Example: Age, length</li>
+</ul>
+</li>
+</ul>
+<h3>均值</h3>
+<h3>Averages</h3>
+<p>一组数据的平均值可以描述为其集中趋势 ; 这给出了这组数据的典型代表。有三种类型的平均值：</p>
+<p>The average of a set of data can be described as its <strong>central tendency</strong>; which gives some sense of a typical or common value for a variable. There are three types:</p>
+<h4>算术平均值</h4>
+<h4>Arithmetic mean</h4>
+<p>通常就是被称为“平均值”, 并记号为<mathjax>$\mu$</mathjax> (mu).</p>
+<p>Often just called the "mean" and notated <mathjax>$\mu$</mathjax> (mu).</p>
+<p>对于数据集<mathjax>$\{x_1, \dots, x_n\}$</mathjax>, 算术平均值为:</p>
+<p>For a dataset <mathjax>$\{x_1, \dots, x_n\}$</mathjax>, the arithmetic mean is:</p>
+<p><mathjax>$$ \frac{\sum_{i=1}^n x_i}{n} $$</mathjax></p>
+<p>平均值可以对极值（离群值）敏感，这是有时使用中值的一个原因。也就是说，中位数是一个更具<strong>鲁棒性</strong>的统计量（意味着它对异常值较不敏感）。</p>
+<p>The mean can be sensitive to extreme values (outliers), which is one reason the median is sometimes used instead. Which is to say, the median is a more <strong>robust</strong> statistic (meaning that it is less sensitive to outliers).</p>
+<p>注意，还有其他类型的手段，但算术平均值是目前最常见的。</p>
+<p>Note that there are other types of means, but the arithmetic mean is by far the most common.</p>
+<h3>中位数</h3>
+<h4>Median</h4>
+<p>数据集中的中心值，例如</p>
+<p>The central value in the dataset, e.g.</p>
+<p><mathjax>$$ 1 \; 1 \; \mathbf 2 \; 3 \; 4 $$</mathjax><br />
+<mathjax>$$ \text{median} = 2 $$</mathjax></p>
+<p>如果有偶数个值，您只需取两个中心值之间的值：</p>
+<p>If there are even number of values, you just take the value between the two central values:</p>
+<p><mathjax>$$ 1 \; 1 \; 2 \; 3 \; 4 \; 4 $$</mathjax><br />
+<mathjax>$$ \text{median} = \frac{2+3}{2} = 2.5 $$</mathjax></p>
+<h4>Mod</h4>
+<p><mathjax>$$
+\def\argmax{\operatorname*{argmax}}
+\def\argmin{\operatorname*{argmin}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\CDF}{CDF}
+\DeclareMathOperator{\df}{df}
+\DeclareMathOperator{\SE}{SE}
+\DeclareMathOperator{\SST}{SST}
+\DeclareMathOperator{\SSW}{SSW}
+\DeclareMathOperator{\SSB}{SSB}
+\DeclareMathOperator{\MSG}{MSG}
+\DeclareMathOperator{\SSG}{SSG}
+\DeclareMathOperator{\MSE}{MSE}
+\DeclareMathOperator{\SSE}{SSE}
+$$</mathjax></p>
+<h1>统计学</h1>
+<h1>Statistics</h1>
+<p>广义上,统计学是关于收集和分析数据的学科.它是描述严谨的方法去收集数据(样本), 并描述数据, 推断结论. 现实世界中有很多过程可以产生可观察的数据, 但是这些过程通常是黑盒, 我们想要洞悉它们内部是怎样工作的.</p>
+<p>Broadly, statistics is concerned with collecting and analyzing data. It seeks to describe rigorous methods for collecting data (samples), for describing the data, and for inferring conclusions from the data. There are processes out there in the world that generate observable data, but these processes are often black boxes and we want to gain some insight into how they work.</p>
+<p>我们可以大致把统计学分成两个主要的分支: <strong>描述统计学</strong>, 它提供各种描述数据的工具; 以及 <strong>推断统计学</strong>,它提供从数据中学习(推断或预估)的工具.</p>
+<p>We can crudely cleave statistics into two main practices: <strong>descriptive statistics</strong>, which provides tools for <em>describing</em> data, and <strong>inferential statistics</strong>, which provides tools for learning (inferring or <em>estimating</em>) from data.</p>
+<p>本节主要聚焦于频率论(经典)统计学, 这与<strong>贝叶斯统计</strong>区分开.</p>
+<p>This section is focused on <em>frequentist</em> (or classical) statistics, which is distinguished from <em>Bayesian statistics</em> (covered in another chapter).</p>
+<h3>记号</h3>
+<ul>
+<li>普通字母,如 <mathjax>$X, Y$</mathjax>, 代表<strong>观察(已知)</strong>变量</li>
+<li>希腊字母,如 <mathjax>$\mu, \sigma$</mathjax>, 代表<strong>未知</strong>变量, 我们正是要去估算这些变量</li>
+<li>带帽字母,如 <mathjax>$\hat \theta$</mathjax>, 表示估计法则, 我们根据这个法则来基于观察数据去计算一个估计结果, 例如参数的估计值.</li>
+</ul>
+<h3>Notation</h3>
+<ul>
+<li>Regular letters, e.g. <mathjax>$X, Y$</mathjax>, typically denote <strong>observed</strong> (known) variables</li>
+<li>Greek letters, e.g. <mathjax>$\mu, \sigma$</mathjax>, typically denote <strong>unknown</strong> variables which we are trying to estimate</li>
+<li>Hats over letters, e.g. <mathjax>$\hat \theta$</mathjax>, denote estimators (an estimator is a rule for calculating an estimate given some observed data), e.g. an estimated value for a parameter.</li>
+</ul>
+<h2>描述统计学</h2>
+<h2>Descriptive Statistics</h2>
+<p>描述统计学是计算能总结一组数据的值, 经典的包括如平均值,标准差,中位数,最小值,最大值等, 这些值称作<strong>概括统计量</strong>.</p>
+<p>Descriptive statistics involves computing values which summarize a set of data. This typically includes statistics like the mean, standard deviation, median, min, max, etc, which are called <strong>summary statistics</strong>.</p>
+<h3>测量尺度</h3>
+<h3>Scales of Measurement</h3>
+<p>在统计学中, 数字和变量有几种分类方式.</p>
+<p>In statistics, numbers and variables are categorized in certain ways.</p>
+<p>变量有一种是<strong>分类的</strong>(也称<strong>定性的</strong>), 它们是离散值(数字代表不同分类的特性), 另一种是<strong>数值的</strong>(也称<strong>定量的</strong>),这种代表连续值.</p>
+<p>Variables may be <strong>categorical</strong> (also called <strong>qualitative</strong>), in which they represent discrete values (numbers here are arbitrarily assigned to represent categories of qualities), or <strong>numerical</strong> (also called <strong>quantitative</strong>) in which they represent continuous values.</p>
+<p>这些变量更进一步分类为测量尺度:</p>
+<ul>
+<li><strong>定类</strong> ：包括只能计数的定性变量; 他们没有顺序或间隔。<br />
+    -- 示例：性别，婚姻状况</li>
+<li><strong>定序</strong>：包括有序的定性变量，因此它们可以被排列成相应的有序排列。但是它们在该序列中的项之间没有任何量值。所以一个对象<mathjax>$A$</mathjax>可能会在一个对象 <mathjax>$B$</mathjax> 之后, 但是两者之间不存在可测量的间隔（例如, 我们不能说 <mathjax>$A$</mathjax> 比 <mathjax>$B$</mathjax> 多10）。<br />
+    -- 示例：教育水平（一些高中，高中，大学等）</li>
+<li><strong>定距</strong>：间隔变量是定量变量; 在某种意义上，它们就像是普通变量那样,在变量之间有可测量的间隔。但是它们没有基准0，因此我们不能将值作为比率进行比较（例如，我们不能<mathjax>$A$</mathjax> 是 <mathjax>$B$</mathjax>的两倍）。<br />
+    -- 示例：日期（我们可以说两个日期之间有多少天，但是，例如，我们不能说一个日期是另一个日期的两倍）</li>
+<li><strong>定比</strong>：比率变量类似于区间变量（也是定量变量），但具有固定且有意义的零点，因此它们可以作为比率进行比较。<br />
+    -- 示例：年龄，长度</li>
+</ul>
+<p>These variables are further categorized into <strong>scales of measurement</strong>.</p>
+<ul>
+<li><strong>Nominal</strong>: Includes qualitative variables that can only be counted; they have no order or intervals.<ul>
+<li>Example: Gender, marital status</li>
+</ul>
+</li>
+<li><strong>Ordinal</strong>: Includes qualitative variables that have a concept of order, so they can be arranged into some sequence accordingly and meaningfully ranked. But they are without any measure of magnitude between items in that sequence. So some object <mathjax>$A$</mathjax> may come after some object <mathjax>$B$</mathjax> but there is no measurement of interval between the two (we can't, for instance, say that <mathjax>$A$</mathjax> is 10 more than <mathjax>$B$</mathjax>).<ul>
+<li>Example: Education level (some high school, high school, college, etc)</li>
+</ul>
+</li>
+<li><strong>Interval</strong>: Interval variables are quantitative variables; in some sense they are like ordinal variables that do have a measure of interval between items. But they do not have an absolute zero point, so we can't compare values as ratios (we can't, for instance, say <mathjax>$A$</mathjax> is twice of <mathjax>$B$</mathjax>).<ul>
+<li>Example: Dates (we can say how many days there are between two dates, but, for example, we can't say one date is twice of another)</li>
+</ul>
+</li>
+<li><strong>Ratio</strong>: Ratio variables are like interval variables (also quantitative variables) but have a fixed and meaningful zero point, so they can be compared as ratios.<ul>
+<li>Example: Age, length</li>
+</ul>
+</li>
+</ul>
+<h3>均值</h3>
+<h3>Averages</h3>
+<p>一组数据的平均值可以描述为其集中趋势 ; 这给出了这组数据的典型代表。有三种类型的平均值：</p>
+<p>The average of a set of data can be described as its <strong>central tendency</strong>; which gives some sense of a typical or common value for a variable. There are three types:</p>
+<h4>算术平均值</h4>
+<h4>Arithmetic mean</h4>
+<p>通常就是被称为“平均值”, 并记号为<mathjax>$\mu$</mathjax> (mu).</p>
+<p>Often just called the "mean" and notated <mathjax>$\mu$</mathjax> (mu).</p>
+<p>对于数据集<mathjax>$\{x_1, \dots, x_n\}$</mathjax>, 算术平均值为:</p>
+<p>For a dataset <mathjax>$\{x_1, \dots, x_n\}$</mathjax>, the arithmetic mean is:</p>
+<p><mathjax>$$ \frac{\sum_{i=1}^n x_i}{n} $$</mathjax></p>
+<p>平均值可以对极值（离群值）敏感，这是有时使用中值的一个原因。也就是说，中位数是一个更具<strong>鲁棒性</strong>的统计量（意味着它对异常值较不敏感）。</p>
+<p>The mean can be sensitive to extreme values (outliers), which is one reason the median is sometimes used instead. Which is to say, the median is a more <strong>robust</strong> statistic (meaning that it is less sensitive to outliers).</p>
+<p>注意，还有其他类型的手段，但算术平均值是目前最常见的。</p>
+<p>Note that there are other types of means, but the arithmetic mean is by far the most common.</p>
+<h3>中位数</h3>
+<h4>Median</h4>
+<p>数据集中的中心值，例如</p>
+<p>The central value in the dataset, e.g.</p>
+<p><mathjax>$$ 1 \; 1 \; \mathbf 2 \; 3 \; 4 $$</mathjax><br />
+<mathjax>$$ \text{median} = 2 $$</mathjax></p>
+<p>如果有偶数个值，您只需取两个中心值之间的值：</p>
+<p>If there are even number of values, you just take the value between the two central values:</p>
+<p><mathjax>$$ 1 \; 1 \; 2 \; 3 \; 4 \; 4 $$</mathjax><br />
+<mathjax>$$ \text{median} = \frac{2+3}{2} = 2.5 $$</mathjax></p>
+<h4>众数</h4>
+<h4>Mode</h4>
+<p>数据集中出现最频繁的值, 例如:</p>
+<p>The most frequently occurring value in the dataset, e.g.</p>
+<p><mathjax>$$ 1 \; 2 \; 3 \; 3 \; 2 \; 3\; 4 \; 3 $$</mathjax><br />
+<mathjax>$$ \text{mode} = 3 $$</mathjax></p>
+<figure><img alt="Central tendencies for a distribution" src="../assets/central_tendencies.svg" /><figcaption>Central tendencies for a distribution</figcaption>
+</figure>
+<h3></h3>
+<h3>Population vs Sample</h3>
+<p>With statistics we take a <strong>sample</strong> of a broader <strong>population</strong> or already have data which is a sample from a population. We use this limited sample in order to learn things about the whole population.</p>
+<p>The mean of the population is denoted <mathjax>$\mu$</mathjax> and consists of <mathjax>$N$</mathjax> items, whereas the mean of the sample (i.e. the <em>sample mean</em>, sometimes called the <em>empirical mean</em>) is notated <mathjax>$\bar x$</mathjax> or <mathjax>$\hat \mu$</mathjax> and consists of <mathjax>$n$</mathjax> items.</p>
+<p>The sample mean is:</p>
+<p><mathjax>$$
+\hat \mu = \frac{1}{n}\sum_i x^{(i)}
+$$</mathjax></p>
+<p>The sample variance is:</p>
+<p><mathjax>$$
+\hat \sigma^2 = \frac{1}{n-1} \sum_i (x^{(i)} - \hat \mu)^2
+$$</mathjax></p>
+<p>The sample covariance matrix is:</p>
+<p><mathjax>$$
+\hat \Sigma = \frac{1}{n-1} \sum_i (x^{(i)} - \hat \mu)(x^{(t)} - \hat \mu)^T
+$$</mathjax></p>
+<p>These estimators are unbiased, i.e.:</p>
+<p><mathjax>$$
+\begin{aligned}
+E[\hat \mu] &amp;= \mu \\
+E[\hat \sigma^2] &amp;= \sigma^2 \\
+E[\hat \Sigma] &amp;= \Sigma
+\end{aligned}
+$$</mathjax></p>
+<h3>Independent and Identically Distributed</h3>
+<p>Often in statistics we assume that a sample is <strong>independent and identically distributed</strong> (iid); that is; that the data points are independent from one another (the outcome of one has no influence over the outcome of any of the others) and that they share the same distribution.</p>
+<p>We say that <mathjax>$X_1, \dots, X_n$</mathjax> are iid if they are independent and drawn from the same distribution, that is <mathjax>$P(X_1) = \dots = P(X_n)$</mathjax>. This can also be stated:</p>
+<p><mathjax>$$
+P(X_1, \dots, X_n) = \prod_i P(X_i)
+$$</mathjax></p>
+<p>In this case, they all share the same mean (expected value) and variance.</p>
+<p>This assumption makes computing statistics for the sample much easier.</p>
+<p>For instance, if a sample was not identically distributed, each datapoint might come from a different distribution, in which case there are different means and variances for each datapoint which must be computed from each of those datapoints alone. They can't really be treated as a group since the datapoints aren't quite equivalent to each other (in a statistical sense).</p>
+<p>Or, if the sample was not independent, then we lose all the conveniences that come with independence.</p>
+<p>The IID assumption doesn't always hold (i.e. it may be violated), of course, so there are other ways of approaching such situations while minimizing complexity, such as Hidden Markov Models.</p>
+<h3>The Law of Large Numbers (LLN)</h3>
+<p>Let <mathjax>$X_1, \dots X_n$</mathjax> be iid with mean <mathjax>$\mu$</mathjax>.</p>
+<p>The <strong>law of large numbers</strong> essentially states that as a sample size approaches infinity, its mean will approach the population ("true") mean:</p>
+<p><mathjax>$$
+\lim_{n \to \infty} \frac{1}{n} \sum^n_{i=1} X_i = \mu
+$$</mathjax></p>
+<h3>Regression to the mean</h3>
+<p><mathjax>$P(Y &lt; x|X = x)$</mathjax> gets bigger as <mathjax>$x$</mathjax> approaches very large values. That is, given a very large <mathjax>$X$</mathjax> (an extreme), the chance that <mathjax>$Y$</mathjax>'s value is as large as or larger than <mathjax>$X$</mathjax> is unlikely.</p>
+<p><mathjax>$P(Y &gt; x|X = x)$</mathjax> gets bigger as <mathjax>$x$</mathjax> approaches very small values. That is, given a very small <mathjax>$X$</mathjax> (an extreme), the chance that <mathjax>$Y$</mathjax>'s value is as small as or smaller than <mathjax>$X$</mathjax> is unlikely.</p>
+<h3>Central Limit Theorem (CLT)</h3>
+<p>Say you have a set of data. Even if the distribution of that data is not normal, you can divide the data into groups (samples) and then average the values of those groups. Those averages will approach the form of a normal curve as you increase the size of those groups (i.e. increase the sample size).</p>
+<p>Let <mathjax>$X_1, \dots X_n$</mathjax> be iid with mean <mathjax>$\mu$</mathjax> and variance <mathjax>$\sigma^2$</mathjax>.</p>
+<p>Then the <strong>central limit theorem</strong> can be formalized as:</p>
+<p><mathjax>$$
+\sqrt \frac{n}{\sigma^2} ((\frac{1}{n} \sum^n_{i=1} X_i) - \mu) \xrightarrow{D} N(0,1)
+$$</mathjax></p>
+<p>That is, the left side <em>converges in distribution</em> to a normal distribution with mean 0 and variance 1 as <mathjax>$n$</mathjax> increases.</p>
+<h3>Dispersion (Variance and Standard Deviation)</h3>
+<p>Dispersion is the "spread" of a distribution - how spread it out its values are.</p>
+<p>The main measures of dispersion are the variance and the standard deviation.</p>
+<h4>Standard Deviation</h4>
+<p>Standard deviation is represented by <mathjax>$\sigma$</mathjax> (sigma) and describes the variation from the mean (<mathjax>$\mu$</mathjax>, i.e. the expected value), calculated:</p>
+<p><mathjax>$$ \sigma = \sqrt{E[(X-\mu)^2]} = \sqrt{E[X^2] - (E[X])^2} $$</mathjax></p>
+<h4>Variance</h4>
+<p>The square of the standard deviation, that is, <mathjax>$E[(X-\mu)^2]$</mathjax>, is the <strong>variance</strong> of <mathjax>$X$</mathjax>, usually notated <mathjax>$\sigma^2$</mathjax>. It can also be written:</p>
+<p><mathjax>$$ \Var(X) = \sigma^2 = E(X^2) - E(X)^2 = \frac{\sum_{i=1}^N(x_i - \mu^2)}{N} $$</mathjax></p>
+<p>For a population of size <mathjax>$N$</mathjax> of datapoints <mathjax>$x$</mathjax>.</p>
+<p>That is, variance is the difference between the square of the inputs and the square of the expected value.</p>
+<h4>Coefficient of variation (CV)</h4>
+<p>Variance depends on the units of measurement, but this can be controlled for by computing the <strong>coefficient of variation</strong>:</p>
+<p><mathjax>$$
+CV = \frac{\sigma}{\bar x} \times 100%
+$$</mathjax></p>
+<p>This allows us to compare variability across variables measured in different units.</p>
+<h4>Variance of a linear combination of random variables</h4>
+<p>The variance of a linear combination of (independent) random variables, e.g. <mathjax>$aX + bY$</mathjax>, can be computed:</p>
+<p><mathjax>$$
+\Var(\beta_1 X_1 + \dots + \beta_n X_n) = \beta_1^2 \Var(X_1) + \dots + \beta_n^2 \Var(X_n)
+$$</mathjax></p>
+<h4>Range</h4>
+<p>The <strong>range</strong> can also be used to get a sense of dispersion. The range is the difference between the highest and lowest values, but very sensitive to outliers.</p>
+<p>As an alternative to the range, you can look at the <strong>interquartile range</strong>, which is the range of the middle 50% of the values (that is, the difference of the 75th and 25th percentile values). This is less sensitive to outliers.</p>
+<h4>Z score</h4>
+<p>A <strong>Z score</strong> is just the number of standard deviations a value is from the mean. It is defined:</p>
+<p><mathjax>$$
+Z = \frac{x-\mu}{\sigma}
+$$</mathjax></p>
+<h4>The Empirical Rule</h4>
+<p>The <strong>empirical rule</strong> describes that, for a normal distribution, there is:</p>
+<ul>
+<li>a 68% chance that a value falls within one standard deviation</li>
+<li>a 95% chance that something falls within two standard deviations</li>
+<li>a 99.7% chance that something falls within three standard deviations</li>
+</ul>
+<figure><img alt="The Empirical Rule" src="../assets/empirical_rule.svg" /><figcaption>The Empirical Rule</figcaption>
+</figure>
+<h4>Pooled standard deviation estimates</h4>
+<p>If you have reason to expect that the standard deviations of two populations are practically identical, you can use the <strong>pooled standard deviation</strong> of the two groups to obtain a more accurate estimate of the standard deviation and standard error:</p>
+<p><mathjax>$$
+s^2_{\text{pooled}} = \frac{s_1^2(n_1 - 1) + s_2^2 (n_2 -1)}{n_1 + n_2 -2}
+$$</mathjax></p>
+<p>Where <mathjax>$n_1, n_2, s_1, s_2$</mathjax> are the sample sizes and standard deviations of the sample groups. We must update the degrees of freedom as well, <mathjax>$\df = n_1 + n_2 - 2$</mathjax>, which we can use for a new t-distribution.</p>
+<h3>Moments</h3>
+<p>The <mathjax>$k$</mathjax>th <strong>moment</strong>, <mathjax>$m_k(X)$</mathjax>, where <mathjax>$k \in {1,2,3,\dots}$</mathjax> (i.e. it is a positive integer), is <mathjax>$E[X^k]$</mathjax>. So the first moment is just the mean, <mathjax>$E[X]$</mathjax>.</p>
+<p>The <mathjax>$k$</mathjax>th <strong>central moment</strong> is <mathjax>$E[(X-E[X])^k]$</mathjax>. So the second central moment is just the variance, <mathjax>$E[(X-E[X])^2]$</mathjax>.</p>
+<p>The third moment is the <strong>skewness</strong>, and the fourth moment is the <strong>kurtosis</strong>; they all share the same form (with different normalization terms):</p>
+<p><mathjax>$$
+\begin{aligned}
+\text{skewness} &amp;= E[(X - \mu)^3 \frac{1}{\sigma^3}] \\
+\text{kurtosis} &amp;= E[(X - \mu)^4] \frac{1}{\sigma^4}
+\end{aligned}
+$$</mathjax></p>
+<p>Moments have different units, e.g. the first moment might be in meters (<mathjax>$m$</mathjax>), the second moment would be <mathjax>$m^2$</mathjax>, and so on, so it is typical to standardize moments by taking their <mathjax>$k$</mathjax>-th root, e.g. <mathjax>$\sqrt{m^2}$</mathjax></p>
+<h3>Covariance</h3>
+<p>The <strong>covariance</strong> describes the variance between two random variables.</p>
+<p>For random variables <mathjax>$x$</mathjax> and <mathjax>$y$</mathjax>, the covariance is (remember, <mathjax>$E(x)$</mathjax> denotes the expected value of random variable <mathjax>$x$</mathjax>):</p>
+<p><mathjax>$$ \Cov(x, y) = E[(x-E(x))(y-E(y))] = \frac{1}{n} \sum (x_i - \bar x)(y_i - \bar y)$$</mathjax></p>
+<p>There must the same number of values <mathjax>$n$</mathjax> for each.</p>
+<p>This is simplified to:</p>
+<p><mathjax>$$ \Cov(x,y) = E[xy] - E[y]E[x] \approx \bar{xy} - \bar{y}\bar{x} $$</mathjax></p>
+<p>A positive covariance means that as <mathjax>$x$</mathjax> goes up, <mathjax>$y$</mathjax> goes up.<br />
+A negative covariance means that as <mathjax>$x$</mathjax> goes up, <mathjax>$y$</mathjax> goes down.</p>
+<p>Note that variance is just the covariance of a random variable with itself:</p>
+<p><mathjax>$$ \Var(X) = E(XX) - E(X)E(X) = \Cov(X, X) $$</mathjax></p>
+<h3>Correlation</h3>
+<p><strong>Correlation</strong> gives us a measure of relatedness between two variables. Alone it does not imply causation, but it can help guide more formal inquiries (e.g. experiments) into causal relationships.</p>
+<p>A good way to visually intuit correlation is through scatterplots.</p>
+<p>We can measure correlation with <strong>correlation coefficients</strong>. These measure the strength and sign of a relationship (but not the slope, <em>linear regression</em>, detailed later, does that).</p>
+<p>Some of the more common correlation coefficients include:</p>
+<ul>
+<li><strong>Pearson product-moment</strong> (used where both variables are on an interval or ratio scale)</li>
+<li><strong>Spearman rank-order</strong> (where both variables are on ordinal scales)</li>
+<li><strong>Phi</strong> (where both variables are on nominal/categorical/dichotomous/binary scales)</li>
+<li><strong>Point biserial</strong> (where one variable is on a nominal/categorical/dichotomous/binary scale and the other is on an interval or ratio scale)</li>
+</ul>
+<p>The Pearson and Spearman coefficients are the most commonly used ones, but sometimes the later two are used in special cases (e.g. with categorical data).</p>
+<h4>Pearson product-moment correlation coefficient (Pearson's correlation)</h4>
+<p><mathjax>$$
+r = \frac{\sum^n_{i=1}(\frac{x_i - \bar x}{s_x})(\frac{y_i - \bar y}{s_y})}{n-1}
+$$</mathjax></p>
+<p>Note: this is sometimes denoted as a capital <mathjax>$R$</mathjax></p>
+<p>You may recognize this as:</p>
+<p><mathjax>$$
+\frac{\Cov(X,Y)}{S_X S_Y}
+$$</mathjax></p>
+<p>Here we convert our values to <strong>standard scores</strong>, i.e. <mathjax>$\frac{x_i - \bar x}{s_x}$</mathjax>. This standardizes the values such that their mean is 0 and their variance is 1 (and so they are unitless)</p>
+<p>For a population, <mathjax>$r$</mathjax> is notated <mathjax>$\rho$</mathjax> (rho).</p>
+<p>This value can range from <mathjax>$[-1, 1]$</mathjax>, where 1 and -1 mean complete correlation and 0 means no correlation.</p>
+<p>To test the statistical significance of the Pearson correlation coefficient, you can use the <mathjax>$t$</mathjax> statistic.</p>
+<p>For instance, if you believe there is a relationship between two variables, you set your null hypothesis as <mathjax>$\rho = 0$</mathjax> and then with your estimate of <mathjax>$r$</mathjax>, calculate the <mathjax>$t$</mathjax> statistic:</p>
+<p><mathjax>$$
+t = \frac{r}{\sqrt{\frac{1-r^2}{n-2}}}
+$$</mathjax></p>
+<p>Then look up the value in a <mathjax>$t$</mathjax> table.</p>
+<p>The Pearson correlation coefficient tells you the strength and direction of a relationship, but it doesn't tell you how much variance of one variable is explained by the other.</p>
+<p>For that, you can use the <strong>coefficient of determination</strong> which is just <mathjax>$r^2$</mathjax>. So for instance, if you have <mathjax>$r=0.9$</mathjax>, then <mathjax>$r^2 = 0.81$</mathjax> which means 81% of the variation of one variable is explained by the other.</p>
+<p>Note that Pearson's correlation only accurately measures linear relationships; so even if you have a Pearson correlation near 0, it is still possible that there may be a strong nonlinear relationship. It's worthwhile to look at a scatter plot to verify.</p>
+<p>It is also not robust in the presence of outliers.</p>
+<h4>Spearman rank-order correlation coefficient (Spearman's rank correlation)</h4>
+<p>Here you compute ranks (i.e. the indices in the sorted sample) rather than standard scores.</p>
+<p>For example, for the dataset <mathjax>$[1,10,100]$</mathjax>, the rank of the value <mathjax>$10$</mathjax> is <mathjax>$2$</mathjax> because it is second in the sorted list.</p>
+<p>Then you can compute the Spearman correlation:</p>
+<p><mathjax>$$
+r_s = 1 - \frac{(6 \sum d^2)}{n(n^2 - 1)}
+$$</mathjax></p>
+<p>Where <mathjax>$d$</mathjax> is the difference in ranks for each datapoint.</p>
+<p>Generally, you can interpret <mathjax>$r_s$</mathjax> in the following ways:</p>
+<ul>
+<li><mathjax>$0.9 \leq r_s \leq 1$</mathjax> - very strong correlation</li>
+<li><mathjax>$0.7 \leq r_s \leq 0.9$</mathjax> - strong correlation</li>
+<li><mathjax>$0.5 \leq r_s \leq 0.7$</mathjax> - moderate correlation</li>
+</ul>
+<p>You can test its statistical significance using a <mathjax>$z$</mathjax> test, where the null hypothesis is that <mathjax>$r_s=0$</mathjax>.</p>
+<p><mathjax>$$
+z = r_s \sqrt{n-1}
+$$</mathjax></p>
+<p>Spearman's correlation is more robust to outliers and skewed distributions.</p>
+<h4>Point-Biserial correlation coefficient</h4>
+<p>This correlation coefficient is useful when comparing a categorical (binary) variable with an interval or ratio scale variable:</p>
+<p><mathjax>$$
+r_{pbi} = \frac{M_p - M_q}{S_t} \sqrt{pq}
+$$</mathjax></p>
+<p>Where <mathjax>$M_p$</mathjax> is the mean for the datapoints categorized as 1 and <mathjax>$M_q$</mathjax> is the mean for the datapoints categorized as 0.<br />
+<mathjax>$S_t$</mathjax> is the standard deviation for the interval/ratio variable, <mathjax>$p$</mathjax> is the proportion of datapoints categorized as 1, and <mathjax>$q$</mathjax> is the proportion of datapoints categorized as 0.</p>
+<h4>Phi correlation coefficient</h4>
+<p>This allows you to measure the correlation between two categorical (binary) variables.</p>
+<p>It is calculated like so:</p>
+<p><mathjax>$$
+\begin{aligned}
+A &amp;= f(0,1) \\
+B &amp;= f(1,1) \\
+C &amp;= f(0,0) \\
+D &amp;= f(1,0) \\
+r_{\phi} &amp;= \frac{AD-BC}{\sqrt{(A+B)(C+D)(A+C)(B+D)}}
+\end{aligned}
+$$</mathjax></p>
+<p>Where <mathjax>$f(a,b)$</mathjax> is the frequency of label <mathjax>$a$</mathjax> and label <mathjax>$b$</mathjax> occurring together in the data.</p>
+<h3>Degrees of Freedom</h3>
+<p><strong>Degrees of freedom</strong> describes the number of variables that are "free" in what value they can take. Often a given variable must be a particular value because of the values the other variables take on and some constraint(s).</p>
+<p>For example: say we have four unknown quantities <mathjax>$x_1, x_2, x_3, x_4$</mathjax>. We know that their mean is 5. In this case we have three degrees of freedom - this is because three of the variables are free to take arbitrary values, but once those three are set, the fourth value <em>must</em> be equal to <mathjax>$x_4 = 20 - x_1 - x_2 - x_3$</mathjax> in order for the mean to be 5 (that is, in order to satisfy the constraint). So for instance, if <mathjax>$x_1=2, x_2=4, x_3=6$</mathjax>, then <mathjax>$x_4$</mathjax> <em>must</em> equal 8. It is not "free" to take on any other value.</p>
+<h3>Time Series Analysis</h3>
+<p>Often data has a temporal component; e.g. you are looking for patterns over time.</p>
+<p>Generally, time series data may have the following parts: a <strong>trend</strong>, which is some function reflecting persistent changes, <strong>seasonality</strong>; that is, periodic variation, and of course there is going to be some noise - random variation - as well.</p>
+<h4>Moving averages</h4>
+<p>To extract a trend from a series, you can use regression, but sometimes you will be better off with some kind of <strong>moving average</strong>. This divides the series into overlapping regions, <strong>windows</strong>, of some size, and takes the averages of each window. The <strong>rolling mean</strong> just takes the mean of each window. There is also the <strong>exponentially-weighted moving average</strong> (EWMA) which gives a weighted average, such that more recent values have the highest weight, and values before that have weights which drop off exponentially. The EWMA takes an additional <strong>span</strong> parameter which determines how fast the weights drop off.</p>
+<h4>Serial correlation (autocorrelation)</h4>
+<p>In time series data you may expect to see patterns. For example, if a value is low, it may stay low for a bit, if it's high, it may stay high for a bit. These types of patterns are <strong>serial correlations</strong>, also called <strong>autocorrelation</strong> (so-called because it is correlated a dataset with itself, in some sense), because the values correlate in their sequence.</p>
+<p>You can compute serial correlation by shifting the time series by some interval, called a <strong>lag</strong>, and then compute the correlation of the shifted series with the original, unshifted series.</p>
+<h3>Survival Analysis</h3>
+<p>Survival analysis describes how long something lasts. It can refer to the survival of, for instance, a person - in the context of disease, a 5-year survival rate is the probability of surviving 5 years after diagnosis, for example - or a mechanical component, and so on. More broadly it can be seen as looking at how long something lasts until something happens - for instance, how long until someone gets married.</p>
+<p>A <strong>survival curve</strong> is a function <mathjax>$S(t)$</mathjax> which computes the probability of surviving longer than duration <mathjax>$t$</mathjax>. Such a duration is called a <strong>lifetime</strong>.</p>
+<p>The survival curve ends up just being the complement of the CDF:</p>
+<p><mathjax>$$
+S(t) = 1 - \CDF(t)
+$$</mathjax></p>
+<p>Looking at it this way, the CDF is the probability of a lifetime <em>less than or equal</em> to <mathjax>$t$</mathjax>.</p>
+<h4>Hazard function</h4>
+<p>A <strong>hazard function</strong> tells you the fraction of cases that continue until <mathjax>$t$</mathjax> and then end at <mathjax>$t$</mathjax>. It can be computed from the survival curve:</p>
+<p><mathjax>$$
+\lambda(t) = \frac{S(t) - S(t+1)}{S(t)}
+$$</mathjax></p>
+<p>Hazard functions are also used for estimating survival curves.</p>
+<h4>Estimating survival curves: Kaplan-Meier estimation</h4>
+<p>Often we do not have the CDF of lifetimes so we can't easily compute the survival curve. We often have non-survival cases alongside have survival cases, where we don't yet know what their final lifetime will be. Often, as is the case in the medical context, we don't want to wait to learn what these unknown lifetimes will be. So we need to estimate the survival curve with the data we do have.</p>
+<p>The Kaplan-Meier estimation allows us to do this. We can use the data we have to estimate the hazard function, and then convert that into a survival curve.</p>
+<p>We can convert a hazard function into an estimate of the survival curve, where each point at time <mathjax>$t$</mathjax> is computed by taking the product of complementary hazard functions through that time <mathjax>$t$</mathjax>, like so:</p>
+<p><mathjax>$$
+\prod_t (1 - \lambda(t))
+$$</mathjax></p>
+<h2>Inferential Statistics</h2>
+<p>Statistical inference is the practice of using statistics to <em>infer</em> some conclusion about a population based on only a sample of that population. This can be the population's distribution - we want to infer from the sample data what the "true" distribution (the population distribution) is and the unknown parameters that define it.</p>
+<p>Generally, data is generated by some <em>process</em>; this data-generating process is also <em>noisy</em>; that is, there is a relatively small degree of imprecision or fluctuation in values due to randomness. In inferential statistics, we try to uncover the particular function that describes this process as closely as possible. We do so by choosing a <em>model</em> (e.g. if we believe it can be modeled linearly, we might choose linear regression, otherwise we might choose a different kind of model such as a probability distribution; modeling is covered in greater detail in the machine learning part). Once we have chosen the model, then we need to determine the <em>parameters</em> (linear coefficients, for example, or mean and variance for a probability distribution) for that model.</p>
+<p>Broadly, the two paradigms of inference are <strong>frequentist</strong>, which relies on long-run repetitions of an event, that is, it is <em>empirical</em> (and could be termed the "conventional" or "traditional" framework, though there's a lot of focus on Bayesian inference now) and <strong>Bayesian</strong>, which is about generating a hypothesis distribution (the prior) and updating it as more evidence is acquired. Bayesian inference is valuable because there are many events which we cannot repeat, but we still want to learn something about.</p>
+<p>The frequentist believes these unknown parameters have precise "true" values which can be (approximately) uncovered. In frequentist statistics, we can estimate these exact values. When we estimate a single value for an unknown, that estimation is called a <strong>point estimate</strong>. This is in contrast to describing a value estimate as a probability distribution, which is the Bayesian method. The Bayesian believes that we cannot express these parameters as single values and we should rather describe them as a distributions of possible values to be explicit about their uncertainty.</p>
+<p>Here we focus on frequentist inference; Bayesian inference is covered in a later chapter.</p>
+<p>In frequentist statistics, the factor of noise means that we may see relationships (and thus come up with non-zero parameters) where they don't exist, just because of the random noise. This is what p-values are meant to compensate for - if the relationship truly did not exist, what's the probability, given the data, that we'd see the non-zero parameter estimate that we computed? Generally if this probability is less than 0.05 (i.e. <mathjax>$p &lt; 0.05$</mathjax>) then we accept the result.</p>
+<p>Often with statistical inference you are trying to quantify some difference between groups (which can be framed as measuring an <strong>effect size</strong>) or testing if some data supports or refutes some hypothesis, and then trying to determine whether or not this difference or effect can be attributed to chance (this is covered in the section on experimental statistics).</p>
+<p>A word of caution: many statistical tools work only under certain conditions, e.g. assumptions of independence, or for a particular distribution, or a large enough sample size, or lack of skew, and so on - so before applying statistical methods and drawing conclusions, make sure the tools are appropriate for the data. And of course you must always be cautious of potential biases involved in the data collection process.</p>
+<h3>Error</h3>
+<p>Dealing with error is a big part of statistics and some error is unavoidable (noise is natural).</p>
+<p>There are three kinds of error:</p>
+<ul>
+<li>Systemic error (systemic flaws in the data collection, e.g. sampling bias)</li>
+<li>Measurement error (due to imprecise instruments, for instance)</li>
+<li>Random error (natural noise, due to chance, uncontrollable, but in theory its effect is minimized if many measurements are taken)</li>
+</ul>
+<p>We never know the true value of something, only what we observe by imprecise means, so we always must grapple with error.</p>
+<h3>Estimates and estimators</h3>
+<p>We can think of the population as representing the underlying data generating process and consider these parameters as functions of the population. To <strong>estimate</strong> these parameters from the sample data, we use <strong>estimators</strong>, which are functions of the sample data that return an estimate for some unknown value. Essentially, any statistic is an estimator. For instance, we may estimate the population mean by using the sample mean as our estimator. Or we may estimate the population variance as the sample variance. And so on.</p>
+<h4>Bias</h4>
+<p>Estimators may be <strong>biased</strong> for small sample sizes; that is, it tends to have more error for small sample sizes.</p>
+<p>Say we are estimating a parameter <mathjax>$\theta$</mathjax>. The bias of an estimator <mathjax>$\hat \theta_m$</mathjax> is:</p>
+<p><mathjax>$$
+\text{bias}(\hat \theta+m) = E[\hat \theta_m] - \theta
+$$</mathjax></p>
+<p>Where <mathjax>$m$</mathjax> is the number of samples.</p>
+<p>There are <strong>unbiased</strong> estimators as well, which have an expected mean error (against the population parameter) of 0. That is, <mathjax>$\text{bias}(\hat \theta) = 0$</mathjax>, which can also be stated as <mathjax>$E[\hat \theta] = \theta$</mathjax>.</p>
+<p>For example, an unbiased estimator for population variance <mathjax>$\sigma^2$</mathjax> is:</p>
+<p><mathjax>$$
+\frac{1}{n-1} \sum(x_i - \bar x)^2
+$$</mathjax></p>
+<p>An estimator may be <strong>asymptotically unbiased</strong> if <mathjax>$\lim_{m \to \infty} \text{bias}(\hat \theta_m) = $</mathjax>, that is, if <mathjax>$\lim_{m \to \infty} E[\hat \theta_m] = 0$</mathjax>.</p>
+<p>Generally, unbiased estimators are preferred, but sometimes biased estimators have other properties which make them useful.</p>
+<p>For an estimate, we can measure its <strong>standard error</strong> (SE), which describes how much we expect the estimate to be off by, on average. It can also be stated as:</p>
+<p><mathjax>$$
+\SE (\hat \theta) = \sqrt{\Var(\hat \theta)}
+$$</mathjax></p>
+<p>"Standard error" sometimes refers to the standard error of the mean, which is the standard deviation of the mean:</p>
+<p><mathjax>$$
+\SE (\hat \mu_m) = \sqrt{\Var(\frac{1}{m}\sum_{i=1}^m x^{(i)})} = \frac{\sigma}{\sqrt m}
+$$</mathjax></p>
+<p>Much of statistical inference is concerned with measuring the quality of these estimates.</p>
+<h3>Consistency</h3>
+<p>When we used a biased estimator, we generally still want our point estimates to converge to the true value of the parameter. This property is called <strong>consistency</strong>. For some error <mathjax>$\epsilon &gt; 0$</mathjax>, we want <mathjax>$\lim_{m \to \infty} P(|\theta_m - \theta| &gt; \epsilon) = 0$</mathjax>. That is, as we increase our sample size, we want the probability of the absolute difference between the estimate and the true value being greater than <mathjax>$\epsilon$</mathjax> to approach 0.</p>
+<h3>Point Estimation</h3>
+<p>Given an unknown population parameter, we may want to estimate a single value for it - this estimate is called a <strong>point estimate</strong>. Ideally, the estimate is as close to the true value as possible.</p>
+<p>The estimation formula (the function which yields an estimate) is called an <strong>estimator</strong> and is a random variable (so there is some underlying distribution). A particular value of the estimator is the <strong>estimate</strong>.</p>
+<p>A simple example: we have a series of trials with some number of successes. We want an estimate for the probability of success of the event we looked at. Here an obvious estimate is be the number of successes over the total number of trials, so our estimator would be <mathjax>$\frac{x}{N}$</mathjax> and - say we had 40 successes out of 100 trials - our estimate would be <mathjax>$0.4$</mathjax>.</p>
+<p>We consider a "good" estimator one whose distribution is concentrated as closely as possible around the parameter's true value (that is, it has a small variance). Generally this becomes the case as more data is collected.</p>
+<p>We can take multiple samples (of a fixed size) from a population and compute a point estimate (e.g. for the mean) from each. Then we can consider the distribution of these point estimates - this distribution is called a <strong>sampling distribution</strong>. The standard deviation of the sampling distribution describes the typical error of a point estimate, so this standard deviation is known as the <strong>standard error</strong> (SE) of the estimate.</p>
+<p>Alternatively, if you have only one sample, the standard error of the sample mean <mathjax>$\bar x$</mathjax> can be computed (where <mathjax>$n$</mathjax> is the size of the sample):</p>
+<p><mathjax>$$
+\SE_{\bar x} = \sigma_{\bar x} = \frac{\sigma_x}{\sqrt n}
+$$</mathjax></p>
+<p>This however requires the population standard deviation, <mathjax>$\sigma_x$</mathjax>, which probably isn't known - but we can also use a point estimate for that as well; that is, you can just use <mathjax>$s$</mathjax>, the sample standard deviation, instead (provided that the sample size is at least 30, as a rule of thumb, and the population distribution is not strongly skewed).</p>
+<p>Also remember that the distribution of sample means approximates a normal distribution, with better approximation as sample size increases, as described by the central limit theorem. Some other point estimates' sampling distribution also approximate a normal distribution. Such point estimates are called <strong>normal point estimates</strong>.</p>
+<p>There are other such computations for the standard error of other estimates as well.</p>
+<p>We say a point estimate is <strong>unbiased</strong> if the sampling distribution of the estimate is centered at the parameter it estimates.</p>
+<h3>Nuisance Parameters</h3>
+<p>Nuisance parameters are values we are not directly interested in, but still need to be dealt with in order to get at what we <em>are</em> interested in.</p>
+<h3>Confidence Intervals</h3>
+<p>Rather than provide a single value estimate of a population parameter, that is, a point estimate, it can be better to provide a range of values for the estimate instead. This range of values is a <strong>confidence interval</strong>. The confidence interval is the range of values where an estimate is likely to fall with some percent probability.</p>
+<p>Confidence intervals are expressed in percentages, e.g. the "95% confidence interval", which describes the plausibility that the parameter is in that interval. It <em>does not</em> imply a probability (that is, it does not mean that the true parameter has a 95% chance of being in that interval), however. Rather, the 95% confidence interval is the range of values in which, over repeated experimentation, in 95% of the experiments, that confidence interval will contain the true value. To put it another way, for the 95% confidence interval, out of every 100 experiments, at least 95 of their confidence intervals will contain the true parameter value. You would say "We are 95% confident the population parameter is in this interval".</p>
+<p>Confidence intervals are a tool for frequentist statistics, and in frequentist statistics, unknown parameters are considered fixed (we don't express them in terms of probability as we do in Bayesian statistics). So we do not associate a probability with the parameter. Rather, the <em>confidence interval itself</em> is the random variable, not the parameter. To put it another way, we are saying that 95% of the intervals we would generate from repeated experimentation would contain the real parameter - but we aren't saying anything about the parameter's value changing, just that the intervals will vary across experiments.</p>
+<p>The mathematical definition of the 95% confidence interval is (where <mathjax>$\theta$</mathjax> is the unknown parameter):</p>
+<p><mathjax>$$
+P(a(Y) &lt; \theta &lt; b(Y)|\theta) = 0.95
+$$</mathjax></p>
+<p>Where <mathjax>$a, b$</mathjax> are the endpoints of the interval, calculated according to the sampling distribution of <mathjax>$Y$</mathjax>. We condition on <mathjax>$\theta$</mathjax> because, as just mentioned, in frequentist statistics, the parameters are fixed and the data <mathjax>$Y$</mathjax> is random.</p>
+<p>We can compute the 95% confidence interval by taking the point estimate (which is the best estimate for the value) and <mathjax>$\pm 2\SE$</mathjax>, that is build an interval within two standard errors of the point estimate. The interval we add or subtract to the point estimate (here it is <mathjax>$2\SE$</mathjax>) is called the <strong>margin of error</strong>. The value we multiply the SE with is essentially a Z score, so we can more generally describe the margin of error as <mathjax>$z\SE$</mathjax>.</p>
+<p>For the confidence interval of the mean, we can be more precise and look within <mathjax>$\pm 1.96\SE$</mathjax> (that is, <mathjax>$z=1.96$</mathjax>) of the point estimate <mathjax>$\bar x$</mathjax> for the 95% confidence interval (that is, our 95% confidence interval would be <mathjax>$\bar x \pm 1.96\SE$</mathjax>). This is because we know to the sampling distribution for the sample means approximates a normal distribution (for sufficiently large sample sizes, <mathjax>$n \geq 30$</mathjax> is a rule of thumb) according to the central limit theorem.</p>
+<h3>Kernel Density Estimates</h3>
+<p>Sometimes we don't want the parameters of our data's distribution, but just a smoothed representation of it. <strong>Kernel density estimation</strong> allows us to get this representation. It is a <em>nonparametric</em> method because it makes no assumptions about the form of the underlying distribution (i.e. no assumptions about its parameters).</p>
+<figure><img alt="Kernel Density Estimation example" src="../assets/kde.svg" /><figcaption>Kernel Density Estimation example</figcaption>
+</figure>
+<p>Some kernel function (which generates symmetric densities) is applied to each data point, then the density estimate is formed by summing the densities. The kernel function determines the shape of these densities and the <em>bandwidth</em> parameter, <mathjax>$h &gt; 0$</mathjax>, determines their spread and the <em>smoothing</em> of the estimate. Typically, a Gaussian kernel function is used, so the bandwidth is equivalent to the variance.</p>
+<figure><img alt="KDE bandwidth comparisons" src="../assets/kde_bandwidth.svg" /><figcaption>KDE bandwidth comparisons</figcaption>
+</figure>
+<p>In this figure, the grey curve is the true density, the red curve is the KDE with <mathjax>$h = 0.05$</mathjax>, the black curve is the KDE with <mathjax>$h = 0.337$</mathjax>, and the green curve is the KDE with <mathjax>$h = 2$</mathjax>.</p>
+<h2>Experimental Statistics</h2>
+<p>Experimental statistics is concerned with <strong>hypothesis testing</strong>, where you have a hypothesis and want to learn if your data supports it. That is, you have some sample data and an apparent effect, and you want to know if there is any reason to believe that the effect is genuine and not just by chance.</p>
+<p>Often you are comparing two or more groups; more specifically, you are typically comparing statistics across these groups, such as their means. For example, you want to see if the difference of their means is <strong>statistically significant</strong>; which is to say, likely that it is a real effect and not just chance.</p>
+<p>The "classical" approach to hypothesis testing, <strong>null hypothesis significance testing</strong> (NHST), follows this general structure:</p>
+<ol>
+<li>Quantify the size of the apparent effect by choosing some <strong>test statistic</strong>, which is just a summary statistic which is useful for hypothesis testing or identifying p-values. For example, if you have two populations you're looking at, this could be the difference in means (of whatever you are measuring) between the two groups.</li>
+<li>Define a <strong>null hypothesis</strong>, which is usually that the apparent effect is not real.</li>
+<li>Compute a <strong>p-value</strong>, which is the probability of seeing the effect if the null hypothesis is true.</li>
+<li>Determine the <strong>statistical significance</strong> of the result. The lower the p-value, the more significant the result is, since the less likely it is to have just occurred by chance.</li>
+</ol>
+<p>Broadly speaking, there are two types of scientific studies: <strong>observational</strong> and <strong>experimental</strong>.</p>
+<p>In observational studies, the research cannot interfere while recording data; as the name implies, the involvement is merely as an observer.</p>
+<p>Experimental studies, however, are deliberately structured and executed. They must be designed to minimize error, both at a low level (e.g. imprecise instruments or measurements) and at a high-level (e.g. researcher biases).</p>
+<h3>Statistical Power</h3>
+<blockquote>
+<p>The power of a study is the likelihood that it will distinguish an effect of a certain size from pure luck. - <a href="http://www.statisticsdonewrong.com/power.html">Statistical power and underpowered statistics</a>, Alex Reinhart</p>
+</blockquote>
+<p>Statistical <strong>power</strong>, sometimes called <strong>sensitivity</strong>, can be defined as the probability of rejecting the null hypothesis when it is false.</p>
+<p>If <mathjax>$\beta$</mathjax> is the probability of a type II error (i.e. failing to reject the null hypothesis when it's false), then <mathjax>$\text{power} = 1 - \beta$</mathjax>.</p>
+<p>Power...</p>
+<ul>
+<li>Increases as <mathjax>$n$</mathjax> (sample size) increases</li>
+<li>Increases as <mathjax>$\sigma$</mathjax> decreases (less variability)</li>
+<li>Is higher for a one-sided test than for its associated two-sided test</li>
+</ul>
+<h3>Sample Selection</h3>
+<p>Bias can enter studies primarily in two ways:</p>
+<ul>
+<li>in the process of selecting the objects to study (sampling and retention)</li>
+<li>in the process of collection information <em>about</em> the objects</li>
+</ul>
+<p>To prevent selection bias (selecting samples in such a way that it encourages a particular outcome, whether done consciously or not), sample selection may be random.</p>
+<p>In the case of medical trials and similar studies, random allocation is ideally <strong>double blind</strong>, so that neither the patient nor the researchers know which treatment a patient is receiving.</p>
+<p>Another sample selection technique is <strong>stratified sampling</strong>, in which the population is divided into categories (e.g. male and female) and samples are selected from those subgroups. If the variable used for stratification is strongly related to the variable being studied, there may be better accuracy from the sample size.</p>
+<p>You need large sample sizes because with small sample sizes, you're more sensitive to the effects of chance. e.g. if I flip a coin 10 times, it's feasible that I get heads 6/10 times (60% of the time). With that result I couldn't conclusively say whether or not that coin is rigged. If I flip that coin 1000 times, it's extremely unlikely that I will get heads 60% of the time (600/1000 times) if it were a fair coin.</p>
+<p>Sometimes to increase sample size, a researcher may use a technique called "replication", which is simply repeating the measurements with new samples. but some researchers really only "pseudoreplicate". samples should be as independent from each other as possible - otherwise you have too many confounding factors. in medical research, researchers may sample a single patient multiple times, every week for instance, and treat each week's sample as a distinct sample. this is pseudoreplication - you begin to inflate other factors particular to that patient in your results. another example is - say you wanted to measure pH levels in soil samples across the US. well, you cant sample soil 15ft from each other because they are too dependent on each other:</p>
+<h4>Operationalization</h4>
+<p><strong>Operationalization</strong> is the practice of coming up with some way of measuring something which cannot be directly measured, such as intelligence. This may be accomplished via <strong>proxy measurements</strong>.</p>
+<h3>The Null Hypothesis</h3>
+<p>In an experiment, the <strong>null hypothesis</strong>, notated <mathjax>$H_0$</mathjax>, is the "status quo". For example, in testing whether or not a drug has an impact on a disease, the null hypothesis would be that the drug has no effect.</p>
+<p>When running an experiment, you do it under the assumption that the null hypothesis is true. Then you ask: what's the probability of getting the results you got, assuming the null hypothesis is true? If that probability is very small, the null hypothesis is likely false. This probability - of getting your results if the null hypothesis were true - is called the <strong>P value</strong>.</p>
+<h3>Type 1 Errors</h3>
+<p>A <strong>type 1 error</strong> is one where the null hypothesis is rejected, even though it is true.</p>
+<p>Type 1 errors are usually presented as a probability of them occurring, e.g. a "0.5% chance of a type 1 error" or a "type 1 error with probability of 0.01".</p>
+<h3>P Values</h3>
+<p>P values are central to null hypothesis significance testing (NHST), but they are commonly misunderstood.</p>
+<p>P values <em>do not</em>:</p>
+<ul>
+<li>tell you the probability of the null hypothesis being true</li>
+<li>tell you the probability of <em>any</em> hypothesis being true</li>
+<li>can never prove or disprove hypotheses</li>
+</ul>
+<blockquote>
+<p>There's no mathematical tool to tell you if your hypothesis is true; you can only see whether it is consistent with the data, and if the data is sparse or unclear, your conclusions are uncertain. - <a href="http://www.statisticsdonewrong.com/data-analysis.html#the-power-of-p-values">Statistics Done Wrong</a>, Alex Reinhart</p>
+</blockquote>
+<p>So what is it then? The P value is the probability of seeing your results or data if the null hypothesis were true.</p>
+<p>That is, given data <mathjax>$D$</mathjax> and a hypothesis <mathjax>$H$</mathjax>, where <mathjax>$H_0$</mathjax> is the null hypothesis, the P value is merely:</p>
+<p><mathjax>$$ P(D|H_0) $$</mathjax></p>
+<p>If instead we want to find the probability of our hypothesis given the data, that is, <mathjax>$P(H|D)$</mathjax>, we have to use Bayesian inference instead:</p>
+<p><mathjax>$$ P(H \, | \, D) = \frac{P(D \, | \, H)P(H)}{P(D \, | \, H)P(H) + P(D\, | \, \lnot H)P(\not H)} $$</mathjax></p>
+<p>Note that P values are problematic when testing multiple hypotheses (<strong>multiple testing</strong> or <strong>multiple comparisons</strong>) because any "significant" results (as determined by P value comparisons, e.g. <mathjax>$p &lt; 0.5$</mathjax>) may be deceptively so, since that result may still have just been chance, as the following comic illustrates. That is, the more significance tests you conduct, the more likely you will make a Type 1 Error.</p>
+<figure><img alt="xkcd - &quot;Significant&quot;" src="../assets/xkcd_pvalue.png" /><figcaption><a href="https://xkcd.com/882/">xkcd - "Significant"</a></figcaption>
+</figure>
+<p>In this comic, 20 hypotheses are tested, so with a significance level at 5%, it's expected that at least one of those tests will come out significant by chance. In the real world this may be problematic in that multiple research groups may be testing the same hypothesis and chances may be such that one of them gets significant results.</p>
+<h3>The Base Rate Fallacy</h3>
+<p>A very important shortcoming to be aware of is the base rate fallacy. A P value cannot be considered in isolation. The base rate of whatever occurrence you are looking at must also be taken into account. Say you are testing 100 treatments for a disease, and it's a very difficult disease to treat, so there's a low chance (say 1%) that a treatment will actually be successful. This is your base rate. A low base rate means a higher probability of false positives - treatments which, during the course of your testing, may appear to be successful but are in reality not (i.e. their success was a fluke). A good example is the mammogram test example (see <a href="http://www.statisticsdonewrong.com/p-value.html">The p value and the base rate fallacy</a>).</p>
+<blockquote>
+<p>A p value is calculated under the assumption that the medication <em>does not work</em> and tells us the probability of obtaining the data we did, or data more extreme than it. It does <em>not</em> tell us the chance the medication is effective. (<a href="http://www.statisticsdonewrong.com/p-value.html">The p value and the base rate fallacy</a>, Alex Reinhart)</p>
+</blockquote>
+<h3>False Discovery Rate</h3>
+<p>The <strong>false discovery rate</strong> is the expected proportion of false positives (Type 1 errors) amongst hypothesis tests.</p>
+<p>For example, if we have a maximum FDR of 0.10 and we have 1000 observations which seem to indicate a significant hypothesis, then we can expect 100 of those observations to be false positives.</p>
+<p>The <strong>q value</strong> for an individual hypothesis is the minimum FDR at which the test may be called significant.</p>
+<p>Say you run multiple comparisons and have the following values:</p>
+<ul>
+<li><mathjax>$m$</mathjax> = the total number of hypotheses tested (number of comparisons)</li>
+<li><mathjax>$m_0$</mathjax> = the number of true null hypotheses (<mathjax>$H_0$</mathjax>)</li>
+<li><mathjax>$m - m_0$</mathjax> = the number of true alternative hypotheses (<mathjax>$H_i$</mathjax>)</li>
+<li><mathjax>$V$</mathjax> = the number of false positives (Type 1 errors)</li>
+<li><mathjax>$S$</mathjax> = the number of true positives</li>
+<li><mathjax>$T$</mathjax> = the number of false negatives (Type 2 errors)</li>
+<li><mathjax>$U$</mathjax> = the number of true negatives</li>
+<li><mathjax>$R = V + S$</mathjax> = the number of hypotheses declared significant</li>
+</ul>
+<p>We can calculate the FDR as:</p>
+<p><mathjax>$$ \text{FDR} = E[\frac{V}{V+S}] = E[\frac{V}{R}] $$</mathjax></p>
+<p>Note that <mathjax>$\frac{V}{R} = 0$</mathjax> if <mathjax>$R = 0$</mathjax>.</p>
+<h3>Alpha Level</h3>
+<p>The value that you select to compare the p-value to, e.g. 0.5 in the comic, is the <strong>alpha level</strong> <mathjax>$\bar \alpha$</mathjax>, also called the <strong>significance level</strong>, of an experiment. Your alpha level should be selected according to the number of tests you'll be conducting in an experiment.</p>
+<p>There are some approaches to help adjust the alpha level.</p>
+<h4>The Bonferroni Correction</h4>
+<p>The highly conservative <strong>Bonferroni Correction</strong> can be used as a safeguard.</p>
+<p>You divide whatever your significance level <mathjax>$\bar \alpha$</mathjax> is by the number of statistical tests <mathjax>$t$</mathjax> you're doing:</p>
+<p><mathjax>$$ \alpha_p = \frac{\bar \alpha}{t} $$</mathjax></p>
+<p><mathjax>$\alpha_p$</mathjax> is the per-comparison significance level which you apply for each individual test, and <mathjax>$\bar \alpha$</mathjax> is the maximum experiment-wide significance level, called the <strong>maximum familywise error rate</strong> (FWER).</p>
+<h4>The Sidak Correction</h4>
+<p>A more sensitive correction, the <strong>Sidak Correction</strong>, can also be used:</p>
+<p><mathjax>$$ \alpha_p = 1 - (1 - \bar \alpha)^{\frac{1}{n}} $$</mathjax></p>
+<p>For <mathjax>$n$</mathjax> <em>independent</em> comparisons, <mathjax>$\alpha$</mathjax>, the experiment-wide significance level (the FWER) is:</p>
+<p><mathjax>$$ \alpha = 1 - (1 - \alpha_p)^n $$</mathjax></p>
+<p>For <mathjax>$n$</mathjax> <em>dependent</em> comparisons, use:</p>
+<p><mathjax>$$ \alpha \leq n \alpha_p $$</mathjax></p>
+<h3>The Benjamini-Hochberg Procedure</h3>
+<p>Approaches like the Bonferroni correction lowers the alpha level which end up decreasing your statistical power - that is, you fail to detect false effects <em>as well as</em> true effects.</p>
+<p>And with such an approach, you are still susceptible to the base rate fallacy, and may still have false positives. So how can you calculate the false discovery rate? That is, what fraction of the statistically Significant results are false positives?</p>
+<p>You can use the Benjamini-Hochberg procedure, which tells you which P values to consider statistically significant:</p>
+<ol>
+<li>Perform your statistical tests and get the P value for each. Make a list and sort it in ascending order.</li>
+<li>Choose a false-discovery rate <mathjax>$q$</mathjax>. The number of statistical tests is <mathjax>$m$</mathjax>.</li>
+<li>Find the largest p value such that <mathjax>$p \leq \frac{iq}{m}$</mathjax>, where <mathjax>$i$</mathjax> is the P value's place in the sorted list.</li>
+<li>Call that P value and all smaller than it statistically significant.</li>
+</ol>
+<blockquote>
+<p>The procedure guarantees that out of all statistically significant results, no more than q percent will be false positives.</p>
+<p>The Benjamini-Hochberg procedure is fast and effective, and it has been widely adopted by statisticians and scientists in certain fields. It usually provides better statistical power than the Bonferroni correction and friends while giving more intuitive results. It can be applied in many different situations, and variations on the procedure provide better statistical power when testing certain kinds of data.</p>
+<p>Of course, it's not perfect. In certain strange situations, the Benjamini-Hochberg procedure gives silly results, and it has been mathematically shown that it is always possible to beat it in controlling the false discovery rate. But it's a start, and it's much better than nothing. - (<a href="http://www.statisticsdonewrong.com/p-value.html#controlling-the-false-discovery-rate">Controlling the false discovery rate</a>, Alex Reinhart)</p>
+</blockquote>
+<h3>Sum of Squares</h3>
+<h4>The sum of squares within (SSW)</h4>
+<p><mathjax>$$ \SSW = \sum_{i=1}^m (\sum{j=1}^n (x_{ij} - \bar{x_i})^2) $$</mathjax></p>
+<ul>
+<li>This shows how much of SST is due to variation <em>within</em> each group, i.e. variation from within that group's mean.</li>
+<li>The degrees of freedom here is calculated <mathjax>$m(n-1)$</mathjax>.</li>
+</ul>
+<h4>The sum of squares between (SSB)</h4>
+<p><mathjax>$$ \SSB = \sum_{i=1}^m [n_m [(\bar{x_m} - \bar{\bar{x}})^2]] $$</mathjax></p>
+<ul>
+<li>This shows how much of SST is due to variation between the group means</li>
+<li>The degrees of freedom here is calculated <mathjax>$m-1$</mathjax>.</li>
+</ul>
+<h4>The total sum of squares (SST)</h4>
+<p><mathjax>$$ \SST = \sum_{i=1}^m (\sum{j=1}^n (x_{ij} - \bar{\bar{x}})^2) $$</mathjax><br />
+<mathjax>$$ \SST = \SSW + \SSB $$</mathjax></p>
+<ul>
+<li>Note: <mathjax>$\bar{\bar{x}}$</mathjax> is the mean of means, or the "grand mean".</li>
+<li>This is the total variation for the groups</li>
+<li>The degrees of freedom here is calculated <mathjax>$mn - 1$</mathjax>.</li>
+</ul>
+<h3>Statistical Tests</h3>
+<h4>Two-sided tests</h4>
+<p>Asks "What is the chance of seeing an effect as big as the observed effect, without regard to its sign?" That is, you are looking for any effect, increase or decrease.</p>
+<h4>One-sided tests</h4>
+<p>Asks "What is the chance of seeing an effect as big as the observed effect, with the same sign?" That is, you are looking for either only an increase or decrease.</p>
+<h4>Unpaired t-test</h4>
+<p>The most basic statistical test, used when comparing the means from two groups. Used for small sample sizes. The t-test returns a p-value.</p>
+<h4>Paired t-test</h4>
+<p>The paired t-test is a t-test used when each datapoint in one group corresponds to one datapoint in the other group.</p>
+<h4>Chi-squared test</h4>
+<p>When comparing proportions of two populations, it is common to use the chi-squared statistic:</p>
+<p><mathjax>$$
+\chi^2 = \sum_i \frac{(O_i - E_i)^2}{E_i}
+$$</mathjax></p>
+<p>Where <mathjax>$O_i$</mathjax> is the observed frequencies and <mathjax>$E_i$</mathjax> is the expected frequencies.</p>
+<p>Say for example you want to test if a coin is fair. You expect that, if it is fair, you should see about 50/50 heads and tails - this describes your expected frequencies. You flip the coin and observe the actual resulting frequencies - these are your observed frequencies.</p>
+<p>The Chi squared test allows you to determine if these frequencies differ significantly.</p>
+<h4>ANOVA (Analysis of Variance)</h4>
+<p>ANOVA, ANCOVA, MANOVA, and MANCOVA are various ways of comparing different groups.</p>
+<ul>
+<li>ANOVA - group A is given a placebo and group B is given the actual medication and the outcome variable to compare is how many pounds were lost</li>
+<li>ANCOVA - same as ANOVA but now there is an additional covariate we consider, e.g. hours of exercise per day</li>
+<li>MANOVA and MANCOVA are multivariate counterparts to the above, for instance we may consider cholesterol levels in addition to weight loss</li>
+</ul>
+<p>ANOVA is used to compare three or more groups. It uses a single test to compare the means across multiple groups simultaneously, which avoids using multiple tests to make multiple comparisons (which can lead to differences across groups resulting from chance).</p>
+<p>There are a few requirements:</p>
+<ul>
+<li>the observations are independent within and across groups</li>
+<li>the data within each group are nearly normal</li>
+<li>the variance in the groups are about equal across groups</li>
+</ul>
+<p>ANOVA tests the null hypothesis that the means across groups are the same (that is, that <mathjax>$\mu_1 = \dots = \mu_k$</mathjax>, if there are <mathjax>$k$</mathjax> groups), with the alternate hypothesis being that at least one mean is different. We look at the variability in the sample means and see if it is so large that it is unlikely to have been due to chance. THe variability we use is the <strong>mean square between groups</strong> (MSG) which has degrees of freedom <mathjax>$\df_G = k - 1$</mathjax>.</p>
+<p>The MSG is calculated:</p>
+<p><mathjax>$$
+\MSG = \frac{1}{\df_G}\SSG = \frac{1}{k-1} \sum_{i=1}^k n_i(\bar x_i - \bar x)^2
+$$</mathjax></p>
+<p>Where the SSG is the <strong>sum of squares between groups</strong> and <mathjax>$n_i$</mathjax> is the sample size of group <mathjax>$i$</mathjax> out of <mathjax>$k$</mathjax> total groups. <mathjax>$\bar x$</mathjax> is the mean of outcomes across all groups.</p>
+<p>We need a value to compare the MSG to, which is the <strong>mean square error</strong> (MSE), which measures the variability within groups and has degrees of freedom <mathjax>$\df_E = n - k$</mathjax>.</p>
+<p>The MSE is calculated:</p>
+<p><mathjax>$$
+\MSE = \frac{1}{\df_E}\SSE
+$$</mathjax></p>
+<p>Where the SSE is the <strong>sum of squared errors</strong> and is computed as:</p>
+<p><mathjax>$$
+\SSE = \SST - \SSG
+$$</mathjax></p>
+<p>Where the SSG is same as before and the SST is the <strong>sum of squares total</strong>:</p>
+<p><mathjax>$$
+\begin{aligned}
+\SST &amp;= \sum_{i=1}^n(x_i - \bar x)^2 \\
+\SSG = \sum_{i=1}^k n_i (\bar x_i - \bar x)^2
+\end{aligned}
+$$</mathjax></p>
+<p>ANOVA uses a test statistic called <mathjax>$F$</mathjax>, which is computed:</p>
+<p><mathjax>$$
+F = \frac{\MSG}{\MSE}
+$$</mathjax></p>
+<p>When the null hypothesis is true, difference in variability across sample means should be due only to chance, so we expect MSG and MSE to be about equal (and thus <mathjax>$F$</mathjax> to be close to 1).</p>
+<p>We take this <mathjax>$F$</mathjax> statistic and use it with a test called the <strong>F test</strong>, where we compute a p-value from the <mathjax>$F$</mathjax> statistic, using the F distribution, which has the parameters <mathjax>$\df_1$</mathjax> and <mathjax>$\df_2$</mathjax>. We expect ANOVA's <mathjax>$F$</mathjax> statistic to follow an F distribution with parameters <mathjax>$\df_1 = \df_G, \df_2 = \df_E$</mathjax> if the null hypothesis is true.</p>
+<h5>One-Way ANOVA</h5>
+<p>Similar to a t-test but used to compare three or more groups. With ANOVA, you calculate the <strong>F statistic</strong>, assuming the null hypothesis^[Remember that <mathjax>$\SSB$</mathjax> is the "sum of squares between" and <mathjax>$\SSW$</mathjax> is the "sum of squares within".]:</p>
+<p><mathjax>$$
+F = \frac{\frac{\SSB}{m-1}}{\frac{\SSW}{m(n-1)}}
+$$</mathjax></p>
+<h5>Two-Way ANOVA</h5>
+<p>Allows you to compare the means of two or more groups when there are multiple variables or factors to be considered.</p>
+<h4>One-tailed &amp; two-tailed tests</h4>
+<p>In a <strong>two-tailed test</strong>, both tails of a distribution are considered. For example, with a drug where you're looking for <em>any</em> effect, positive or negative.</p>
+<p>In a <strong>one-tailed</strong>, only one tail is considered. For example, you may be looking only for a positive or only for a negative effect.</p>
+<h3>Effect Size</h3>
+<p>A big part of statistical inference is measuring <em>effect size</em>, which more generally is trying to quantify differences between groups, but typically just referred to as "effect size".</p>
+<p>There are a few ways of measuring effect size:</p>
+<h4>Difference in means</h4>
+<p>The difference in means, e.g. <mathjax>$\mu_1 - \mu_2$</mathjax></p>
+<p>But this has a few problems:</p>
+<ul>
+<li>Must be expressed in the units of measure of the mean (e.g. ft, kg, etc), so it can be difficult to compare to other studies</li>
+<li>Needs more context about the distributions (e.g. standard deviation) to understand if the difference is large or not</li>
+</ul>
+<h4>Distribution overlap</h4>
+<p>The overlap between the two distributions:</p>
+<p>Choose some threshold between the two means, e.g.</p>
+<ul>
+<li>The midpoint between the means: <mathjax>$\frac{\mu_1 + \mu_2}{2}$</mathjax></li>
+<li>Where the PDFs cross: <mathjax>$\frac{\sigma_1\mu_1 + \sigma_2\mu_2}{\sigma_1 + \sigma_2}$</mathjax></li>
+</ul>
+<p>Count how many in the first group are below the threshold, call it <mathjax>$m_1$</mathjax><br />
+Count how many in the second group are above the threshold, call it <mathjax>$m_2$</mathjax>.</p>
+<p>The overlap then is:</p>
+<p><mathjax>$$
+\frac{m_1}{n_1} + \frac{m_2}{n_2}
+$$</mathjax></p>
+<p>Where <mathjax>$n_1, n_2$</mathjax> are the sample sizes of the first and second groups, respectively.</p>
+<p>This overlap can also be framed as a <em>misclassification rate</em>, which is just <mathjax>$\frac{\text{overlap}}{2}$</mathjax>.</p>
+<p>These measures are unitless, which makes them easy to compare across studies.</p>
+<h4>Probability of superiority</h4>
+<p>The "probability of superiority" is the probability that a randomly chosen datapoint from group 1 is greater than a randomly chosen datapoint from group 2.</p>
+<p>This measure is also unitless.</p>
+<h4>Cohen's <mathjax>$d$</mathjax></h4>
+<p>Cohen's <mathjax>$d$</mathjax> is the difference in means, divided by the standard deviation, which is computed from the pooled variance, <mathjax>$\sigma_p^2$</mathjax>, of the groups:</p>
+<p><mathjax>$$
+\begin{aligned}
+\sigma_p^2 &amp;= \frac{n_1\sigma_1^2 + n_2\sigma_2^2}{n_1+n_2} \\
+d &amp;= \frac{\mu_1 - \mu_2}{\sqrt{\sigma_p^2}}
+\end{aligned}
+$$</mathjax></p>
+<p>This measure is also unitless.</p>
+<p>Different fields have different intuitions about how big a <mathjax>$d$</mathjax> value is; it's something you have to learn.</p>
+<h3>Reliability</h3>
+<p><em>Reliability</em> refers to how consistent or repeatable a measurement is (for continuous data).</p>
+<p>There are three main approaches:</p>
+<h4>Multiple-occasions reliability</h4>
+<p>Aka <em>test-retest reliability</em>. This is how a test holds up over repeated testing, e.g. "temporal stability". This assumes the underlying metric does not change.</p>
+<h4>Multiple-forms reliability</h4>
+<p>Aka <em>parallel-forms reliability</em>. This asks: how consistent are different tests at measuring the same thing?</p>
+<h4>Internal consistency reliability</h4>
+<p>This asks: do the items on a test all measure the same thing?</p>
+<h3>Agreement</h3>
+<p><em>Agreement</em> is similar to reliability, but used more for discrete data.</p>
+<h4>Percent agreement</h4>
+<p><mathjax>$$
+\frac{\text{number of cases where tests agreed}}{\text{all cases}}
+$$</mathjax></p>
+<p>Note that a high percent agreement may be obtained by chance.</p>
+<h4>Cohen's kappa</h4>
+<p>Often just called kappa, this corrects for the possibility of chance agreement:</p>
+<p><mathjax>$$
+\kappa = \frac{p_o - p_e}{1 - p_e}
+$$</mathjax></p>
+<p>Where <mathjax>$p_o$</mathjax> is the <em>observed agreement</em>, that is, <mathjax>$\frac{\text{num. agreement}}{\text{total cases}}$</mathjax>, and <mathjax>$p_e$</mathjax> is the <em>expected agreement</em>. Kappa ranges from -1 to 1, where 1 is perfect agreement.</p>
+<h2>Handling Data</h2>
+<h3>Transforming data</h3>
+<p>Occasionally you may find data easier to work with if you apply a <strong>transformation</strong> to it; that is, rescale it in some way. For instance, you might take the natural log of your values, or the square root, or the inverse. This can reduce skew and the effect of outliers or make linear modeling easier.</p>
+<p>The function which applies this transformation is called a <strong>link function</strong>.</p>
+<h3>Dealing with missing data</h3>
+<p>Data can be missing for a few reasons:</p>
+<ul>
+<li><em>Missing completely at random</em> (MCAR) - missing cases are identical to non-missing cases, on average.</li>
+<li><em>Missing at random</em> (MAR) - Missing data depends on measured values, so they can be modeled by other observed variables.</li>
+<li><em>Missing not at random</em> (MNAR) - Missing data depends on unmeasured/unknown variables, so there is no way to account for them.</li>
+</ul>
+<p>There are a few strategies for dealing with missing data.</p>
+<p>The worst you can do is to ignore the missing data and try to run your analysis, missing data and all (it likely won't and probably shouldn't work).</p>
+<p>Alternatively, you can delete all datapoints which have missing data, leaving only complete data points - this is called <strong>complete case analysis</strong>. Complete case analysis makes the most sense with MCAR missing data - you will have a reduction in sample size, and thus a reduction in statistical power, as a result, but your inference will not be biased. The possibly systemic nature of missing data in MAR and MNAR means that complete case analysis may overlook important details for your model.</p>
+<p>You also have the option of filling in missing values - this is called <strong>imputation</strong> (you "impute" the missing values). You can, for instance, filling in missing values with the mean of that variable. You don't gain any of the information that was missing, and you end up ignoring the uncertainty associated with the fill-in value (and the resulting variances will be <em>artificially reduced</em>), but you at least get to maintain your sample size. Again, bias may be introduced in MAR and MNAR situations since the missing data may be due to some systemic cause.</p>
+<p>One of the better approaches is <strong>multiple imputation</strong>, which produces unbiased parameter estimates and accounts for the uncertainty of imputed values. A regression model is used to generated the imputed values, and does well especially under MAR conditions - the regression model may be able to exploit info in the dataset about the missing data. If some known values correlate with the missing values, they can be of use in this way.</p>
+<p>Then, instead of using the regression model to produce one value for each missing value, multiple values are produced, so that the end result is multiple copies of your dataset, each with different imputed values for the missing values. Your perform your analysis across all datasets and average the produced estimates.</p>
+<h3>Resampling</h3>
+<p>Resampling involves repeatedly drawing subsamples from an existing sample.</p>
+<p>Resampling is useful for assessing and selecting models and for estimating the precision of parameter estimates.</p>
+<p>A common resampling method is <strong>bootstrapping</strong>.</p>
+<h4>Bootstrapping</h4>
+<p>Bootstrapping is a resampling method to approximate the true sampling distribution of a dataset, which can then be used to estimate the mean and the variance of the distribution. The advantage with bootstrapping is that there is no need to compute derivatives or make assumptions about the distribution's form.</p>
+<p>You take <mathjax>$R$</mathjax> samples <mathjax>$S_i^*$</mathjax>, with replacement, each of size <mathjax>$n$</mathjax> (i.e. each resample is the same size as the original sample), from your dataset. These samples, <mathjax>$S^*=\\{S_1^*, \dots, S_R^*\\}$</mathjax> are called <em>replicate</em> bootstrap samples. Then you can compute an estimate of the <mathjax>$t$</mathjax> statistic for each of the bootstrap samples, <mathjax>$T_i^* = t(S_i^*)$</mathjax>.</p>
+<p>Then you can estimate the mean and variance:</p>
+<p><mathjax>$$
+\begin{aligned}
+\bar T^* = \hat E[T^*] &amp;= \frac{\sum_i T_i^*}{R} \\
+\hat \Var(T^*) &amp;= \frac{\sum_i (T_i^* - \bar T^*)^2}{R-1}
+\end{aligned}
+$$</mathjax></p>
+<p>With bootstrap estimates, there are two possible sources of error. You may have the <strong>sampling error</strong> from your original sample <mathjax>$S$</mathjax> in addition to the <strong>bootstrap error</strong>, from failing to be comprehensive in your sampling of bootstrap samples. To avoid the latter, you should try to choose a large <mathjax>$R$</mathjax>, such as <mathjax>$R=1000$</mathjax>.</p>
+<h2>References</h2>
+<ul>
+<li>Review of fundamentals, IFT725. Hugo Larochelle. 2012.</li>
+<li><a href="https://sux13.github.io/DataScienceSpCourseNotes/6_STATINFERENCE/Statistical_Inference_Course_Notes.pdf">Statistical Inference Course Notes</a>, Xing Su</li>
+<li><a href="https://sux13.github.io/DataScienceSpCourseNotes/7_REGMODS/Regression_Models_Course_Notes.pdf">Regression Models Course Notes</a>, Xing Su</li>
+<li><em>Statistics in a Nutshell</em>. Second Edition. Sarah Boslaugh.</li>
+<li><a href="https://stats.stackexchange.com/questions/71962/what-is-the-difference-between-descriptive-and-inferential-statistics">What is the difference between descriptive and inferential statistics?</a>. Jeromy Anglim.</li>
+<li><a href="http://www.countbayesie.com/blog/2015/2/21/variance-co-variance-and-correlation">Understanding Variance, Co-Variance, and Correlation</a>. <a href="https://www.countbayesie.com/">Count Bayesie</a>. Will Kurt.</li>
+<li><a href="http://greenteapress.com/thinkstats/">Think Stats: Exploratory Data Analysis in Python</a>. Version 2.0.27. Allen B Downey.</li>
+<li><em>Principles of Statistics</em>, M.G. Bulmer. 1979.</li>
+<li><a href="https://www.openintro.org/stat/textbook.php?stat_book=os">OpenIntro Statistics</a>. Second Edition. David M Diez, Christopher D Barr, Mine Çetinkaya-Rundel.</li>
+<li><a href="https://sites.google.com/site/pyinference/home/scipy-2015">Computational Statistics I</a>. Allen Downey. SciPy 2015.</li>
+<li><a href="https://www.youtube.com/watch?v=heFaYLKVZY4">Computational Statistics II</a> (<a href="https://github.com/fonnesbeck/scipy2015_tutorial">code</a>). Chris Fonnesbeck. SciPy 2015.</li>
+<li><a href="https://github.com/fonnesbeck/scipy2014_tutorial">Bayesian Statistical Analysis</a>. Chris Fonnesbeck. SciPy 2014.</li>
+<li><a href="http://cs229.stanford.edu/materials.html">Lecture Notes from CS229</a> (Stanford).</li>
+<li><em>Data Analysis Using Regression and Multilevel/Hierarchical Models</em>. First edition. Andrew Gelman and Jennifer Hill.</li>
+<li><a href="http://jakevdp.github.io/blog/2014/03/11/frequentism-and-bayesianism-a-practical-intro/">Frequentism and Bayesianism: A Practical Introduction</a>. Jake Vanderplas</li>
+<li><a href="https://www.coursera.org/learn/machine-learning">Machine Learning</a>. 2014. Andrew Ng. Stanford University/Coursera.</li>
+<li><a href="https://www.udacity.com/wiki/cs271">Introduction to Artificial Intelligence</a> (Udacity CS271). Peter Norvig and Sebastian Thrun.</li>
+<li><a href="http://www-labs.iro.umontreal.ca/~bengioy/dlbook/">Deep Learning</a>. Yoshua Bengio, Ian Goodfellow, Aaron Courville.</li>
+<li><a href="http://www.statisticsdonewrong.com/p-value.html#controlling-the-false-discovery-rate">Controlling the false discovery rate</a>. Alex Reinhart.</li>
+<li><a href="http://www.statisticsdonewrong.com/p-value.html">The p value and the base rate fallacy</a>. Alex Reinhart.</li>
+<li><em>Toward Evidence-Based Medical Statistics. 1: The P Value Fallacy</em>, Steven N. Goodman, MD, PhD</li>
+<li><em>Misinterpretations of Significance: A Problem Students Share with Their Teachers?</em>, Heiko Haller &amp; Stefan Krauss</li>
+<li><a href="http://www.statisticsdonewrong.com/">Statistics Done Wrong</a>, Alex Reinhart<br />
+G- Stevens, S. S. (1946). <a href="http://gaius.fpce.uc.pt/niips/novoplano/mip1/mip1_201314/scales/Stevens_1946.pdf">On the theory of scales of measurement</a>.<br />
+e</li>
+</ul>
+<p>数据集中出现最频繁的值, 例如:</p>
+<p>The most frequently occurring value in the dataset, e.g.</p>
+<p><mathjax>$$ 1 \; 2 \; 3 \; 3 \; 2 \; 3\; 4 \; 3 $$</mathjax><br />
+<mathjax>$$ \text{mode} = 3 $$</mathjax></p>
+<figure><img alt="Central tendencies for a distribution" src="../assets/central_tendencies.svg" /><figcaption>Central tendencies for a distribution</figcaption>
+</figure>
+<h3>Population vs Sample</h3>
+<p>With statistics we take a <strong>sample</strong> of a broader <strong>population</strong> or already have data which is a sample from a population. We use this limited sample in order to learn things about the whole population.</p>
+<p>The mean of the population is denoted <mathjax>$\mu$</mathjax> and consists of <mathjax>$N$</mathjax> items, whereas the mean of the sample (i.e. the <em>sample mean</em>, sometimes called the <em>empirical mean</em>) is notated <mathjax>$\bar x$</mathjax> or <mathjax>$\hat \mu$</mathjax> and consists of <mathjax>$n$</mathjax> items.</p>
+<p>The sample mean is:</p>
+<p><mathjax>$$
+\hat \mu = \frac{1}{n}\sum_i x^{(i)}
+$$</mathjax></p>
+<p>The sample variance is:</p>
+<p><mathjax>$$
+\hat \sigma^2 = \frac{1}{n-1} \sum_i (x^{(i)} - \hat \mu)^2
+$$</mathjax></p>
+<p>The sample covariance matrix is:</p>
+<p><mathjax>$$
+\hat \Sigma = \frac{1}{n-1} \sum_i (x^{(i)} - \hat \mu)(x^{(t)} - \hat \mu)^T
+$$</mathjax></p>
+<p>These estimators are unbiased, i.e.:</p>
+<p><mathjax>$$
+\begin{aligned}
+E[\hat \mu] &amp;= \mu \\
+E[\hat \sigma^2] &amp;= \sigma^2 \\
+E[\hat \Sigma] &amp;= \Sigma
+\end{aligned}
+$$</mathjax></p>
+<h3>Independent and Identically Distributed</h3>
+<p>Often in statistics we assume that a sample is <strong>independent and identically distributed</strong> (iid); that is; that the data points are independent from one another (the outcome of one has no influence over the outcome of any of the others) and that they share the same distribution.</p>
+<p>We say that <mathjax>$X_1, \dots, X_n$</mathjax> are iid if they are independent and drawn from the same distribution, that is <mathjax>$P(X_1) = \dots = P(X_n)$</mathjax>. This can also be stated:</p>
+<p><mathjax>$$
+P(X_1, \dots, X_n) = \prod_i P(X_i)
+$$</mathjax></p>
+<p>In this case, they all share the same mean (expected value) and variance.</p>
+<p>This assumption makes computing statistics for the sample much easier.</p>
+<p>For instance, if a sample was not identically distributed, each datapoint might come from a different distribution, in which case there are different means and variances for each datapoint which must be computed from each of those datapoints alone. They can't really be treated as a group since the datapoints aren't quite equivalent to each other (in a statistical sense).</p>
+<p>Or, if the sample was not independent, then we lose all the conveniences that come with independence.</p>
+<p>The IID assumption doesn't always hold (i.e. it may be violated), of course, so there are other ways of approaching such situations while minimizing complexity, such as Hidden Markov Models.</p>
+<h3>The Law of Large Numbers (LLN)</h3>
+<p>Let <mathjax>$X_1, \dots X_n$</mathjax> be iid with mean <mathjax>$\mu$</mathjax>.</p>
+<p>The <strong>law of large numbers</strong> essentially states that as a sample size approaches infinity, its mean will approach the population ("true") mean:</p>
+<p><mathjax>$$
+\lim_{n \to \infty} \frac{1}{n} \sum^n_{i=1} X_i = \mu
+$$</mathjax></p>
+<h3>Regression to the mean</h3>
+<p><mathjax>$P(Y &lt; x|X = x)$</mathjax> gets bigger as <mathjax>$x$</mathjax> approaches very large values. That is, given a very large <mathjax>$X$</mathjax> (an extreme), the chance that <mathjax>$Y$</mathjax>'s value is as large as or larger than <mathjax>$X$</mathjax> is unlikely.</p>
+<p><mathjax>$P(Y &gt; x|X = x)$</mathjax> gets bigger as <mathjax>$x$</mathjax> approaches very small values. That is, given a very small <mathjax>$X$</mathjax> (an extreme), the chance that <mathjax>$Y$</mathjax>'s value is as small as or smaller than <mathjax>$X$</mathjax> is unlikely.</p>
+<h3>Central Limit Theorem (CLT)</h3>
+<p>Say you have a set of data. Even if the distribution of that data is not normal, you can divide the data into groups (samples) and then average the values of those groups. Those averages will approach the form of a normal curve as you increase the size of those groups (i.e. increase the sample size).</p>
+<p>Let <mathjax>$X_1, \dots X_n$</mathjax> be iid with mean <mathjax>$\mu$</mathjax> and variance <mathjax>$\sigma^2$</mathjax>.</p>
+<p>Then the <strong>central limit theorem</strong> can be formalized as:</p>
+<p><mathjax>$$
+\sqrt \frac{n}{\sigma^2} ((\frac{1}{n} \sum^n_{i=1} X_i) - \mu) \xrightarrow{D} N(0,1)
+$$</mathjax></p>
+<p>That is, the left side <em>converges in distribution</em> to a normal distribution with mean 0 and variance 1 as <mathjax>$n$</mathjax> increases.</p>
+<h3>Dispersion (Variance and Standard Deviation)</h3>
+<p>Dispersion is the "spread" of a distribution - how spread it out its values are.</p>
+<p>The main measures of dispersion are the variance and the standard deviation.</p>
+<h4>Standard Deviation</h4>
+<p>Standard deviation is represented by <mathjax>$\sigma$</mathjax> (sigma) and describes the variation from the mean (<mathjax>$\mu$</mathjax>, i.e. the expected value), calculated:</p>
+<p><mathjax>$$ \sigma = \sqrt{E[(X-\mu)^2]} = \sqrt{E[X^2] - (E[X])^2} $$</mathjax></p>
+<h4>Variance</h4>
+<p>The square of the standard deviation, that is, <mathjax>$E[(X-\mu)^2]$</mathjax>, is the <strong>variance</strong> of <mathjax>$X$</mathjax>, usually notated <mathjax>$\sigma^2$</mathjax>. It can also be written:</p>
+<p><mathjax>$$ \Var(X) = \sigma^2 = E(X^2) - E(X)^2 = \frac{\sum_{i=1}^N(x_i - \mu^2)}{N} $$</mathjax></p>
+<p>For a population of size <mathjax>$N$</mathjax> of datapoints <mathjax>$x$</mathjax>.</p>
+<p>That is, variance is the difference between the square of the inputs and the square of the expected value.</p>
+<h4>Coefficient of variation (CV)</h4>
+<p>Variance depends on the units of measurement, but this can be controlled for by computing the <strong>coefficient of variation</strong>:</p>
+<p><mathjax>$$
+CV = \frac{\sigma}{\bar x} \times 100%
+$$</mathjax></p>
+<p>This allows us to compare variability across variables measured in different units.</p>
+<h4>Variance of a linear combination of random variables</h4>
+<p>The variance of a linear combination of (independent) random variables, e.g. <mathjax>$aX + bY$</mathjax>, can be computed:</p>
+<p><mathjax>$$
+\Var(\beta_1 X_1 + \dots + \beta_n X_n) = \beta_1^2 \Var(X_1) + \dots + \beta_n^2 \Var(X_n)
+$$</mathjax></p>
+<h4>Range</h4>
+<p>The <strong>range</strong> can also be used to get a sense of dispersion. The range is the difference between the highest and lowest values, but very sensitive to outliers.</p>
+<p>As an alternative to the range, you can look at the <strong>interquartile range</strong>, which is the range of the middle 50% of the values (that is, the difference of the 75th and 25th percentile values). This is less sensitive to outliers.</p>
+<h4>Z score</h4>
+<p>A <strong>Z score</strong> is just the number of standard deviations a value is from the mean. It is defined:</p>
+<p><mathjax>$$
+Z = \frac{x-\mu}{\sigma}
+$$</mathjax></p>
+<h4>The Empirical Rule</h4>
+<p>The <strong>empirical rule</strong> describes that, for a normal distribution, there is:</p>
+<ul>
+<li>a 68% chance that a value falls within one standard deviation</li>
+<li>a 95% chance that something falls within two standard deviations</li>
+<li>a 99.7% chance that something falls within three standard deviations</li>
+</ul>
+<figure><img alt="The Empirical Rule" src="../assets/empirical_rule.svg" /><figcaption>The Empirical Rule</figcaption>
+</figure>
+<h4>Pooled standard deviation estimates</h4>
+<p>If you have reason to expect that the standard deviations of two populations are practically identical, you can use the <strong>pooled standard deviation</strong> of the two groups to obtain a more accurate estimate of the standard deviation and standard error:</p>
+<p><mathjax>$$
+s^2_{\text{pooled}} = \frac{s_1^2(n_1 - 1) + s_2^2 (n_2 -1)}{n_1 + n_2 -2}
+$$</mathjax></p>
+<p>Where <mathjax>$n_1, n_2, s_1, s_2$</mathjax> are the sample sizes and standard deviations of the sample groups. We must update the degrees of freedom as well, <mathjax>$\df = n_1 + n_2 - 2$</mathjax>, which we can use for a new t-distribution.</p>
+<h3>Moments</h3>
+<p>The <mathjax>$k$</mathjax>th <strong>moment</strong>, <mathjax>$m_k(X)$</mathjax>, where <mathjax>$k \in {1,2,3,\dots}$</mathjax> (i.e. it is a positive integer), is <mathjax>$E[X^k]$</mathjax>. So the first moment is just the mean, <mathjax>$E[X]$</mathjax>.</p>
+<p>The <mathjax>$k$</mathjax>th <strong>central moment</strong> is <mathjax>$E[(X-E[X])^k]$</mathjax>. So the second central moment is just the variance, <mathjax>$E[(X-E[X])^2]$</mathjax>.</p>
+<p>The third moment is the <strong>skewness</strong>, and the fourth moment is the <strong>kurtosis</strong>; they all share the same form (with different normalization terms):</p>
+<p><mathjax>$$
+\begin{aligned}
+\text{skewness} &amp;= E[(X - \mu)^3 \frac{1}{\sigma^3}] \\
+\text{kurtosis} &amp;= E[(X - \mu)^4] \frac{1}{\sigma^4}
+\end{aligned}
+$$</mathjax></p>
+<p>Moments have different units, e.g. the first moment might be in meters (<mathjax>$m$</mathjax>), the second moment would be <mathjax>$m^2$</mathjax>, and so on, so it is typical to standardize moments by taking their <mathjax>$k$</mathjax>-th root, e.g. <mathjax>$\sqrt{m^2}$</mathjax></p>
+<h3>Covariance</h3>
+<p>The <strong>covariance</strong> describes the variance between two random variables.</p>
+<p>For random variables <mathjax>$x$</mathjax> and <mathjax>$y$</mathjax>, the covariance is (remember, <mathjax>$E(x)$</mathjax> denotes the expected value of random variable <mathjax>$x$</mathjax>):</p>
+<p><mathjax>$$ \Cov(x, y) = E[(x-E(x))(y-E(y))] = \frac{1}{n} \sum (x_i - \bar x)(y_i - \bar y)$$</mathjax></p>
+<p>There must the same number of values <mathjax>$n$</mathjax> for each.</p>
+<p>This is simplified to:</p>
+<p><mathjax>$$ \Cov(x,y) = E[xy] - E[y]E[x] \approx \bar{xy} - \bar{y}\bar{x} $$</mathjax></p>
+<p>A positive covariance means that as <mathjax>$x$</mathjax> goes up, <mathjax>$y$</mathjax> goes up.<br />
+A negative covariance means that as <mathjax>$x$</mathjax> goes up, <mathjax>$y$</mathjax> goes down.</p>
+<p>Note that variance is just the covariance of a random variable with itself:</p>
+<p><mathjax>$$ \Var(X) = E(XX) - E(X)E(X) = \Cov(X, X) $$</mathjax></p>
+<h3>Correlation</h3>
+<p><strong>Correlation</strong> gives us a measure of relatedness between two variables. Alone it does not imply causation, but it can help guide more formal inquiries (e.g. experiments) into causal relationships.</p>
+<p>A good way to visually intuit correlation is through scatterplots.</p>
+<p>We can measure correlation with <strong>correlation coefficients</strong>. These measure the strength and sign of a relationship (but not the slope, <em>linear regression</em>, detailed later, does that).</p>
+<p>Some of the more common correlation coefficients include:</p>
+<ul>
+<li><strong>Pearson product-moment</strong> (used where both variables are on an interval or ratio scale)</li>
+<li><strong>Spearman rank-order</strong> (where both variables are on ordinal scales)</li>
+<li><strong>Phi</strong> (where both variables are on nominal/categorical/dichotomous/binary scales)</li>
+<li><strong>Point biserial</strong> (where one variable is on a nominal/categorical/dichotomous/binary scale and the other is on an interval or ratio scale)</li>
+</ul>
+<p>The Pearson and Spearman coefficients are the most commonly used ones, but sometimes the later two are used in special cases (e.g. with categorical data).</p>
+<h4>Pearson product-moment correlation coefficient (Pearson's correlation)</h4>
+<p><mathjax>$$
+r = \frac{\sum^n_{i=1}(\frac{x_i - \bar x}{s_x})(\frac{y_i - \bar y}{s_y})}{n-1}
+$$</mathjax></p>
+<p>Note: this is sometimes denoted as a capital <mathjax>$R$</mathjax></p>
+<p>You may recognize this as:</p>
+<p><mathjax>$$
+\frac{\Cov(X,Y)}{S_X S_Y}
+$$</mathjax></p>
+<p>Here we convert our values to <strong>standard scores</strong>, i.e. <mathjax>$\frac{x_i - \bar x}{s_x}$</mathjax>. This standardizes the values such that their mean is 0 and their variance is 1 (and so they are unitless)</p>
+<p>For a population, <mathjax>$r$</mathjax> is notated <mathjax>$\rho$</mathjax> (rho).</p>
+<p>This value can range from <mathjax>$[-1, 1]$</mathjax>, where 1 and -1 mean complete correlation and 0 means no correlation.</p>
+<p>To test the statistical significance of the Pearson correlation coefficient, you can use the <mathjax>$t$</mathjax> statistic.</p>
+<p>For instance, if you believe there is a relationship between two variables, you set your null hypothesis as <mathjax>$\rho = 0$</mathjax> and then with your estimate of <mathjax>$r$</mathjax>, calculate the <mathjax>$t$</mathjax> statistic:</p>
+<p><mathjax>$$
+t = \frac{r}{\sqrt{\frac{1-r^2}{n-2}}}
+$$</mathjax></p>
+<p>Then look up the value in a <mathjax>$t$</mathjax> table.</p>
+<p>The Pearson correlation coefficient tells you the strength and direction of a relationship, but it doesn't tell you how much variance of one variable is explained by the other.</p>
+<p>For that, you can use the <strong>coefficient of determination</strong> which is just <mathjax>$r^2$</mathjax>. So for instance, if you have <mathjax>$r=0.9$</mathjax>, then <mathjax>$r^2 = 0.81$</mathjax> which means 81% of the variation of one variable is explained by the other.</p>
+<p>Note that Pearson's correlation only accurately measures linear relationships; so even if you have a Pearson correlation near 0, it is still possible that there may be a strong nonlinear relationship. It's worthwhile to look at a scatter plot to verify.</p>
+<p>It is also not robust in the presence of outliers.</p>
+<h4>Spearman rank-order correlation coefficient (Spearman's rank correlation)</h4>
+<p>Here you compute ranks (i.e. the indices in the sorted sample) rather than standard scores.</p>
+<p>For example, for the dataset <mathjax>$[1,10,100]$</mathjax>, the rank of the value <mathjax>$10$</mathjax> is <mathjax>$2$</mathjax> because it is second in the sorted list.</p>
+<p>Then you can compute the Spearman correlation:</p>
+<p><mathjax>$$
+r_s = 1 - \frac{(6 \sum d^2)}{n(n^2 - 1)}
+$$</mathjax></p>
+<p>Where <mathjax>$d$</mathjax> is the difference in ranks for each datapoint.</p>
+<p>Generally, you can interpret <mathjax>$r_s$</mathjax> in the following ways:</p>
+<ul>
+<li><mathjax>$0.9 \leq r_s \leq 1$</mathjax> - very strong correlation</li>
+<li><mathjax>$0.7 \leq r_s \leq 0.9$</mathjax> - strong correlation</li>
+<li><mathjax>$0.5 \leq r_s \leq 0.7$</mathjax> - moderate correlation</li>
+</ul>
+<p>You can test its statistical significance using a <mathjax>$z$</mathjax> test, where the null hypothesis is that <mathjax>$r_s=0$</mathjax>.</p>
+<p><mathjax>$$
+z = r_s \sqrt{n-1}
+$$</mathjax></p>
+<p>Spearman's correlation is more robust to outliers and skewed distributions.</p>
+<h4>Point-Biserial correlation coefficient</h4>
+<p>This correlation coefficient is useful when comparing a categorical (binary) variable with an interval or ratio scale variable:</p>
+<p><mathjax>$$
+r_{pbi} = \frac{M_p - M_q}{S_t} \sqrt{pq}
+$$</mathjax></p>
+<p>Where <mathjax>$M_p$</mathjax> is the mean for the datapoints categorized as 1 and <mathjax>$M_q$</mathjax> is the mean for the datapoints categorized as 0.<br />
+<mathjax>$S_t$</mathjax> is the standard deviation for the interval/ratio variable, <mathjax>$p$</mathjax> is the proportion of datapoints categorized as 1, and <mathjax>$q$</mathjax> is the proportion of datapoints categorized as 0.</p>
+<h4>Phi correlation coefficient</h4>
+<p>This allows you to measure the correlation between two categorical (binary) variables.</p>
+<p>It is calculated like so:</p>
+<p><mathjax>$$
+\begin{aligned}
+A &amp;= f(0,1) \\
+B &amp;= f(1,1) \\
+C &amp;= f(0,0) \\
+D &amp;= f(1,0) \\
+r_{\phi} &amp;= \frac{AD-BC}{\sqrt{(A+B)(C+D)(A+C)(B+D)}}
+\end{aligned}
+$$</mathjax></p>
+<p>Where <mathjax>$f(a,b)$</mathjax> is the frequency of label <mathjax>$a$</mathjax> and label <mathjax>$b$</mathjax> occurring together in the data.</p>
+<h3>Degrees of Freedom</h3>
+<p><strong>Degrees of freedom</strong> describes the number of variables that are "free" in what value they can take. Often a given variable must be a particular value because of the values the other variables take on and some constraint(s).</p>
+<p>For example: say we have four unknown quantities <mathjax>$x_1, x_2, x_3, x_4$</mathjax>. We know that their mean is 5. In this case we have three degrees of freedom - this is because three of the variables are free to take arbitrary values, but once those three are set, the fourth value <em>must</em> be equal to <mathjax>$x_4 = 20 - x_1 - x_2 - x_3$</mathjax> in order for the mean to be 5 (that is, in order to satisfy the constraint). So for instance, if <mathjax>$x_1=2, x_2=4, x_3=6$</mathjax>, then <mathjax>$x_4$</mathjax> <em>must</em> equal 8. It is not "free" to take on any other value.</p>
+<h3>Time Series Analysis</h3>
+<p>Often data has a temporal component; e.g. you are looking for patterns over time.</p>
+<p>Generally, time series data may have the following parts: a <strong>trend</strong>, which is some function reflecting persistent changes, <strong>seasonality</strong>; that is, periodic variation, and of course there is going to be some noise - random variation - as well.</p>
+<h4>Moving averages</h4>
+<p>To extract a trend from a series, you can use regression, but sometimes you will be better off with some kind of <strong>moving average</strong>. This divides the series into overlapping regions, <strong>windows</strong>, of some size, and takes the averages of each window. The <strong>rolling mean</strong> just takes the mean of each window. There is also the <strong>exponentially-weighted moving average</strong> (EWMA) which gives a weighted average, such that more recent values have the highest weight, and values before that have weights which drop off exponentially. The EWMA takes an additional <strong>span</strong> parameter which determines how fast the weights drop off.</p>
+<h4>Serial correlation (autocorrelation)</h4>
+<p>In time series data you may expect to see patterns. For example, if a value is low, it may stay low for a bit, if it's high, it may stay high for a bit. These types of patterns are <strong>serial correlations</strong>, also called <strong>autocorrelation</strong> (so-called because it is correlated a dataset with itself, in some sense), because the values correlate in their sequence.</p>
+<p>You can compute serial correlation by shifting the time series by some interval, called a <strong>lag</strong>, and then compute the correlation of the shifted series with the original, unshifted series.</p>
+<h3>Survival Analysis</h3>
+<p>Survival analysis describes how long something lasts. It can refer to the survival of, for instance, a person - in the context of disease, a 5-year survival rate is the probability of surviving 5 years after diagnosis, for example - or a mechanical component, and so on. More broadly it can be seen as looking at how long something lasts until something happens - for instance, how long until someone gets married.</p>
+<p>A <strong>survival curve</strong> is a function <mathjax>$S(t)$</mathjax> which computes the probability of surviving longer than duration <mathjax>$t$</mathjax>. Such a duration is called a <strong>lifetime</strong>.</p>
+<p>The survival curve ends up just being the complement of the CDF:</p>
+<p><mathjax>$$
+S(t) = 1 - \CDF(t)
+$$</mathjax></p>
+<p>Looking at it this way, the CDF is the probability of a lifetime <em>less than or equal</em> to <mathjax>$t$</mathjax>.</p>
+<h4>Hazard function</h4>
+<p>A <strong>hazard function</strong> tells you the fraction of cases that continue until <mathjax>$t$</mathjax> and then end at <mathjax>$t$</mathjax>. It can be computed from the survival curve:</p>
+<p><mathjax>$$
+\lambda(t) = \frac{S(t) - S(t+1)}{S(t)}
+$$</mathjax></p>
+<p>Hazard functions are also used for estimating survival curves.</p>
+<h4>Estimating survival curves: Kaplan-Meier estimation</h4>
+<p>Often we do not have the CDF of lifetimes so we can't easily compute the survival curve. We often have non-survival cases alongside have survival cases, where we don't yet know what their final lifetime will be. Often, as is the case in the medical context, we don't want to wait to learn what these unknown lifetimes will be. So we need to estimate the survival curve with the data we do have.</p>
+<p>The Kaplan-Meier estimation allows us to do this. We can use the data we have to estimate the hazard function, and then convert that into a survival curve.</p>
+<p>We can convert a hazard function into an estimate of the survival curve, where each point at time <mathjax>$t$</mathjax> is computed by taking the product of complementary hazard functions through that time <mathjax>$t$</mathjax>, like so:</p>
+<p><mathjax>$$
+\prod_t (1 - \lambda(t))
+$$</mathjax></p>
+<h2>Inferential Statistics</h2>
+<p>Statistical inference is the practice of using statistics to <em>infer</em> some conclusion about a population based on only a sample of that population. This can be the population's distribution - we want to infer from the sample data what the "true" distribution (the population distribution) is and the unknown parameters that define it.</p>
+<p>Generally, data is generated by some <em>process</em>; this data-generating process is also <em>noisy</em>; that is, there is a relatively small degree of imprecision or fluctuation in values due to randomness. In inferential statistics, we try to uncover the particular function that describes this process as closely as possible. We do so by choosing a <em>model</em> (e.g. if we believe it can be modeled linearly, we might choose linear regression, otherwise we might choose a different kind of model such as a probability distribution; modeling is covered in greater detail in the machine learning part). Once we have chosen the model, then we need to determine the <em>parameters</em> (linear coefficients, for example, or mean and variance for a probability distribution) for that model.</p>
+<p>Broadly, the two paradigms of inference are <strong>frequentist</strong>, which relies on long-run repetitions of an event, that is, it is <em>empirical</em> (and could be termed the "conventional" or "traditional" framework, though there's a lot of focus on Bayesian inference now) and <strong>Bayesian</strong>, which is about generating a hypothesis distribution (the prior) and updating it as more evidence is acquired. Bayesian inference is valuable because there are many events which we cannot repeat, but we still want to learn something about.</p>
+<p>The frequentist believes these unknown parameters have precise "true" values which can be (approximately) uncovered. In frequentist statistics, we can estimate these exact values. When we estimate a single value for an unknown, that estimation is called a <strong>point estimate</strong>. This is in contrast to describing a value estimate as a probability distribution, which is the Bayesian method. The Bayesian believes that we cannot express these parameters as single values and we should rather describe them as a distributions of possible values to be explicit about their uncertainty.</p>
+<p>Here we focus on frequentist inference; Bayesian inference is covered in a later chapter.</p>
+<p>In frequentist statistics, the factor of noise means that we may see relationships (and thus come up with non-zero parameters) where they don't exist, just because of the random noise. This is what p-values are meant to compensate for - if the relationship truly did not exist, what's the probability, given the data, that we'd see the non-zero parameter estimate that we computed? Generally if this probability is less than 0.05 (i.e. <mathjax>$p &lt; 0.05$</mathjax>) then we accept the result.</p>
+<p>Often with statistical inference you are trying to quantify some difference between groups (which can be framed as measuring an <strong>effect size</strong>) or testing if some data supports or refutes some hypothesis, and then trying to determine whether or not this difference or effect can be attributed to chance (this is covered in the section on experimental statistics).</p>
+<p>A word of caution: many statistical tools work only under certain conditions, e.g. assumptions of independence, or for a particular distribution, or a large enough sample size, or lack of skew, and so on - so before applying statistical methods and drawing conclusions, make sure the tools are appropriate for the data. And of course you must always be cautious of potential biases involved in the data collection process.</p>
+<h3>Error</h3>
+<p>Dealing with error is a big part of statistics and some error is unavoidable (noise is natural).</p>
+<p>There are three kinds of error:</p>
+<ul>
+<li>Systemic error (systemic flaws in the data collection, e.g. sampling bias)</li>
+<li>Measurement error (due to imprecise instruments, for instance)</li>
+<li>Random error (natural noise, due to chance, uncontrollable, but in theory its effect is minimized if many measurements are taken)</li>
+</ul>
+<p>We never know the true value of something, only what we observe by imprecise means, so we always must grapple with error.</p>
+<h3>Estimates and estimators</h3>
+<p>We can think of the population as representing the underlying data generating process and consider these parameters as functions of the population. To <strong>estimate</strong> these parameters from the sample data, we use <strong>estimators</strong>, which are functions of the sample data that return an estimate for some unknown value. Essentially, any statistic is an estimator. For instance, we may estimate the population mean by using the sample mean as our estimator. Or we may estimate the population variance as the sample variance. And so on.</p>
+<h4>Bias</h4>
+<p>Estimators may be <strong>biased</strong> for small sample sizes; that is, it tends to have more error for small sample sizes.</p>
+<p>Say we are estimating a parameter <mathjax>$\theta$</mathjax>. The bias of an estimator <mathjax>$\hat \theta_m$</mathjax> is:</p>
+<p><mathjax>$$
+\text{bias}(\hat \theta+m) = E[\hat \theta_m] - \theta
+$$</mathjax></p>
+<p>Where <mathjax>$m$</mathjax> is the number of samples.</p>
+<p>There are <strong>unbiased</strong> estimators as well, which have an expected mean error (against the population parameter) of 0. That is, <mathjax>$\text{bias}(\hat \theta) = 0$</mathjax>, which can also be stated as <mathjax>$E[\hat \theta] = \theta$</mathjax>.</p>
+<p>For example, an unbiased estimator for population variance <mathjax>$\sigma^2$</mathjax> is:</p>
+<p><mathjax>$$
+\frac{1}{n-1} \sum(x_i - \bar x)^2
+$$</mathjax></p>
+<p>An estimator may be <strong>asymptotically unbiased</strong> if <mathjax>$\lim_{m \to \infty} \text{bias}(\hat \theta_m) = $</mathjax>, that is, if <mathjax>$\lim_{m \to \infty} E[\hat \theta_m] = 0$</mathjax>.</p>
+<p>Generally, unbiased estimators are preferred, but sometimes biased estimators have other properties which make them useful.</p>
+<p>For an estimate, we can measure its <strong>standard error</strong> (SE), which describes how much we expect the estimate to be off by, on average. It can also be stated as:</p>
+<p><mathjax>$$
+\SE (\hat \theta) = \sqrt{\Var(\hat \theta)}
+$$</mathjax></p>
+<p>"Standard error" sometimes refers to the standard error of the mean, which is the standard deviation of the mean:</p>
+<p><mathjax>$$
+\SE (\hat \mu_m) = \sqrt{\Var(\frac{1}{m}\sum_{i=1}^m x^{(i)})} = \frac{\sigma}{\sqrt m}
+$$</mathjax></p>
+<p>Much of statistical inference is concerned with measuring the quality of these estimates.</p>
+<h3>Consistency</h3>
+<p>When we used a biased estimator, we generally still want our point estimates to converge to the true value of the parameter. This property is called <strong>consistency</strong>. For some error <mathjax>$\epsilon &gt; 0$</mathjax>, we want <mathjax>$\lim_{m \to \infty} P(|\theta_m - \theta| &gt; \epsilon) = 0$</mathjax>. That is, as we increase our sample size, we want the probability of the absolute difference between the estimate and the true value being greater than <mathjax>$\epsilon$</mathjax> to approach 0.</p>
+<h3>Point Estimation</h3>
+<p>Given an unknown population parameter, we may want to estimate a single value for it - this estimate is called a <strong>point estimate</strong>. Ideally, the estimate is as close to the true value as possible.</p>
+<p>The estimation formula (the function which yields an estimate) is called an <strong>estimator</strong> and is a random variable (so there is some underlying distribution). A particular value of the estimator is the <strong>estimate</strong>.</p>
+<p>A simple example: we have a series of trials with some number of successes. We want an estimate for the probability of success of the event we looked at. Here an obvious estimate is be the number of successes over the total number of trials, so our estimator would be <mathjax>$\frac{x}{N}$</mathjax> and - say we had 40 successes out of 100 trials - our estimate would be <mathjax>$0.4$</mathjax>.</p>
+<p>We consider a "good" estimator one whose distribution is concentrated as closely as possible around the parameter's true value (that is, it has a small variance). Generally this becomes the case as more data is collected.</p>
+<p>We can take multiple samples (of a fixed size) from a population and compute a point estimate (e.g. for the mean) from each. Then we can consider the distribution of these point estimates - this distribution is called a <strong>sampling distribution</strong>. The standard deviation of the sampling distribution describes the typical error of a point estimate, so this standard deviation is known as the <strong>standard error</strong> (SE) of the estimate.</p>
+<p>Alternatively, if you have only one sample, the standard error of the sample mean <mathjax>$\bar x$</mathjax> can be computed (where <mathjax>$n$</mathjax> is the size of the sample):</p>
+<p><mathjax>$$
+\SE_{\bar x} = \sigma_{\bar x} = \frac{\sigma_x}{\sqrt n}
+$$</mathjax></p>
+<p>This however requires the population standard deviation, <mathjax>$\sigma_x$</mathjax>, which probably isn't known - but we can also use a point estimate for that as well; that is, you can just use <mathjax>$s$</mathjax>, the sample standard deviation, instead (provided that the sample size is at least 30, as a rule of thumb, and the population distribution is not strongly skewed).</p>
+<p>Also remember that the distribution of sample means approximates a normal distribution, with better approximation as sample size increases, as described by the central limit theorem. Some other point estimates' sampling distribution also approximate a normal distribution. Such point estimates are called <strong>normal point estimates</strong>.</p>
+<p>There are other such computations for the standard error of other estimates as well.</p>
+<p>We say a point estimate is <strong>unbiased</strong> if the sampling distribution of the estimate is centered at the parameter it estimates.</p>
+<h3>Nuisance Parameters</h3>
+<p>Nuisance parameters are values we are not directly interested in, but still need to be dealt with in order to get at what we <em>are</em> interested in.</p>
+<h3>Confidence Intervals</h3>
+<p>Rather than provide a single value estimate of a population parameter, that is, a point estimate, it can be better to provide a range of values for the estimate instead. This range of values is a <strong>confidence interval</strong>. The confidence interval is the range of values where an estimate is likely to fall with some percent probability.</p>
+<p>Confidence intervals are expressed in percentages, e.g. the "95% confidence interval", which describes the plausibility that the parameter is in that interval. It <em>does not</em> imply a probability (that is, it does not mean that the true parameter has a 95% chance of being in that interval), however. Rather, the 95% confidence interval is the range of values in which, over repeated experimentation, in 95% of the experiments, that confidence interval will contain the true value. To put it another way, for the 95% confidence interval, out of every 100 experiments, at least 95 of their confidence intervals will contain the true parameter value. You would say "We are 95% confident the population parameter is in this interval".</p>
+<p>Confidence intervals are a tool for frequentist statistics, and in frequentist statistics, unknown parameters are considered fixed (we don't express them in terms of probability as we do in Bayesian statistics). So we do not associate a probability with the parameter. Rather, the <em>confidence interval itself</em> is the random variable, not the parameter. To put it another way, we are saying that 95% of the intervals we would generate from repeated experimentation would contain the real parameter - but we aren't saying anything about the parameter's value changing, just that the intervals will vary across experiments.</p>
+<p>The mathematical definition of the 95% confidence interval is (where <mathjax>$\theta$</mathjax> is the unknown parameter):</p>
+<p><mathjax>$$
+P(a(Y) &lt; \theta &lt; b(Y)|\theta) = 0.95
+$$</mathjax></p>
+<p>Where <mathjax>$a, b$</mathjax> are the endpoints of the interval, calculated according to the sampling distribution of <mathjax>$Y$</mathjax>. We condition on <mathjax>$\theta$</mathjax> because, as just mentioned, in frequentist statistics, the parameters are fixed and the data <mathjax>$Y$</mathjax> is random.</p>
+<p>We can compute the 95% confidence interval by taking the point estimate (which is the best estimate for the value) and <mathjax>$\pm 2\SE$</mathjax>, that is build an interval within two standard errors of the point estimate. The interval we add or subtract to the point estimate (here it is <mathjax>$2\SE$</mathjax>) is called the <strong>margin of error</strong>. The value we multiply the SE with is essentially a Z score, so we can more generally describe the margin of error as <mathjax>$z\SE$</mathjax>.</p>
+<p>For the confidence interval of the mean, we can be more precise and look within <mathjax>$\pm 1.96\SE$</mathjax> (that is, <mathjax>$z=1.96$</mathjax>) of the point estimate <mathjax>$\bar x$</mathjax> for the 95% confidence interval (that is, our 95% confidence interval would be <mathjax>$\bar x \pm 1.96\SE$</mathjax>). This is because we know to the sampling distribution for the sample means approximates a normal distribution (for sufficiently large sample sizes, <mathjax>$n \geq 30$</mathjax> is a rule of thumb) according to the central limit theorem.</p>
+<h3>Kernel Density Estimates</h3>
+<p>Sometimes we don't want the parameters of our data's distribution, but just a smoothed representation of it. <strong>Kernel density estimation</strong> allows us to get this representation. It is a <em>nonparametric</em> method because it makes no assumptions about the form of the underlying distribution (i.e. no assumptions about its parameters).</p>
+<figure><img alt="Kernel Density Estimation example" src="../assets/kde.svg" /><figcaption>Kernel Density Estimation example</figcaption>
+</figure>
+<p>Some kernel function (which generates symmetric densities) is applied to each data point, then the density estimate is formed by summing the densities. The kernel function determines the shape of these densities and the <em>bandwidth</em> parameter, <mathjax>$h &gt; 0$</mathjax>, determines their spread and the <em>smoothing</em> of the estimate. Typically, a Gaussian kernel function is used, so the bandwidth is equivalent to the variance.</p>
+<figure><img alt="KDE bandwidth comparisons" src="../assets/kde_bandwidth.svg" /><figcaption>KDE bandwidth comparisons</figcaption>
+</figure>
+<p>In this figure, the grey curve is the true density, the red curve is the KDE with <mathjax>$h = 0.05$</mathjax>, the black curve is the KDE with <mathjax>$h = 0.337$</mathjax>, and the green curve is the KDE with <mathjax>$h = 2$</mathjax>.</p>
+<h2>Experimental Statistics</h2>
+<p>Experimental statistics is concerned with <strong>hypothesis testing</strong>, where you have a hypothesis and want to learn if your data supports it. That is, you have some sample data and an apparent effect, and you want to know if there is any reason to believe that the effect is genuine and not just by chance.</p>
+<p>Often you are comparing two or more groups; more specifically, you are typically comparing statistics across these groups, such as their means. For example, you want to see if the difference of their means is <strong>statistically significant</strong>; which is to say, likely that it is a real effect and not just chance.</p>
+<p>The "classical" approach to hypothesis testing, <strong>null hypothesis significance testing</strong> (NHST), follows this general structure:</p>
+<ol>
+<li>Quantify the size of the apparent effect by choosing some <strong>test statistic</strong>, which is just a summary statistic which is useful for hypothesis testing or identifying p-values. For example, if you have two populations you're looking at, this could be the difference in means (of whatever you are measuring) between the two groups.</li>
+<li>Define a <strong>null hypothesis</strong>, which is usually that the apparent effect is not real.</li>
+<li>Compute a <strong>p-value</strong>, which is the probability of seeing the effect if the null hypothesis is true.</li>
+<li>Determine the <strong>statistical significance</strong> of the result. The lower the p-value, the more significant the result is, since the less likely it is to have just occurred by chance.</li>
+</ol>
+<p>Broadly speaking, there are two types of scientific studies: <strong>observational</strong> and <strong>experimental</strong>.</p>
+<p>In observational studies, the research cannot interfere while recording data; as the name implies, the involvement is merely as an observer.</p>
+<p>Experimental studies, however, are deliberately structured and executed. They must be designed to minimize error, both at a low level (e.g. imprecise instruments or measurements) and at a high-level (e.g. researcher biases).</p>
+<h3>Statistical Power</h3>
+<blockquote>
+<p>The power of a study is the likelihood that it will distinguish an effect of a certain size from pure luck. - <a href="http://www.statisticsdonewrong.com/power.html">Statistical power and underpowered statistics</a>, Alex Reinhart</p>
+</blockquote>
+<p>Statistical <strong>power</strong>, sometimes called <strong>sensitivity</strong>, can be defined as the probability of rejecting the null hypothesis when it is false.</p>
+<p>If <mathjax>$\beta$</mathjax> is the probability of a type II error (i.e. failing to reject the null hypothesis when it's false), then <mathjax>$\text{power} = 1 - \beta$</mathjax>.</p>
+<p>Power...</p>
+<ul>
+<li>Increases as <mathjax>$n$</mathjax> (sample size) increases</li>
+<li>Increases as <mathjax>$\sigma$</mathjax> decreases (less variability)</li>
+<li>Is higher for a one-sided test than for its associated two-sided test</li>
+</ul>
+<h3>Sample Selection</h3>
+<p>Bias can enter studies primarily in two ways:</p>
+<ul>
+<li>in the process of selecting the objects to study (sampling and retention)</li>
+<li>in the process of collection information <em>about</em> the objects</li>
+</ul>
+<p>To prevent selection bias (selecting samples in such a way that it encourages a particular outcome, whether done consciously or not), sample selection may be random.</p>
+<p>In the case of medical trials and similar studies, random allocation is ideally <strong>double blind</strong>, so that neither the patient nor the researchers know which treatment a patient is receiving.</p>
+<p>Another sample selection technique is <strong>stratified sampling</strong>, in which the population is divided into categories (e.g. male and female) and samples are selected from those subgroups. If the variable used for stratification is strongly related to the variable being studied, there may be better accuracy from the sample size.</p>
+<p>You need large sample sizes because with small sample sizes, you're more sensitive to the effects of chance. e.g. if I flip a coin 10 times, it's feasible that I get heads 6/10 times (60% of the time). With that result I couldn't conclusively say whether or not that coin is rigged. If I flip that coin 1000 times, it's extremely unlikely that I will get heads 60% of the time (600/1000 times) if it were a fair coin.</p>
+<p>Sometimes to increase sample size, a researcher may use a technique called "replication", which is simply repeating the measurements with new samples. but some researchers really only "pseudoreplicate". samples should be as independent from each other as possible - otherwise you have too many confounding factors. in medical research, researchers may sample a single patient multiple times, every week for instance, and treat each week's sample as a distinct sample. this is pseudoreplication - you begin to inflate other factors particular to that patient in your results. another example is - say you wanted to measure pH levels in soil samples across the US. well, you cant sample soil 15ft from each other because they are too dependent on each other:</p>
+<h4>Operationalization</h4>
+<p><strong>Operationalization</strong> is the practice of coming up with some way of measuring something which cannot be directly measured, such as intelligence. This may be accomplished via <strong>proxy measurements</strong>.</p>
+<h3>The Null Hypothesis</h3>
+<p>In an experiment, the <strong>null hypothesis</strong>, notated <mathjax>$H_0$</mathjax>, is the "status quo". For example, in testing whether or not a drug has an impact on a disease, the null hypothesis would be that the drug has no effect.</p>
+<p>When running an experiment, you do it under the assumption that the null hypothesis is true. Then you ask: what's the probability of getting the results you got, assuming the null hypothesis is true? If that probability is very small, the null hypothesis is likely false. This probability - of getting your results if the null hypothesis were true - is called the <strong>P value</strong>.</p>
+<h3>Type 1 Errors</h3>
+<p>A <strong>type 1 error</strong> is one where the null hypothesis is rejected, even though it is true.</p>
+<p>Type 1 errors are usually presented as a probability of them occurring, e.g. a "0.5% chance of a type 1 error" or a "type 1 error with probability of 0.01".</p>
+<h3>P Values</h3>
+<p>P values are central to null hypothesis significance testing (NHST), but they are commonly misunderstood.</p>
+<p>P values <em>do not</em>:</p>
+<ul>
+<li>tell you the probability of the null hypothesis being true</li>
+<li>tell you the probability of <em>any</em> hypothesis being true</li>
+<li>can never prove or disprove hypotheses</li>
+</ul>
+<blockquote>
+<p>There's no mathematical tool to tell you if your hypothesis is true; you can only see whether it is consistent with the data, and if the data is sparse or unclear, your conclusions are uncertain. - <a href="http://www.statisticsdonewrong.com/data-analysis.html#the-power-of-p-values">Statistics Done Wrong</a>, Alex Reinhart</p>
+</blockquote>
+<p>So what is it then? The P value is the probability of seeing your results or data if the null hypothesis were true.</p>
+<p>That is, given data <mathjax>$D$</mathjax> and a hypothesis <mathjax>$H$</mathjax>, where <mathjax>$H_0$</mathjax> is the null hypothesis, the P value is merely:</p>
+<p><mathjax>$$ P(D|H_0) $$</mathjax></p>
+<p>If instead we want to find the probability of our hypothesis given the data, that is, <mathjax>$P(H|D)$</mathjax>, we have to use Bayesian inference instead:</p>
+<p><mathjax>$$ P(H \, | \, D) = \frac{P(D \, | \, H)P(H)}{P(D \, | \, H)P(H) + P(D\, | \, \lnot H)P(\not H)} $$</mathjax></p>
+<p>Note that P values are problematic when testing multiple hypotheses (<strong>multiple testing</strong> or <strong>multiple comparisons</strong>) because any "significant" results (as determined by P value comparisons, e.g. <mathjax>$p &lt; 0.5$</mathjax>) may be deceptively so, since that result may still have just been chance, as the following comic illustrates. That is, the more significance tests you conduct, the more likely you will make a Type 1 Error.</p>
+<figure><img alt="xkcd - &quot;Significant&quot;" src="../assets/xkcd_pvalue.png" /><figcaption><a href="https://xkcd.com/882/">xkcd - "Significant"</a></figcaption>
+</figure>
+<p>In this comic, 20 hypotheses are tested, so with a significance level at 5%, it's expected that at least one of those tests will come out significant by chance. In the real world this may be problematic in that multiple research groups may be testing the same hypothesis and chances may be such that one of them gets significant results.</p>
+<h3>The Base Rate Fallacy</h3>
+<p>A very important shortcoming to be aware of is the base rate fallacy. A P value cannot be considered in isolation. The base rate of whatever occurrence you are looking at must also be taken into account. Say you are testing 100 treatments for a disease, and it's a very difficult disease to treat, so there's a low chance (say 1%) that a treatment will actually be successful. This is your base rate. A low base rate means a higher probability of false positives - treatments which, during the course of your testing, may appear to be successful but are in reality not (i.e. their success was a fluke). A good example is the mammogram test example (see <a href="http://www.statisticsdonewrong.com/p-value.html">The p value and the base rate fallacy</a>).</p>
+<blockquote>
+<p>A p value is calculated under the assumption that the medication <em>does not work</em> and tells us the probability of obtaining the data we did, or data more extreme than it. It does <em>not</em> tell us the chance the medication is effective. (<a href="http://www.statisticsdonewrong.com/p-value.html">The p value and the base rate fallacy</a>, Alex Reinhart)</p>
+</blockquote>
+<h3>False Discovery Rate</h3>
+<p>The <strong>false discovery rate</strong> is the expected proportion of false positives (Type 1 errors) amongst hypothesis tests.</p>
+<p>For example, if we have a maximum FDR of 0.10 and we have 1000 observations which seem to indicate a significant hypothesis, then we can expect 100 of those observations to be false positives.</p>
+<p>The <strong>q value</strong> for an individual hypothesis is the minimum FDR at which the test may be called significant.</p>
+<p>Say you run multiple comparisons and have the following values:</p>
+<ul>
+<li><mathjax>$m$</mathjax> = the total number of hypotheses tested (number of comparisons)</li>
+<li><mathjax>$m_0$</mathjax> = the number of true null hypotheses (<mathjax>$H_0$</mathjax>)</li>
+<li><mathjax>$m - m_0$</mathjax> = the number of true alternative hypotheses (<mathjax>$H_i$</mathjax>)</li>
+<li><mathjax>$V$</mathjax> = the number of false positives (Type 1 errors)</li>
+<li><mathjax>$S$</mathjax> = the number of true positives</li>
+<li><mathjax>$T$</mathjax> = the number of false negatives (Type 2 errors)</li>
+<li><mathjax>$U$</mathjax> = the number of true negatives</li>
+<li><mathjax>$R = V + S$</mathjax> = the number of hypotheses declared significant</li>
+</ul>
+<p>We can calculate the FDR as:</p>
+<p><mathjax>$$ \text{FDR} = E[\frac{V}{V+S}] = E[\frac{V}{R}] $$</mathjax></p>
+<p>Note that <mathjax>$\frac{V}{R} = 0$</mathjax> if <mathjax>$R = 0$</mathjax>.</p>
+<h3>Alpha Level</h3>
+<p>The value that you select to compare the p-value to, e.g. 0.5 in the comic, is the <strong>alpha level</strong> <mathjax>$\bar \alpha$</mathjax>, also called the <strong>significance level</strong>, of an experiment. Your alpha level should be selected according to the number of tests you'll be conducting in an experiment.</p>
+<p>There are some approaches to help adjust the alpha level.</p>
+<h4>The Bonferroni Correction</h4>
+<p>The highly conservative <strong>Bonferroni Correction</strong> can be used as a safeguard.</p>
+<p>You divide whatever your significance level <mathjax>$\bar \alpha$</mathjax> is by the number of statistical tests <mathjax>$t$</mathjax> you're doing:</p>
+<p><mathjax>$$ \alpha_p = \frac{\bar \alpha}{t} $$</mathjax></p>
+<p><mathjax>$\alpha_p$</mathjax> is the per-comparison significance level which you apply for each individual test, and <mathjax>$\bar \alpha$</mathjax> is the maximum experiment-wide significance level, called the <strong>maximum familywise error rate</strong> (FWER).</p>
+<h4>The Sidak Correction</h4>
+<p>A more sensitive correction, the <strong>Sidak Correction</strong>, can also be used:</p>
+<p><mathjax>$$ \alpha_p = 1 - (1 - \bar \alpha)^{\frac{1}{n}} $$</mathjax></p>
+<p>For <mathjax>$n$</mathjax> <em>independent</em> comparisons, <mathjax>$\alpha$</mathjax>, the experiment-wide significance level (the FWER) is:</p>
+<p><mathjax>$$ \alpha = 1 - (1 - \alpha_p)^n $$</mathjax></p>
+<p>For <mathjax>$n$</mathjax> <em>dependent</em> comparisons, use:</p>
+<p><mathjax>$$ \alpha \leq n \alpha_p $$</mathjax></p>
+<h3>The Benjamini-Hochberg Procedure</h3>
+<p>Approaches like the Bonferroni correction lowers the alpha level which end up decreasing your statistical power - that is, you fail to detect false effects <em>as well as</em> true effects.</p>
+<p>And with such an approach, you are still susceptible to the base rate fallacy, and may still have false positives. So how can you calculate the false discovery rate? That is, what fraction of the statistically Significant results are false positives?</p>
+<p>You can use the Benjamini-Hochberg procedure, which tells you which P values to consider statistically significant:</p>
+<ol>
+<li>Perform your statistical tests and get the P value for each. Make a list and sort it in ascending order.</li>
+<li>Choose a false-discovery rate <mathjax>$q$</mathjax>. The number of statistical tests is <mathjax>$m$</mathjax>.</li>
+<li>Find the largest p value such that <mathjax>$p \leq \frac{iq}{m}$</mathjax>, where <mathjax>$i$</mathjax> is the P value's place in the sorted list.</li>
+<li>Call that P value and all smaller than it statistically significant.</li>
+</ol>
+<blockquote>
+<p>The procedure guarantees that out of all statistically significant results, no more than q percent will be false positives.</p>
+<p>The Benjamini-Hochberg procedure is fast and effective, and it has been widely adopted by statisticians and scientists in certain fields. It usually provides better statistical power than the Bonferroni correction and friends while giving more intuitive results. It can be applied in many different situations, and variations on the procedure provide better statistical power when testing certain kinds of data.</p>
+<p>Of course, it's not perfect. In certain strange situations, the Benjamini-Hochberg procedure gives silly results, and it has been mathematically shown that it is always possible to beat it in controlling the false discovery rate. But it's a start, and it's much better than nothing. - (<a href="http://www.statisticsdonewrong.com/p-value.html#controlling-the-false-discovery-rate">Controlling the false discovery rate</a>, Alex Reinhart)</p>
+</blockquote>
+<h3>Sum of Squares</h3>
+<h4>The sum of squares within (SSW)</h4>
+<p><mathjax>$$ \SSW = \sum_{i=1}^m (\sum{j=1}^n (x_{ij} - \bar{x_i})^2) $$</mathjax></p>
+<ul>
+<li>This shows how much of SST is due to variation <em>within</em> each group, i.e. variation from within that group's mean.</li>
+<li>The degrees of freedom here is calculated <mathjax>$m(n-1)$</mathjax>.</li>
+</ul>
+<h4>The sum of squares between (SSB)</h4>
+<p><mathjax>$$ \SSB = \sum_{i=1}^m [n_m [(\bar{x_m} - \bar{\bar{x}})^2]] $$</mathjax></p>
+<ul>
+<li>This shows how much of SST is due to variation between the group means</li>
+<li>The degrees of freedom here is calculated <mathjax>$m-1$</mathjax>.</li>
+</ul>
+<h4>The total sum of squares (SST)</h4>
+<p><mathjax>$$ \SST = \sum_{i=1}^m (\sum{j=1}^n (x_{ij} - \bar{\bar{x}})^2) $$</mathjax><br />
+<mathjax>$$ \SST = \SSW + \SSB $$</mathjax></p>
+<ul>
+<li>Note: <mathjax>$\bar{\bar{x}}$</mathjax> is the mean of means, or the "grand mean".</li>
+<li>This is the total variation for the groups</li>
+<li>The degrees of freedom here is calculated <mathjax>$mn - 1$</mathjax>.</li>
+</ul>
+<h3>Statistical Tests</h3>
+<h4>Two-sided tests</h4>
+<p>Asks "What is the chance of seeing an effect as big as the observed effect, without regard to its sign?" That is, you are looking for any effect, increase or decrease.</p>
+<h4>One-sided tests</h4>
+<p>Asks "What is the chance of seeing an effect as big as the observed effect, with the same sign?" That is, you are looking for either only an increase or decrease.</p>
+<h4>Unpaired t-test</h4>
+<p>The most basic statistical test, used when comparing the means from two groups. Used for small sample sizes. The t-test returns a p-value.</p>
+<h4>Paired t-test</h4>
+<p>The paired t-test is a t-test used when each datapoint in one group corresponds to one datapoint in the other group.</p>
+<h4>Chi-squared test</h4>
+<p>When comparing proportions of two populations, it is common to use the chi-squared statistic:</p>
+<p><mathjax>$$
+\chi^2 = \sum_i \frac{(O_i - E_i)^2}{E_i}
+$$</mathjax></p>
+<p>Where <mathjax>$O_i$</mathjax> is the observed frequencies and <mathjax>$E_i$</mathjax> is the expected frequencies.</p>
+<p>Say for example you want to test if a coin is fair. You expect that, if it is fair, you should see about 50/50 heads and tails - this describes your expected frequencies. You flip the coin and observe the actual resulting frequencies - these are your observed frequencies.</p>
+<p>The Chi squared test allows you to determine if these frequencies differ significantly.</p>
+<h4>ANOVA (Analysis of Variance)</h4>
+<p>ANOVA, ANCOVA, MANOVA, and MANCOVA are various ways of comparing different groups.</p>
+<ul>
+<li>ANOVA - group A is given a placebo and group B is given the actual medication and the outcome variable to compare is how many pounds were lost</li>
+<li>ANCOVA - same as ANOVA but now there is an additional covariate we consider, e.g. hours of exercise per day</li>
+<li>MANOVA and MANCOVA are multivariate counterparts to the above, for instance we may consider cholesterol levels in addition to weight loss</li>
+</ul>
+<p>ANOVA is used to compare three or more groups. It uses a single test to compare the means across multiple groups simultaneously, which avoids using multiple tests to make multiple comparisons (which can lead to differences across groups resulting from chance).</p>
+<p>There are a few requirements:</p>
+<ul>
+<li>the observations are independent within and across groups</li>
+<li>the data within each group are nearly normal</li>
+<li>the variance in the groups are about equal across groups</li>
+</ul>
+<p>ANOVA tests the null hypothesis that the means across groups are the same (that is, that <mathjax>$\mu_1 = \dots = \mu_k$</mathjax>, if there are <mathjax>$k$</mathjax> groups), with the alternate hypothesis being that at least one mean is different. We look at the variability in the sample means and see if it is so large that it is unlikely to have been due to chance. THe variability we use is the <strong>mean square between groups</strong> (MSG) which has degrees of freedom <mathjax>$\df_G = k - 1$</mathjax>.</p>
+<p>The MSG is calculated:</p>
+<p><mathjax>$$
+\MSG = \frac{1}{\df_G}\SSG = \frac{1}{k-1} \sum_{i=1}^k n_i(\bar x_i - \bar x)^2
+$$</mathjax></p>
+<p>Where the SSG is the <strong>sum of squares between groups</strong> and <mathjax>$n_i$</mathjax> is the sample size of group <mathjax>$i$</mathjax> out of <mathjax>$k$</mathjax> total groups. <mathjax>$\bar x$</mathjax> is the mean of outcomes across all groups.</p>
+<p>We need a value to compare the MSG to, which is the <strong>mean square error</strong> (MSE), which measures the variability within groups and has degrees of freedom <mathjax>$\df_E = n - k$</mathjax>.</p>
+<p>The MSE is calculated:</p>
+<p><mathjax>$$
+\MSE = \frac{1}{\df_E}\SSE
+$$</mathjax></p>
+<p>Where the SSE is the <strong>sum of squared errors</strong> and is computed as:</p>
+<p><mathjax>$$
+\SSE = \SST - \SSG
+$$</mathjax></p>
+<p>Where the SSG is same as before and the SST is the <strong>sum of squares total</strong>:</p>
+<p><mathjax>$$
+\begin{aligned}
+\SST &amp;= \sum_{i=1}^n(x_i - \bar x)^2 \\
+\SSG = \sum_{i=1}^k n_i (\bar x_i - \bar x)^2
+\end{aligned}
+$$</mathjax></p>
+<p>ANOVA uses a test statistic called <mathjax>$F$</mathjax>, which is computed:</p>
+<p><mathjax>$$
+F = \frac{\MSG}{\MSE}
+$$</mathjax></p>
+<p>When the null hypothesis is true, difference in variability across sample means should be due only to chance, so we expect MSG and MSE to be about equal (and thus <mathjax>$F$</mathjax> to be close to 1).</p>
+<p>We take this <mathjax>$F$</mathjax> statistic and use it with a test called the <strong>F test</strong>, where we compute a p-value from the <mathjax>$F$</mathjax> statistic, using the F distribution, which has the parameters <mathjax>$\df_1$</mathjax> and <mathjax>$\df_2$</mathjax>. We expect ANOVA's <mathjax>$F$</mathjax> statistic to follow an F distribution with parameters <mathjax>$\df_1 = \df_G, \df_2 = \df_E$</mathjax> if the null hypothesis is true.</p>
+<h5>One-Way ANOVA</h5>
+<p>Similar to a t-test but used to compare three or more groups. With ANOVA, you calculate the <strong>F statistic</strong>, assuming the null hypothesis^[Remember that <mathjax>$\SSB$</mathjax> is the "sum of squares between" and <mathjax>$\SSW$</mathjax> is the "sum of squares within".]:</p>
+<p><mathjax>$$
+F = \frac{\frac{\SSB}{m-1}}{\frac{\SSW}{m(n-1)}}
+$$</mathjax></p>
+<h5>Two-Way ANOVA</h5>
+<p>Allows you to compare the means of two or more groups when there are multiple variables or factors to be considered.</p>
+<h4>One-tailed &amp; two-tailed tests</h4>
+<p>In a <strong>two-tailed test</strong>, both tails of a distribution are considered. For example, with a drug where you're looking for <em>any</em> effect, positive or negative.</p>
+<p>In a <strong>one-tailed</strong>, only one tail is considered. For example, you may be looking only for a positive or only for a negative effect.</p>
+<h3>Effect Size</h3>
+<p>A big part of statistical inference is measuring <em>effect size</em>, which more generally is trying to quantify differences between groups, but typically just referred to as "effect size".</p>
+<p>There are a few ways of measuring effect size:</p>
+<h4>Difference in means</h4>
+<p>The difference in means, e.g. <mathjax>$\mu_1 - \mu_2$</mathjax></p>
+<p>But this has a few problems:</p>
+<ul>
+<li>Must be expressed in the units of measure of the mean (e.g. ft, kg, etc), so it can be difficult to compare to other studies</li>
+<li>Needs more context about the distributions (e.g. standard deviation) to understand if the difference is large or not</li>
+</ul>
+<h4>Distribution overlap</h4>
+<p>The overlap between the two distributions:</p>
+<p>Choose some threshold between the two means, e.g.</p>
+<ul>
+<li>The midpoint between the means: <mathjax>$\frac{\mu_1 + \mu_2}{2}$</mathjax></li>
+<li>Where the PDFs cross: <mathjax>$\frac{\sigma_1\mu_1 + \sigma_2\mu_2}{\sigma_1 + \sigma_2}$</mathjax></li>
+</ul>
+<p>Count how many in the first group are below the threshold, call it <mathjax>$m_1$</mathjax><br />
+Count how many in the second group are above the threshold, call it <mathjax>$m_2$</mathjax>.</p>
+<p>The overlap then is:</p>
+<p><mathjax>$$
+\frac{m_1}{n_1} + \frac{m_2}{n_2}
+$$</mathjax></p>
+<p>Where <mathjax>$n_1, n_2$</mathjax> are the sample sizes of the first and second groups, respectively.</p>
+<p>This overlap can also be framed as a <em>misclassification rate</em>, which is just <mathjax>$\frac{\text{overlap}}{2}$</mathjax>.</p>
+<p>These measures are unitless, which makes them easy to compare across studies.</p>
+<h4>Probability of superiority</h4>
+<p>The "probability of superiority" is the probability that a randomly chosen datapoint from group 1 is greater than a randomly chosen datapoint from group 2.</p>
+<p>This measure is also unitless.</p>
+<h4>Cohen's <mathjax>$d$</mathjax></h4>
+<p>Cohen's <mathjax>$d$</mathjax> is the difference in means, divided by the standard deviation, which is computed from the pooled variance, <mathjax>$\sigma_p^2$</mathjax>, of the groups:</p>
+<p><mathjax>$$
+\begin{aligned}
+\sigma_p^2 &amp;= \frac{n_1\sigma_1^2 + n_2\sigma_2^2}{n_1+n_2} \\
+d &amp;= \frac{\mu_1 - \mu_2}{\sqrt{\sigma_p^2}}
+\end{aligned}
+$$</mathjax></p>
+<p>This measure is also unitless.</p>
+<p>Different fields have different intuitions about how big a <mathjax>$d$</mathjax> value is; it's something you have to learn.</p>
+<h3>Reliability</h3>
+<p><em>Reliability</em> refers to how consistent or repeatable a measurement is (for continuous data).</p>
+<p>There are three main approaches:</p>
+<h4>Multiple-occasions reliability</h4>
+<p>Aka <em>test-retest reliability</em>. This is how a test holds up over repeated testing, e.g. "temporal stability". This assumes the underlying metric does not change.</p>
+<h4>Multiple-forms reliability</h4>
+<p>Aka <em>parallel-forms reliability</em>. This asks: how consistent are different tests at measuring the same thing?</p>
+<h4>Internal consistency reliability</h4>
+<p>This asks: do the items on a test all measure the same thing?</p>
+<h3>Agreement</h3>
+<p><em>Agreement</em> is similar to reliability, but used more for discrete data.</p>
+<h4>Percent agreement</h4>
+<p><mathjax>$$
+\frac{\text{number of cases where tests agreed}}{\text{all cases}}
+$$</mathjax></p>
+<p>Note that a high percent agreement may be obtained by chance.</p>
+<h4>Cohen's kappa</h4>
+<p>Often just called kappa, this corrects for the possibility of chance agreement:</p>
+<p><mathjax>$$
+\kappa = \frac{p_o - p_e}{1 - p_e}
+$$</mathjax></p>
+<p>Where <mathjax>$p_o$</mathjax> is the <em>observed agreement</em>, that is, <mathjax>$\frac{\text{num. agreement}}{\text{total cases}}$</mathjax>, and <mathjax>$p_e$</mathjax> is the <em>expected agreement</em>. Kappa ranges from -1 to 1, where 1 is perfect agreement.</p>
+<h2>Handling Data</h2>
+<h3>Transforming data</h3>
+<p>Occasionally you may find data easier to work with if you apply a <strong>transformation</strong> to it; that is, rescale it in some way. For instance, you might take the natural log of your values, or the square root, or the inverse. This can reduce skew and the effect of outliers or make linear modeling easier.</p>
+<p>The function which applies this transformation is called a <strong>link function</strong>.</p>
+<h3>Dealing with missing data</h3>
+<p>Data can be missing for a few reasons:</p>
+<ul>
+<li><em>Missing completely at random</em> (MCAR) - missing cases are identical to non-missing cases, on average.</li>
+<li><em>Missing at random</em> (MAR) - Missing data depends on measured values, so they can be modeled by other observed variables.</li>
+<li><em>Missing not at random</em> (MNAR) - Missing data depends on unmeasured/unknown variables, so there is no way to account for them.</li>
+</ul>
+<p>There are a few strategies for dealing with missing data.</p>
+<p>The worst you can do is to ignore the missing data and try to run your analysis, missing data and all (it likely won't and probably shouldn't work).</p>
+<p>Alternatively, you can delete all datapoints which have missing data, leaving only complete data points - this is called <strong>complete case analysis</strong>. Complete case analysis makes the most sense with MCAR missing data - you will have a reduction in sample size, and thus a reduction in statistical power, as a result, but your inference will not be biased. The possibly systemic nature of missing data in MAR and MNAR means that complete case analysis may overlook important details for your model.</p>
+<p>You also have the option of filling in missing values - this is called <strong>imputation</strong> (you "impute" the missing values). You can, for instance, filling in missing values with the mean of that variable. You don't gain any of the information that was missing, and you end up ignoring the uncertainty associated with the fill-in value (and the resulting variances will be <em>artificially reduced</em>), but you at least get to maintain your sample size. Again, bias may be introduced in MAR and MNAR situations since the missing data may be due to some systemic cause.</p>
+<p>One of the better approaches is <strong>multiple imputation</strong>, which produces unbiased parameter estimates and accounts for the uncertainty of imputed values. A regression model is used to generated the imputed values, and does well especially under MAR conditions - the regression model may be able to exploit info in the dataset about the missing data. If some known values correlate with the missing values, they can be of use in this way.</p>
+<p>Then, instead of using the regression model to produce one value for each missing value, multiple values are produced, so that the end result is multiple copies of your dataset, each with different imputed values for the missing values. Your perform your analysis across all datasets and average the produced estimates.</p>
+<h3>Resampling</h3>
+<p>Resampling involves repeatedly drawing subsamples from an existing sample.</p>
+<p>Resampling is useful for assessing and selecting models and for estimating the precision of parameter estimates.</p>
+<p>A common resampling method is <strong>bootstrapping</strong>.</p>
+<h4>Bootstrapping</h4>
+<p>Bootstrapping is a resampling method to approximate the true sampling distribution of a dataset, which can then be used to estimate the mean and the variance of the distribution. The advantage with bootstrapping is that there is no need to compute derivatives or make assumptions about the distribution's form.</p>
+<p>You take <mathjax>$R$</mathjax> samples <mathjax>$S_i^*$</mathjax>, with replacement, each of size <mathjax>$n$</mathjax> (i.e. each resample is the same size as the original sample), from your dataset. These samples, <mathjax>$S^*=\\{S_1^*, \dots, S_R^*\\}$</mathjax> are called <em>replicate</em> bootstrap samples. Then you can compute an estimate of the <mathjax>$t$</mathjax> statistic for each of the bootstrap samples, <mathjax>$T_i^* = t(S_i^*)$</mathjax>.</p>
+<p>Then you can estimate the mean and variance:</p>
+<p><mathjax>$$
+\begin{aligned}
+\bar T^* = \hat E[T^*] &amp;= \frac{\sum_i T_i^*}{R} \\
+\hat \Var(T^*) &amp;= \frac{\sum_i (T_i^* - \bar T^*)^2}{R-1}
+\end{aligned}
+$$</mathjax></p>
+<p>With bootstrap estimates, there are two possible sources of error. You may have the <strong>sampling error</strong> from your original sample <mathjax>$S$</mathjax> in addition to the <strong>bootstrap error</strong>, from failing to be comprehensive in your sampling of bootstrap samples. To avoid the latter, you should try to choose a large <mathjax>$R$</mathjax>, such as <mathjax>$R=1000$</mathjax>.</p>
+<h2>References</h2>
+<ul>
+<li>Review of fundamentals, IFT725. Hugo Larochelle. 2012.</li>
+<li><a href="https://sux13.github.io/DataScienceSpCourseNotes/6_STATINFERENCE/Statistical_Inference_Course_Notes.pdf">Statistical Inference Course Notes</a>, Xing Su</li>
+<li><a href="https://sux13.github.io/DataScienceSpCourseNotes/7_REGMODS/Regression_Models_Course_Notes.pdf">Regression Models Course Notes</a>, Xing Su</li>
+<li><em>Statistics in a Nutshell</em>. Second Edition. Sarah Boslaugh.</li>
+<li><a href="https://stats.stackexchange.com/questions/71962/what-is-the-difference-between-descriptive-and-inferential-statistics">What is the difference between descriptive and inferential statistics?</a>. Jeromy Anglim.</li>
+<li><a href="http://www.countbayesie.com/blog/2015/2/21/variance-co-variance-and-correlation">Understanding Variance, Co-Variance, and Correlation</a>. <a href="https://www.countbayesie.com/">Count Bayesie</a>. Will Kurt.</li>
+<li><a href="http://greenteapress.com/thinkstats/">Think Stats: Exploratory Data Analysis in Python</a>. Version 2.0.27. Allen B Downey.</li>
+<li><em>Principles of Statistics</em>, M.G. Bulmer. 1979.</li>
+<li><a href="https://www.openintro.org/stat/textbook.php?stat_book=os">OpenIntro Statistics</a>. Second Edition. David M Diez, Christopher D Barr, Mine Çetinkaya-Rundel.</li>
+<li><a href="https://sites.google.com/site/pyinference/home/scipy-2015">Computational Statistics I</a>. Allen Downey. SciPy 2015.</li>
+<li><a href="https://www.youtube.com/watch?v=heFaYLKVZY4">Computational Statistics II</a> (<a href="https://github.com/fonnesbeck/scipy2015_tutorial">code</a>). Chris Fonnesbeck. SciPy 2015.</li>
+<li><a href="https://github.com/fonnesbeck/scipy2014_tutorial">Bayesian Statistical Analysis</a>. Chris Fonnesbeck. SciPy 2014.</li>
+<li><a href="http://cs229.stanford.edu/materials.html">Lecture Notes from CS229</a> (Stanford).</li>
+<li><em>Data Analysis Using Regression and Multilevel/Hierarchical Models</em>. First edition. Andrew Gelman and Jennifer Hill.</li>
+<li><a href="http://jakevdp.github.io/blog/2014/03/11/frequentism-and-bayesianism-a-practical-intro/">Frequentism and Bayesianism: A Practical Introduction</a>. Jake Vanderplas</li>
+<li><a href="https://www.coursera.org/learn/machine-learning">Machine Learning</a>. 2014. Andrew Ng. Stanford University/Coursera.</li>
+<li><a href="https://www.udacity.com/wiki/cs271">Introduction to Artificial Intelligence</a> (Udacity CS271). Peter Norvig and Sebastian Thrun.</li>
+<li><a href="http://www-labs.iro.umontreal.ca/~bengioy/dlbook/">Deep Learning</a>. Yoshua Bengio, Ian Goodfellow, Aaron Courville.</li>
+<li><a href="http://www.statisticsdonewrong.com/p-value.html#controlling-the-false-discovery-rate">Controlling the false discovery rate</a>. Alex Reinhart.</li>
+<li><a href="http://www.statisticsdonewrong.com/p-value.html">The p value and the base rate fallacy</a>. Alex Reinhart.</li>
+<li><em>Toward Evidence-Based Medical Statistics. 1: The P Value Fallacy</em>, Steven N. Goodman, MD, PhD</li>
+<li><em>Misinterpretations of Significance: A Problem Students Share with Their Teachers?</em>, Heiko Haller &amp; Stefan Krauss</li>
+<li><a href="http://www.statisticsdonewrong.com/">Statistics Done Wrong</a>, Alex Reinhart<br />
+G- Stevens, S. S. (1946). <a href="http://gaius.fpce.uc.pt/niips/novoplano/mip1/mip1_201314/scales/Stevens_1946.pdf">On the theory of scales of measurement</a>.</li>
+</ul>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+
+
+</body>
+</html>
