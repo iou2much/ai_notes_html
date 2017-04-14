@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="288pt" version="1.1" viewBox="0 0 288 288" width="288pt">
+ <defs>
+  <pattern height="72" id="h715a50add1" patternUnits="userSpaceOnUse" width="72" x="0" y="0">
+   <rect fill="#386df9" height="73" width="73" x="0" y="0"/>
+   <path d=" M-36 36 L36 -36 M-32 40 L40 -32 M-28 44 L44 -28 M-24 48 L48 -24 M-20 52 L52 -20 M-16 56 L56 -16 M-12 60 L60 -12 M-8 64 L64 -8 M-4 68 L68 -4 M0 72 L72 0 M4 76 L76 4 M8 80 L80 8 M12 84 L84 12 M16 88 L88 16 M20 92 L92 20 M24 96 L96 24 M28 100 L100 28 M32 104 L104 32 M36 108 L108 36" style="fill:#2255db;stroke:#2255db;stroke-linecap:butt;stroke-linejoin:miter;stroke-width:1.0;"/>
+  </pattern>
+ </defs>
+<defs>
+  <style type="text/css">
+*{stroke-linecap:butt;stroke-linejoin:round;}
+  </style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d=" M0 288 L288 288 L288 0 L0 0 z " style="fill:#ffffff;"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d=" M36 252 L259.2 252 L259.2 28.8 L36 28.8 z " style="fill:#eaeaf2;"/>
+   </g>
+   <g id="matplotlib.axis_1"/>
+   <g id="matplotlib.axis_2"/>
+   <g id="patch_3">
+    <path clip-path="url(#p08154cb638)" d=" M147.6 252 L259.2 252 L259.2 28.8 L147.6 28.8 z " style="fill:url(#h715a50add1);stroke:#2255db;stroke-linejoin:miter;stroke-width:0.39;"/>
+   </g>
+   <g id="line2d_1">
+    <path clip-path="url(#p08154cb638)" d=" M36 140.4 L259.2 140.4" style="fill:none;stroke:#dcdce6;stroke-linecap:round;stroke-width:2;"/>
+   </g>
+   <g id="line2d_2">
+    <path clip-path="url(#p08154cb638)" d=" M147.6 252 L147.6 28.8" style="fill:none;stroke:#dcdce6;stroke-linecap:round;stroke-width:2;"/>
+   </g>
+   <g id="patch_4">
+    <path d=" M36 252 L36 28.8" style="fill:none;"/>
+   </g>
+   <g id="patch_5">
+    <path d=" M36 252 L259.2 252" style="fill:none;"/>
+   </g>
+   <g id="patch_6">
+    <path d=" M259.2 252 L259.2 28.8" style="fill:none;"/>
+   </g>
+   <g id="patch_7">
+    <path d=" M36 28.8 L259.2 28.8" style="fill:none;"/>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p08154cb638">
+   <rect height="223.2" width="223.2" x="36.0" y="28.8"/>
+  </clipPath>
+ </defs>
+ </svg>

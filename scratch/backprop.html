@@ -1,0 +1,126 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>backprop</title>
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/color-brewer.min.css">
+    <link rel="stylesheet" href="http://ai-code.tech/ai_notes_html/css/custom.css">
+</head>
+
+<body>
+
+    <p>(trying a clearer explanation of backprop)</p>
+<p>terms:</p>
+<ul>
+<li><mathjax>$J$</mathjax> = cost function</li>
+<li><mathjax>$w_i$</mathjax> = weights for layer <mathjax>$i$</mathjax></li>
+<li><mathjax>$b_i$</mathjax> = biases for layer <mathjax>$i$</mathjax></li>
+<li><mathjax>$f_i$</mathjax> = activation function for layer <mathjax>$i$</mathjax></li>
+<li><mathjax>$l_i = w_i f_{i-1}(l_{i-1}) + b_i$</mathjax></li>
+<li><mathjax>$n$</mathjax> = number of layers, i.e. <mathjax>$i=n$</mathjax> is the output layer</li>
+<li><mathjax>$d$</mathjax> = number of input dimensions</li>
+</ul>
+<p>The goal of backprop is to compute weight and bias updates, i.e. to compute <mathjax>$\frac{\partial J}{\partial w_i}$</mathjax> and <mathjax>$\frac{\partial J}{\partial b_i}$</mathjax> for all <mathjax>$i \in [1, n]$</mathjax>. We basically do so through applying the chain rule of derivatives.</p>
+<p>For a layer <mathjax>$i$</mathjax> we want to compute <mathjax>$\frac{\partial J}{\partial l_i}$</mathjax> because we can easily compute <mathjax>$\frac{\partial J}{\partial w_i}$</mathjax> and <mathjax>$\frac{\partial J}{\partial b_i}$</mathjax> from it:</p>
+<p><mathjax>$$
+\begin{aligned}
+\frac{\partial J}{\partial w_i} &amp;= \frac{\partial J}{\partial l_i} \frac{\partial l_i}{\partial w_i} \\
+\frac{\partial J}{\partial b_i} &amp;= \frac{\partial J}{\partial l_i} \frac{\partial l_i}{\partial b_i}
+\end{aligned}
+$$</mathjax></p>
+<p>Also note that (these derivatives are quite easy to work out on your own):</p>
+<p><mathjax>$$
+\begin{aligned}
+\frac{\partial l_i}{\partial w_i} &amp;= f_{i-1}(l_{i-1}) \\
+\frac{\partial l_i}{\partial b_i} &amp;= 1
+\end{aligned}
+$$</mathjax></p>
+<p>To clarify, <mathjax>$\frac{\partial l_i}{\partial w_i} = f_{i-1}(l_{i-1})$</mathjax> just means that it equals the output of the previous layer.</p>
+<p>With these in mind, we can carry out backpropagation.</p>
+<p>We start with the output layer, i.e. with <mathjax>$i=n$</mathjax>.</p>
+<p><mathjax>$$
+\begin{aligned}
+\frac{\partial J}{\partial l_n} &amp;= \frac{\partial J}{\partial f_n(l_n)} \frac{\partial f_n(l_n)}{\partial l_n} \\
+&amp;= \frac{\partial J}{\partial f_n(l_n)} f_n'(l_n)
+\end{aligned}
+$$</mathjax></p>
+<p>Note that <mathjax>$\frac{\partial J}{\partial f_n(l_n)}$</mathjax> is just the derivative of the cost function with respect to the network's predicted values, i.e. <mathjax>$J'(h(x))$</mathjax>.</p>
+<p>With <mathjax>$\frac{\partial J}{\partial l_n}$</mathjax> we can compute the updates for <mathjax>$w_n$</mathjax> and <mathjax>$b_n$</mathjax> using the relationship shown above.</p>
+<p>Now we move backwards a layer to compute <mathjax>$\frac{\partial J}{\partial l_{n-1}}$</mathjax>. Starting with the full chain rule version:</p>
+<p><mathjax>$$
+\frac{\partial J}{\partial l_{n-1}} = \frac{\partial J}{\partial f_n(l_n)} \frac{\partial f_n(l_n)}{\partial l_n} \frac{\partial l_n}{\partial f_{n-1}(l_{n-1})} \frac{\partial f_{n-1}(l_{n-1})}{\partial l_{n-1}}
+$$</mathjax></p>
+<p>But we can simplify this a bit, especially because we've already computed <mathjax>$\frac{\partial J}{\partial l_n}$</mathjax>:</p>
+<p><mathjax>$$
+\begin{aligned}
+\frac{\partial J}{\partial l_{n-1}} &amp;= \frac{\partial J}{\partial l_n} \frac{\partial l_n}{\partial f_{n-1}(l_{n-1})} \frac{\partial f_{n-1}(l_{n-1})}{\partial l_{n-1}} \\
+&amp;= \frac{\partial J}{\partial l_n} \frac{\partial l_n}{\partial f_{n-1}(l_{n-1})} f_{n-1}'(l_{n-1})
+\end{aligned}
+$$</mathjax></p>
+<p>Also note that because:</p>
+<p><mathjax>$$
+l_n = w_n f_{n-1}(l_{n-1}) + b_n
+$$</mathjax></p>
+<p>Then (again, this is easy to show with basic derivative rules):</p>
+<p><mathjax>$$
+\frac{\partial l_n}{\partial f_{n-1}(l_{n-1})} = w_n
+$$</mathjax></p>
+<p>Therefore:</p>
+<p><mathjax>$$
+\frac{\partial J}{\partial l_{n-1}} = \frac{\partial J}{\partial l_n} w_n f_{n-1}'(l_{n-1})
+$$</mathjax></p>
+<p>Then we can again go from this to <mathjax>$\frac{\partial J}{\partial w_{n-1}}$</mathjax> and <mathjax>$\frac{\partial J}{\partial b_{n-1}}$</mathjax> using the relationship described earlier.</p>
+<p>We can generalize what we just did for any layer <mathjax>$i$</mathjax>:</p>
+<p><mathjax>$$
+\frac{\partial J}{\partial l_i} = \frac{\partial J}{\partial l_{i+1}} w_{i+1} f_i'(l_i)
+$$</mathjax></p>
+<p>And then use the relationship described earlier to go from this to <mathjax>$\frac{\partial J}{\partial w_i}$</mathjax> and <mathjax>$\frac{\partial J}{\partial b_i}$</mathjax>.</p>
+<hr />
+<p>To summarize:</p>
+<p>Compute for the output layer, i.e. <mathjax>$i=n$</mathjax>:</p>
+<p><mathjax>$$
+\frac{\partial J}{\partial l_n} = J'(h(x)) f_n'(l_n)
+$$</mathjax></p>
+<p>Then for all other layers <mathjax>$i \neq n$</mathjax> (except for the input layer, that has no parameters):</p>
+<p><mathjax>$$
+\frac{\partial J}{\partial l_i} = \frac{\partial J}{\partial l_{i+1}} w_{i+1} f_i'(l_i)
+$$</mathjax></p>
+<p>Then, for all layers <mathjax>$i \in [1, n]$</mathjax>, compute the weight and bias updates:</p>
+<p><mathjax>$$
+\begin{aligned}
+\text{weight update} &amp;= \frac{\partial J}{\partial l_i} \frac{\partial l_i}{\partial w_i} = \frac{\partial J}{\partial l_i} f_{i-1}(l_{i-1}) \\
+\text{bias update} &amp;= \frac{\partial J}{\partial l_i} \frac{\partial l_i}{\partial b_i} = \frac{\partial J}{\partial l_i}
+\end{aligned}
+$$</mathjax></p>
+<p>Note that <mathjax>$f_0(l_0) = X$</mathjax> (the input layer's output is just the input <mathjax>$X$</mathjax>).</p>
+    
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.js"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('pre').each(function(i, e) {hljs.highlightBlock(e)});
+            MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"]],
+                    displayMath: [['$$','$$']],
+                    processEscapes: true
+                },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true }
+                }
+            });
+            MathJax.Hub.Startup.onload();
+        });
+    </script>
+    <script src="http://ai-code.tech/ai_notes_html/js/custom.js"></script>
+
+
+</body>
+</html>
